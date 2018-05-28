@@ -3,33 +3,44 @@
 import socket
 import threading
 import sys
+import time
 
 BUFSIZ = 8192
 g_ThreadTCP = None
 g_Host = ""
 
 
-class ServerTCP(threading.Thread):
-    PORT = 14699
-    # Communication state constants
-    REQUESTED = 0
-    OK = 1
-    NOK = 2
-    ABORT = 3
+class ServeClient(threading.Thread):
+    def __init__(self, conn, addr):
+        threading.Thread.__init__(self)
+        # Construction parameters
+        self.conn = conn
+        self.addr = addr
 
-    def __init__(self, serverId):
+    # Thread method invoked when started
+    def run(self):
+        # send response
+        msg = "response" + "\r\n"
+        self.conn.send(msg.encode('ascii'))
+        # end connection
+        self.conn.close()
+
+
+class ServerTCP(threading.Thread):
+    def __init__(self, serverId, port):
         threading.Thread.__init__(self)
         # Construction parameters
         self.Id = serverId
+        self.port = port
+        # client thread array
+        # self.clients = []
         print("Creating server #%d" % self.Id)
         sys.stdout.flush()
 
-        print("Creating TCP socket port:%d." % ServerTCP.PORT)
+        print("Creating TCP socket port:%d." % self.port)
         sys.stdout.flush()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # Connection dictionary: [host] = connection
-        self.connDic = {}
 
         self.queueSize = 5
 
@@ -41,32 +52,25 @@ class ServerTCP(threading.Thread):
               % str(threading.current_thread().ident))
         sys.stdout.flush()
 
-        print("Bind TCP %s:%d" % (g_Host, ServerTCP.PORT))
+        print("Bind TCP %s:%d" % (g_Host, self.port))
         sys.stdout.flush()
-        self.socket.bind((g_Host, ServerTCP.PORT));
+        self.socket.bind((g_Host, self.port));
 
         print("Server listening...")
         sys.stdout.flush()
         self.socket.listen(self.queueSize)
 
         while True:
-            try:
-                # establish connection
-                conn, addr = self.socket.accept()
-                print("Connected %s:%d" % (str(addr[0]), addr[1]))
-                sys.stdout.flush()
-                self.connDic[str(addr[0])] = conn
+            # establish connection
+            conn, addr = self.socket.accept()
+            print("Connected %s:%d" % (str(addr[0]), addr[1]))
+            sys.stdout.flush()
+            # send response
+            msg = 'Connected to ' + g_Host + ":" + str(self.port) + "\r\n"
+            conn.send(msg.encode('ascii'))
 
-                # send response
-                msg = 'Connected to ' + g_Host + ":" + str(self.PORT) + "\r\n"
-                conn.send(msg.encode('ascii'))
-                # end connection
-                conn.close()
-                del self.connDic[str(addr[0])]
-            except (KeyboardInterrupt, SystemExit):
-                for connection in self.connDic:
-                    connection.close()
-                break
+            client = ServeClient(conn, str(addr[0]))
+            client.start()
 
 
 def main(argv):
@@ -76,7 +80,7 @@ def main(argv):
     g_Host = socket.gethostbyname(socket.getfqdn())
 
     serverId = 3
-    g_ThreadTCP = ServerTCP(serverId)
+    g_ThreadTCP = ServerTCP(serverId, 14699)
     g_ThreadTCP.start()
 
 

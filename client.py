@@ -11,8 +11,13 @@ sock = socket.socket(
 host = socket.gethostname()
 # connect to host on the port.
 sock.connect((host, PORT))
+
 # Receive
 msg = sock.recv(BUFSIZ)
+print(msg.decode('ascii'))
+
+msg = sock.recv(BUFSIZ)
+print(msg.decode('ascii'))
+
 # end connection
 sock.close()
-print(msg.decode('ascii'))
