@@ -13,28 +13,42 @@ def create_socket():
     return sock
 
 
-def connect_server(remote):
+def escuta(sock, receive_id):
+    while True:
+        try:
+            sock.settimeout(3)
+            dat, address = sock.recvfrom(receive_id)
+            return dat
+        except socket.timeout:
+            return 0
+
+
+def connect_server(remote, entrada):
     is_connected = False
     sock = create_socket()
     host = remote[0]
     port = remote[1]
+
     try:
         host = socket.gethostbyname(host)
+
         sock.connect((host, port))
-        is_connected = True
         print("[Client] Connected: server %s:%d" % (host, port))
-        sys.stdout.flush()
+
+        mensagem = entrada.encode('ascii')
+        sock.send(mensagem)
+
+        escuta(sock, port)
+        is_connected = True
+
     except ConnectionRefusedError:
         print("[Client] Refused:   server %s:%d" % (host, port))
-        sys.stdout.flush()
         pass
     except Exception as e:
         print(e)
-        sys.stdout.flush()
     finally:
         if not is_connected:
             print("[Client] Closing socket")
-            sys.stdout.flush()
             sock.close()
         return is_connected, sock
 
@@ -42,15 +56,19 @@ def connect_server(remote):
 def main(argv):
     remote_list, _ = remotes.create_remote_list()
 
-    for idx, remote in enumerate(remote_list):
-        print("[Client] Requesting server #%d" % idx)
-        sys.stdout.flush()
-        is_connected, conn = connect_server(remote)
-        if is_connected:
-            # TODO
-            # conn.send("myString")
-            break
+    while True:
+        get_input = input("Type an arithmetic expression. Example: 1+1, 8/2, 5*3")
+
+        for idx, remote in enumerate(remote_list):
+            print("[Client] Requesting server #%d" % idx)
+            is_connected, sock = connect_server(remote, get_input)
+            if is_connected:
+                print("[Client] Received " + sock.recv(BUFSIZ).decode('ascii') + " from Server")
+                print("[Client] Closing socket")
+                sock.close()
 
 
-if __name__ == "__main__":
-    main(sys.argv[0:])
+# if __name__ == "__main__":
+#     main(sys.argv[0:])
+
+main(0)

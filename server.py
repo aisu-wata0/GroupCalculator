@@ -6,8 +6,8 @@ from threading import Timer
 import sys
 import struct
 import datetime
-
 import remotes
+import pyparsingtest
 
 BUFSIZ = 8192
 g_heartbeatInterval = 4
@@ -24,10 +24,10 @@ class ServeClient(threading.Thread):
 
     # Thread method invoked when started
     def run(self):
-        # send response
-        msg = "response" + "\r\n"
-        self.conn.send(msg.encode('ascii'))
-        # end connection
+
+        msg = self.conn.recv(BUFSIZ).decode('ascii')
+        print("received: " + msg + " result: " + pyparsingtest.create_result(msg).__str__())
+        self.conn.send(pyparsingtest.create_result(msg).__str__().encode("ascii"))
         self.conn.close()
 
 
@@ -70,7 +70,7 @@ class ServerTCP(threading.Thread):
                 msg = 'Connected to ' + g_Host + ":" + str(self.port) + "\r\n"
                 conn.send(msg.encode('ascii'))
 
-                client = ServeClient(conn, str(addr[0]))
+                client = ServeClient(conn, addr[0])
                 client.start()
 
     # heartbeat port
