@@ -9,6 +9,8 @@ from datetime import datetime
 import select
 import time
 
+import remotes
+
 BUFSIZ = 8192
 g_heartbeatInterval = 4
 g_ThreadTCP = None
@@ -234,9 +236,8 @@ class HealthMonitor(threading.Thread):
                 return re.Id
         return -1  # should be impossible, local server delta = 0
 
-
 def main(argv):
-    global g_Host
+    global g_Host, serverid, myport, remotelist
     global g_ThreadTCP
     global g_HealthMonitor
 
@@ -247,27 +248,16 @@ def main(argv):
         print("Usage %s [port]" % argv[0])
         exit(0)
 
-    remoteList = []
-    index = 0
-    serverId = 0
-    myPort = int(argv[1])
-    file = open("servers.txt", "r")
-    for line in file:
-        lineArr = line.split(" ")
-        addr = lineArr[0]
-        port = int(lineArr[1])
-        remoteList.append((addr, port))
-        print("Registered remote %s:%d" % (addr, port))
-        if socket.gethostbyname(addr) == g_Host and port == myPort:
-            serverId = index
-            port = remoteList[index][1]
-            print("I am server #%d" % serverId)
-        index += 1
+    remote = remotes.create_remote_list(argv[1], g_Host)
 
-    g_ThreadTCP = ServerTCP(serverId, myPort)
+    remotelist = remote['remoteList']
+    serverid = remote['serverId']
+    myport = remote['myPort']
+
+    g_ThreadTCP = ServerTCP(serverid, myport)
     g_ThreadTCP.start()
 
-    g_HealthMonitor = HealthMonitor(remoteList)
+    g_HealthMonitor = HealthMonitor(remotelist)
     g_HealthMonitor.start()
 
 
