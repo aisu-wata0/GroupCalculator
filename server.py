@@ -153,7 +153,8 @@ class Heartbeat:
 
     def timeout(self):
         global g_heartbeatInterval
-        return int(g_heartbeatInterval/2)
+        return int(g_heartbeatInterval / 2)
+
 
 class Remote:
     def __init__(self, addr, port, Id):
@@ -181,7 +182,7 @@ class HealthMonitor(threading.Thread):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-        self.queueSize = len(remoteList)*3
+        self.queueSize = len(remoteList) * 3
 
         heartbeatList = []
         # Construction parameters
@@ -230,11 +231,12 @@ class HealthMonitor(threading.Thread):
         global g_heartbeatInterval
 
         for re in self.remotes:
-            if re.delta <= g_heartbeatInterval+g_heartbeatInterval/2:
+            if re.delta <= g_heartbeatInterval + g_heartbeatInterval / 2:
                 print("[HealthMonitor] Leader is %d" % re.Id)
                 sys.stdout.flush()
                 return re.Id
         return -1  # should be impossible, local server delta = 0
+
 
 def main(argv):
     global g_Host, serverid, myport, remotelist
