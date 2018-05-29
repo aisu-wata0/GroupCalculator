@@ -13,15 +13,15 @@ def create_socket():
     return sock
 
 
-def check_if_connection_is_fine(remote):
-    did_it_work = False
+def connect_server(remote):
+    is_connected = False
     sock = create_socket()
     host = remote[0]
     port = remote[1]
     try:
         host = socket.gethostbyname(host)
         sock.connect((host, port))
-        did_it_work = True
+        is_connected = True
         print("[Client] Connected: server %s:%d" % (host, port))
         sys.stdout.flush()
     except ConnectionRefusedError:
@@ -32,10 +32,11 @@ def check_if_connection_is_fine(remote):
         print(e)
         sys.stdout.flush()
     finally:
-        print("[Client] Closing socket")
-        sys.stdout.flush()
-        sock.close()
-        return did_it_work
+        if not is_connected:
+            print("[Client] Closing socket")
+            sys.stdout.flush()
+            sock.close()
+        return is_connected, sock
 
 
 def main(argv):
@@ -44,8 +45,10 @@ def main(argv):
     for idx, remote in enumerate(remote_list):
         print("[Client] Requesting server #%d" % idx)
         sys.stdout.flush()
-        is_connection_working = check_if_connection_is_fine(remote)
-        if is_connection_working:
+        is_connected, conn = connect_server(remote)
+        if is_connected:
+            # TODO
+            # conn.send("myString")
             break
 
 
