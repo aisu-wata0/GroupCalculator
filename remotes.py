@@ -3,7 +3,7 @@
 import socket
 
 
-def create_remote_list(my_port, my_name):
+def create_remote_list(my_port=-1, my_name=""):
     remote_list = []
     index = 0
     server_id = 0

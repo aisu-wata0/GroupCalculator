@@ -40,7 +40,7 @@ def check_if_connection_is_fine(remote):
 
 # noinspection PyUnusedLocal
 def main(argv):
-    remote_list, _ = remotes.create_remote_list(-1, "")
+    remote_list, _ = remotes.create_remote_list()
 
     for idx, remote in enumerate(remote_list):
         print("[Client] Requesting server #%d" % idx)
