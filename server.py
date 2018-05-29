@@ -9,6 +9,8 @@ import datetime
 import select
 import time
 
+import remotes
+
 BUFSIZ = 8192
 g_heartbeatInterval = 4
 g_ThreadTCP = None
@@ -152,7 +154,7 @@ class Heartbeat:
 
     def timeout(self):
         global g_heartbeatInterval
-        return int(g_heartbeatInterval/2)
+        return int(g_heartbeatInterval / 2)
 
 
 # Stores information of other remotes
@@ -163,7 +165,7 @@ class Remote:
         self.Id = Id
         print("[Remote %d] created" % self.Id)
         sys.stdout.flush()
-        self.delta = 0
+        self.devHB = 0
         self.lastHeartbeat = datetime.datetime.now()
 
     # heartbeat port
@@ -235,9 +237,12 @@ class HealthMonitor(threading.Thread):
             # update heartbeat time
             self.remotes[idx].lastHeartbeat = datetime.datetime.now()
             timedelta = self.remotes[idx].lastHeartbeat - prev
-            # update delta time
-            self.remotes[idx].delta = timedelta_ms(timedelta)
-            print("[HealthMonitor] Server %d heartbeat, delta = %dms" % (idx, self.remotes[idx].delta))
+            # update deviation
+            dev = 0.75*self.remotes[idx].devHB\
+                + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
+            self.remotes[idx].devHB = dev
+            print("[HealthMonitor] Server %d heartbeat, delta = %dms; dev = %d"
+                  % (idx, timedelta_ms(timedelta), self.remotes[idx].devHB))
             sys.stdout.flush()
             # close connection
             conn.close()
@@ -248,16 +253,18 @@ class HealthMonitor(threading.Thread):
         sys.stdout.flush()
         # calculate tolerance
         now = datetime.datetime.now()
-        tolerance = now - datetime.timedelta(milliseconds=int(1000*1.5*g_heartbeatInterval))
         # return first remote Id considered available
         for re in self.remotes:
-            if re.delta == 0:  # local
+            if re.devHB == 0:  # local
                 print("[HealthMonitor] Leader is %d, me" % re.Id)
                 sys.stdout.flush()
                 return re.Id
+            timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
+            print("[HealthMonitor] %d timeoutInterval = %dms" % (re.Id, 1000*timeout.total_seconds()))
+            tolerance = now - timeout
             last = re.lastHeartbeat
-            delta = (last - tolerance).total_seconds()
-            print("[HealthMonitor] %d delta = %dms" % (re.Id, timedelta_ms(delta)))
+            delta = timedelta_ms(last - tolerance)
+            print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
             sys.stdout.flush()
             # inside tolerance
             if delta > 0:  # TODO test this
@@ -279,27 +286,16 @@ def main(argv):
         print("Usage %s [port]" % argv[0])
         exit(0)
 
-    remoteList = []
-    index = 0
-    serverId = 0
-    myPort = int(argv[1])
-    file = open("servers.txt", "r")
-    for line in file:
-        lineArr = line.split(" ")
-        addr = lineArr[0]
-        port = int(lineArr[1])
-        remoteList.append((addr, port))
-        print("Registered remote %s:%d" % (addr, port))
-        if socket.gethostbyname(addr) == g_Host and port == myPort:
-            serverId = index
-            port = remoteList[index][1]
-            print("I am server #%d" % serverId)
-        index += 1
+    my_port = int(argv[1])
+    remote = remotes.create_remote_list(my_port, g_Host)
 
-    g_ThreadTCP = ServerTCP(serverId, myPort)
+    remote_list = remote['remote_list']
+    server_id = remote['server_id']
+
+    g_ThreadTCP = ServerTCP(server_id, my_port)
     g_ThreadTCP.start()
 
-    g_HealthMonitor = HealthMonitor(remoteList)
+    g_HealthMonitor = HealthMonitor(remote_list)
     g_HealthMonitor.start()
 
 
