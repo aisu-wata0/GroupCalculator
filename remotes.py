@@ -3,37 +3,30 @@
 import socket
 
 
-# recebe uma porta e o nome local, verifica se
-# pertence a lista do servers.txt, cria uma lista com base nela
-# e verifica qual é o número do servidor (se for algum). Retorna
-# o valor da remote_list e o valor do server_id, que será usado
-# no servidor (mas não no cliente)
-def create_remote_list(my_port=-1, my_name=""):
-    # valores começam inicialmente sem valor
+# Opens servers.txt to extract a remote_list
+# each entry has a tuple (hostname, port) of the remote server
+# It also finds out the server_id of the server
+# (host, port) passed as optional arguments
+# returns remote_list, server_id
+# server_id is not useful to client
+def create_remote_list(my_name="", my_port=-1):
+    # initialize variables
     remote_list = []
     index = 0
-    server_id = 0
+    server_id = -1
 
     file = open("servers.txt", "r")
     for line in file:
-        # exemplo de execução: "macalan 1111" => ["macalan", 1111]
-        line_split = line.split(" ")
-
-        # separa a primeira parte da linha
-        addr = line_split[0]
-
-        # separa a segunda parte da linha
-        port = int(line_split[1])
-
-        # remote_list recebe os valores do endereço e da porta
+        # parse addr and port from line, example: line = "hostname 1111" => ["hostname", "1111"]
+        addr, port = line.split(" ")
+        port = int(port)
+        # append remote (address,port) tuple in remote_list
         remote_list.append((addr, port))
         print("Registered remote %s:%d" % (addr, port))
-
-        # caso seja o servidor, verifica qual número ele é
+        # check if it's my address and port, to find out my id
         if socket.gethostbyname(addr) == my_name and port == my_port:
             server_id = index
             print("I am server #%d" % server_id)
         index += 1
 
-    # retorna a lista com endereços e portas, e o index do servidor
     return remote_list, server_id

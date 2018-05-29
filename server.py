@@ -11,10 +11,18 @@ import pyparsingtest
 import remotes
 import logger
 
+# buffer size
 BUFSIZ = 8192
 g_heartbeatInterval = 4
-g_ThreadTCP = None
+
+g_Server = None
+g_HealthMonitor = None
+
 g_Host = ""
+
+g_ServerLog = None
+g_HealthMonitorLog = None
+g_HeartbeatLog = None
 
 
 class ServeClient(threading.Thread):
@@ -46,10 +54,10 @@ class ServerTCP(threading.Thread):
         self.port = port
         # client thread array
         # self.clients = []
-        g_ServerLogger.print("[ServerTCP] Creating server #%d" % self.Id)
+        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
         sys.stdout.flush()
 
-        g_ServerLogger.print("[ServerTCP] Creating TCP socket")
+        g_ServerLog.print("[ServerTCP] Creating TCP socket")
         sys.stdout.flush()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -59,18 +67,20 @@ class ServerTCP(threading.Thread):
     # Thread method invoked when started
     def run(self):
         global g_Host
-        g_ServerLogger.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
+        global g_ServerLog
+
+        g_ServerLog.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
         sys.stdout.flush()
         self.socket.bind((g_Host, self.port))
 
-        g_ServerLogger.print("[ServerTCP] listening...")
+        g_ServerLog.print("[ServerTCP] listening...")
         sys.stdout.flush()
         self.socket.listen(self.queueSize)
 
         while True:
             # establish connection
             conn, addr = self.socket.accept()
-            g_ServerLogger.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
+            g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
             sys.stdout.flush()
             if g_HealthMonitor.leader() == self.Id:
                 client = ServeClient(conn, addr[0])
@@ -113,8 +123,8 @@ class Heartbeat:
         global g_heartbeatInterval
 
         self.remote = remote
-        g_HeartbeatLogger.print("[Remote %d] Creating socket" % remote.Id)
-        g_HeartbeatLogger.print("[Remote %d] Starting heartbeat" % remote.Id)
+        g_HeartbeatLog.print("[Remote %d] Creating socket" % remote.Id)
+        g_HeartbeatLog.print("[Remote %d] Starting heartbeat" % remote.Id)
 
         self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
@@ -122,7 +132,7 @@ class Heartbeat:
         global g_heartbeatInterval
 
         host = socket.gethostbyname(self.remote.addr)
-        g_HeartbeatLogger.print(
+        g_HeartbeatLog.print(
             "[Remote %d] Sending heartbeat %s:%d"
             % (self.remote.Id, host, self.remote.port_heart()))
 
@@ -131,14 +141,14 @@ class Heartbeat:
         try:
             sock_fd.connect((host, self.remote.port_heart()))
             # send my id as heartbeat
-            msg = str(g_ThreadTCP.Id)
+            msg = str(g_Server.Id)
             sock_fd.send(msg.encode('ascii'))
         except ConnectionRefusedError:
-            g_HeartbeatLogger.print(
+            g_HeartbeatLog.print(
                 "[Remote %d] Refused heartbeat" % self.remote.Id)
             pass
         finally:
-            g_HeartbeatLogger.print(
+            g_HeartbeatLog.print(
                 "[Remote %d] Closing socket" % self.remote.Id)
 
             sock_fd.close()
@@ -168,7 +178,7 @@ class Remote:
         self.addr = addr
         self.port = port
         self.Id = idx
-        g_HeartbeatLogger.print("[Remote %d] created" % self.Id)
+        g_HeartbeatLog.print("[Remote %d] created" % self.Id)
         self.devHB = 0
         self.lastHeartbeat = datetime.datetime.now()
 
@@ -187,7 +197,7 @@ def timedelta_ms(timedelta):
 class HealthMonitor(threading.Thread):
     def __init__(self, remote_list):
         threading.Thread.__init__(self)
-        g_HealthMonitorLogger.print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
+        g_HealthMonitorLog.print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
         sys.stdout.flush()
 
         # remote array
@@ -211,31 +221,31 @@ class HealthMonitor(threading.Thread):
             # add to list
             self.remotes.append(remote)
             # If not myself, send heartbeats to it
-            if idx != g_ThreadTCP.Id:
+            if idx != g_Server.Id:
                 # create and add Heartbeat
                 heartbeat_list.append(Heartbeat(remote))
 
     # Thread method invoked when started
     def run(self):
-        g_HealthMonitorLogger.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ThreadTCP.port_heart()))
+        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_Server.port_heart()))
         sys.stdout.flush()
         # receive from any source, in 'portHG()' port
-        self.socketListenHeartbeats.bind((g_Host, g_ThreadTCP.port_heart()))
+        self.socketListenHeartbeats.bind((g_Host, g_Server.port_heart()))
 
-        g_HealthMonitorLogger.print("[HealthMonitor] listening for heartbeats...")
+        g_HealthMonitorLog.print("[HealthMonitor] listening for heartbeats...")
         sys.stdout.flush()
         self.socketListenHeartbeats.listen(self.queueSize)
 
         while True:
             # accept connection
             conn, addr = self.socketListenHeartbeats.accept()
-            g_HealthMonitorLogger.print('[HealthMonitor] Connected %s:%d' % (str(addr[0]), addr[1]))
+            g_HealthMonitorLog.print('[HealthMonitor] Connected %s:%d' % (str(addr[0]), addr[1]))
             sys.stdout.flush()
             # receive heartbeat
             data = conn.recv(BUFSIZ)
             # heartbeat has the server id
             idx = data.decode('ascii')
-            g_HealthMonitorLogger.print("[HealthMonitor] Heartbeat from %s" % idx)
+            g_HealthMonitorLog.print("[HealthMonitor] Heartbeat from %s" % idx)
             sys.stdout.flush()
             idx = int(idx)
             # Calculate delta time since last heartbeat from this server
@@ -247,7 +257,7 @@ class HealthMonitor(threading.Thread):
             dev = 0.75*self.remotes[idx].devHB\
                 + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
             self.remotes[idx].devHB = dev
-            g_HealthMonitorLogger.print(
+            g_HealthMonitorLog.print(
                 "[HealthMonitor] Server %d heartbeat, delta = %dms; dev = %d"
                 % (idx, timedelta_ms(timedelta), self.remotes[idx].devHB))
             sys.stdout.flush()
@@ -256,28 +266,28 @@ class HealthMonitor(threading.Thread):
 
     def leader(self):
         global g_heartbeatInterval
-        g_HealthMonitorLogger.print("[HealthMonitor] leader calc")
+        g_HealthMonitorLog.print("[HealthMonitor] leader calc")
         sys.stdout.flush()
         # calculate tolerance
         now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
-            if re.Id == g_ThreadTCP.Id:  # local
-                g_HealthMonitorLogger.print("[HealthMonitor] Leader is %d, me" % re.Id)
+            if re.Id == g_Server.Id:  # local
+                g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 sys.stdout.flush()
                 return re.Id
             timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
-            g_HealthMonitorLogger.print(
+            g_HealthMonitorLog.print(
                 "[HealthMonitor] %d timeoutInterval = %dms"
                 % (re.Id, 1000*timeout.total_seconds()))
             tolerance = now - timeout
             last = re.lastHeartbeat
             delta = timedelta_ms(last - tolerance)
-            g_HealthMonitorLogger.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
+            g_HealthMonitorLog.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
             sys.stdout.flush()
             # inside tolerance
             if delta > 0:  # TODO test this
-                g_HealthMonitorLogger.print("[HealthMonitor] Leader is %d" % re.Id)
+                g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 sys.stdout.flush()
                 return re.Id
         return -1  # should be impossible, local server delta = 0
@@ -285,8 +295,6 @@ class HealthMonitor(threading.Thread):
 
 def main(argv):
     global g_Host
-    global g_ThreadTCP
-    global g_HealthMonitor
 
     # get my host
     g_Host = socket.gethostbyname(socket.getfqdn())
@@ -295,37 +303,43 @@ def main(argv):
     if len(argv) < 2:
         print("Hostname: %s" % g_Host)
         print("Usage %s [port]" % argv[0])
-        exit(0)
+        sys.exit(0)
     # get parameters
     my_port = int(argv[1])
 
     # get remotes registered
-    remote_list, server_id = remotes.create_remote_list(my_port, g_Host)
+    remote_list, server_id = remotes.create_remote_list(g_Host, my_port)
+    if server_id == -1:
+        print("Error: I'm not registered on servers.txt\nlocalhost is not a valid entry: use the machine name")
+        sys.stdout.flush()
+        sys.exit(1)
 
     # Create Loggers
-    global g_ServerLogger
-    # serverLogFile = open("server.log", "w")
-    # g_ServerLogger = logger.Logger(serverLogFile)
-    g_ServerLogger = logger.Logger(sys.stdout)
-    g_ServerLogger.header("Server")
+    global g_ServerLog
+    # ServerLogFile = open("log/Server.log", "w")
+    # g_ServerLog = logger.Logger(ServerLogFile)
+    g_ServerLog = logger.Logger(sys.stdout)
+    g_ServerLog.header("Server")
 
-    global g_HealthMonitorLogger
-    # HealthMonitorFile = open("HealthMonitor.log", "w")
-    # g_HealthMonitorLogger = logger.Logger(HealthMonitorFile)
-    g_HealthMonitorLogger = logger.Logger(sys.stdout)
-    g_HealthMonitorLogger.header("HealthMonitor")
+    global g_HealthMonitorLog
+    # HealthMonitorFile = open("log/HealthMonitor.log", "w")
+    # g_HealthMonitorLog = logger.Logger(HealthMonitorFile)
+    g_HealthMonitorLog = logger.Logger(sys.stdout)
+    g_HealthMonitorLog.header("HealthMonitor")
 
-    global g_HeartbeatLogger
-    # HeartbeatFile = open("Heartbeat.log", "w")
-    # g_HeartbeatLogger = logger.Logger(HeartbeatFile)
-    g_HeartbeatLogger = logger.Logger(sys.stdout)
-    g_HeartbeatLogger.header("Heartbeat")
+    global g_HeartbeatLog
+    # HeartbeatFile = open("log/Heartbeat.log", "w")
+    # g_HeartbeatLog = logger.Logger(HeartbeatFile)
+    g_HeartbeatLog = logger.Logger(sys.stdout)
+    g_HeartbeatLog.header("Heartbeat")
 
     # Start Server
-    g_ThreadTCP = ServerTCP(server_id, my_port)
-    g_ThreadTCP.start()
+    global g_Server
+    g_Server = ServerTCP(server_id, my_port)
+    g_Server.start()
 
     # Start HealthMonitor
+    global g_HealthMonitor
     g_HealthMonitor = HealthMonitor(remote_list)
     g_HealthMonitor.start()
 
