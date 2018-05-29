@@ -99,7 +99,7 @@ def main(argv):
                 print("result = " + result)
 
                 # não precisamos continuar iterando pelos próximos servidores, se
-                # encontramos o de menor número, que o líder, e ele já nos devolveu
+                # encontramos o de menor número, que é o líder, e ele já nos devolveu
                 # a resposta. Logo, break irá retornar para o While que irá pedir
                 # outra expressão aritmética para o usuário.
                 break
