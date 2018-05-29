@@ -162,4 +162,5 @@ def generateTests():
     test("sgn(0)", 0)
     test("sgn(0.1)", 1)
 
-generateTests()
+
+# generateTests()

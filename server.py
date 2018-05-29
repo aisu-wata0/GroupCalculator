@@ -24,10 +24,15 @@ class ServeClient(threading.Thread):
 
     # Thread method invoked when started
     def run(self):
-
-        msg = self.conn.recv(BUFSIZ).decode('ascii')
-        print("received: " + msg + " result: " + pyparsingtest.create_result(msg).__str__())
-        self.conn.send(pyparsingtest.create_result(msg).__str__().encode("ascii"))
+        # receive expression
+        expression = self.conn.recv(BUFSIZ).decode('ascii')
+        # calculate result
+        result = pyparsingtest.create_result(expression)
+        print("received: " + expression + " result: " + str(result))
+        sys.stdout.flush()
+        # respond result
+        self.conn.send(str(result).encode("ascii"))
+        # end connection
         self.conn.close()
 
 
@@ -67,8 +72,8 @@ class ServerTCP(threading.Thread):
             sys.stdout.flush()
             if g_HealthMonitor.leader() == self.Id:
                 # send response
-                msg = 'Connected to ' + g_Host + ":" + str(self.port) + "\r\n"
-                conn.send(msg.encode('ascii'))
+                # msg = 'Connected to ' + g_Host + ":" + str(self.port) + "\r\n"
+                # conn.send(msg.encode('ascii'))
 
                 client = ServeClient(conn, addr[0])
                 client.start()
@@ -189,8 +194,10 @@ class HealthMonitor(threading.Thread):
         # remote array
         self.remotes = []
         # create socket
-        self.socketListenHeartbeats = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socketListenHeartbeats.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socketListenHeartbeats \
+            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socketListenHeartbeats\
+            .setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # heartbeat queue size
         self.queueSize = len(remote_list)*3
 
@@ -279,19 +286,25 @@ def main(argv):
     global g_ThreadTCP
     global g_HealthMonitor
 
+    # get my host
     g_Host = socket.gethostbyname(socket.getfqdn())
 
+    # check parameters
     if len(argv) < 2:
         print("Hostname: %s" % g_Host)
         print("Usage %s [port]" % argv[0])
         exit(0)
-
+    # get parameters
     my_port = int(argv[1])
+
+    # get remotes registered
     remote_list, server_id = remotes.create_remote_list(my_port, g_Host)
 
+    # Start Server
     g_ThreadTCP = ServerTCP(server_id, my_port)
     g_ThreadTCP.start()
 
+    # Start HealthMonitor
     g_HealthMonitor = HealthMonitor(remote_list)
     g_HealthMonitor.start()
 

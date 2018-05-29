@@ -13,17 +13,17 @@ def create_socket():
     return sock
 
 
-def escuta(sock, receive_id):
-    while True:
-        try:
-            sock.settimeout(3)
-            dat, address = sock.recvfrom(receive_id)
-            return dat
-        except socket.timeout:
-            return 0
+# def listen(sock):
+#     while True:
+#         try:
+#             sock.settimeout(3)
+#             dat, address = sock.recv(BUFSIZ)
+#             return dat
+#         except socket.timeout:
+#             return 0
 
 
-def connect_server(remote, entrada):
+def connect_server(remote):
     is_connected = False
     sock = create_socket()
     host = remote[0]
@@ -35,10 +35,6 @@ def connect_server(remote, entrada):
         sock.connect((host, port))
         print("[Client] Connected: server %s:%d" % (host, port))
 
-        mensagem = entrada.encode('ascii')
-        sock.send(mensagem)
-
-        escuta(sock, port)
         is_connected = True
 
     except ConnectionRefusedError:
@@ -46,6 +42,7 @@ def connect_server(remote, entrada):
         pass
     except Exception as e:
         print(e)
+
     finally:
         if not is_connected:
             print("[Client] Closing socket")
@@ -57,18 +54,28 @@ def main(argv):
     remote_list, _ = remotes.create_remote_list()
 
     while True:
-        get_input = input("Type an arithmetic expression. Example: 1+1, 8/2, 5*3")
+        # read expression from user
+        expression = input("Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3\n")
 
+        # try to connect to each server
         for idx, remote in enumerate(remote_list):
             print("[Client] Requesting server #%d" % idx)
-            is_connected, sock = connect_server(remote, get_input)
+            sys.stdout.flush()
+            # try server
+            is_connected, sock = connect_server(remote)
             if is_connected:
-                print("[Client] Received " + sock.recv(BUFSIZ).decode('ascii') + " from Server")
+                msg = expression.encode('ascii')
+                print("[Client] Sending expression " + expression)
+                sys.stdout.flush()
+                sock.send(msg)
+                print("[Client] Waiting server result")
+                sys.stdout.flush()
+                result = sock.recv(BUFSIZ).decode('ascii')
                 print("[Client] Closing socket")
+                sys.stdout.flush()
                 sock.close()
+                print("result = " + result)
 
 
-# if __name__ == "__main__":
-#     main(sys.argv[0:])
-
-main(0)
+if __name__ == "__main__":
+    main(sys.argv[0:])
