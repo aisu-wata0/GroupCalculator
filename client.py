@@ -22,10 +22,10 @@ def check_if_connection_is_fine(remote):
         host = socket.gethostbyname(host)
         sock.connect((host, port))
         did_it_work = True
-        print("[Client] Connected:\tserver %s:%d" % (host, port))
+        print("[Client] Connected: server %s:%d" % (host, port))
         sys.stdout.flush()
     except ConnectionRefusedError:
-        print("[Client] Refused:  \tserver %s:%d" % (host, port))
+        print("[Client] Refused:   server %s:%d" % (host, port))
         sys.stdout.flush()
         pass
     except Exception as e:
@@ -38,6 +38,7 @@ def check_if_connection_is_fine(remote):
         return did_it_work
 
 
+# noinspection PyUnusedLocal
 def main(argv):
     remote_list, _ = remotes.create_remote_list(-1, "")
 

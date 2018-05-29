@@ -6,8 +6,6 @@ from threading import Timer
 import sys
 import struct
 import datetime
-import select
-import time
 
 import remotes
 
@@ -34,10 +32,10 @@ class ServeClient(threading.Thread):
 
 
 class ServerTCP(threading.Thread):
-    def __init__(self, serverId, port):
+    def __init__(self, server_id, port):
         threading.Thread.__init__(self)
         # Construction parameters
-        self.Id = serverId
+        self.Id = server_id
         self.port = port
         # client thread array
         # self.clients = []
@@ -56,7 +54,7 @@ class ServerTCP(threading.Thread):
         global g_Host
         print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
         sys.stdout.flush()
-        self.socket.bind((g_Host, self.port));
+        self.socket.bind((g_Host, self.port))
 
         print("[ServerTCP] listening...")
         sys.stdout.flush()
@@ -76,7 +74,7 @@ class ServerTCP(threading.Thread):
                 client.start()
 
     # heartbeat port
-    def portHB(self):
+    def port_heart(self):
         return self.port + 1
 
 
@@ -119,28 +117,16 @@ class Heartbeat:
         sys.stdout.flush()
         self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
-    def createSocket(self):
-        global g_heartbeatInterval
-
-        sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # set timeout
-        secs = int(self.timeout())
-        micro_secs = int(0)
-        timeval = struct.pack('ll', secs, micro_secs)
-        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, timeval)
-        return sock_fd
-
     def heartbeat(self):
         global g_heartbeatInterval
 
         host = socket.gethostbyname(self.remote.addr)
-        print("[Remote %d] Sending heartbeat %s:%d" % (self.remote.Id, host, self.remote.portHB()))
+        print("[Remote %d] Sending heartbeat %s:%d" % (self.remote.Id, host, self.remote.port_heart()))
         sys.stdout.flush()
-        sock_fd = self.createSocket()
+        sock_fd = Heartbeat.create_socket()
         sock_fd.settimeout(self.timeout())
         try:
-            sock_fd.connect((host, self.remote.portHB()))
+            sock_fd.connect((host, self.remote.port_heart()))
             # send my id as heartbeat
             msg = str(g_ThreadTCP.Id)
             sock_fd.send(msg.encode('ascii'))
@@ -152,24 +138,38 @@ class Heartbeat:
             sys.stdout.flush()
             sock_fd.close()
 
-    def timeout(self):
+    @staticmethod
+    def create_socket():
+        global g_heartbeatInterval
+
+        sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # set timeout
+        secs = int(Heartbeat.timeout())
+        micro_secs = int(0)
+        timeval = struct.pack('ll', secs, micro_secs)
+        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, timeval)
+        return sock_fd
+
+    @staticmethod
+    def timeout():
         global g_heartbeatInterval
         return int(g_heartbeatInterval / 2)
 
 
 # Stores information of other remotes
 class Remote:
-    def __init__(self, addr, port, Id):
+    def __init__(self, addr, port, idx):
         self.addr = addr
         self.port = port
-        self.Id = Id
+        self.Id = idx
         print("[Remote %d] created" % self.Id)
         sys.stdout.flush()
         self.devHB = 0
         self.lastHeartbeat = datetime.datetime.now()
 
     # heartbeat port
-    def portHB(self):
+    def port_heart(self):
         return self.port + 1
 
 
@@ -181,7 +181,7 @@ def timedelta_ms(timedelta):
 
 # Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
 class HealthMonitor(threading.Thread):
-    def __init__(self, remoteList):
+    def __init__(self, remote_list):
         threading.Thread.__init__(self)
         print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
         sys.stdout.flush()
@@ -192,12 +192,12 @@ class HealthMonitor(threading.Thread):
         self.socketListenHeartbeats = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socketListenHeartbeats.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # heartbeat queue size
-        self.queueSize = len(remoteList)*3
+        self.queueSize = len(remote_list)*3
 
         # Heartbeat sending list
-        heartbeatList = []
+        heartbeat_list = []
         # Construct remotes and Heartbeat list
-        for idx, remote in enumerate(remoteList):
+        for idx, remote in enumerate(remote_list):
             addr = remote[0]
             port = remote[1]
             # create remote info
@@ -207,14 +207,14 @@ class HealthMonitor(threading.Thread):
             # If not myself, send heartbeats to it
             if idx != g_ThreadTCP.Id:
                 # create and add Heartbeat
-                heartbeatList.append(Heartbeat(remote))
+                heartbeat_list.append(Heartbeat(remote))
 
     # Thread method invoked when started
     def run(self):
-        print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ThreadTCP.portHB()))
+        print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ThreadTCP.port_heart()))
         sys.stdout.flush()
         # receive from any source, in 'portHG()' port
-        self.socketListenHeartbeats.bind((g_Host, g_ThreadTCP.portHB()))
+        self.socketListenHeartbeats.bind((g_Host, g_ThreadTCP.port_heart()))
 
         print("[HealthMonitor] listening for heartbeats...")
         sys.stdout.flush()
@@ -255,7 +255,7 @@ class HealthMonitor(threading.Thread):
         now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
-            if re.devHB == 0:  # local
+            if re.Id == g_ThreadTCP.Id:  # local
                 print("[HealthMonitor] Leader is %d, me" % re.Id)
                 sys.stdout.flush()
                 return re.Id
