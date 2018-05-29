@@ -38,7 +38,6 @@ def check_if_connection_is_fine(remote):
         return did_it_work
 
 
-# noinspection PyUnusedLocal
 def main(argv):
     remote_list, _ = remotes.create_remote_list()
 
