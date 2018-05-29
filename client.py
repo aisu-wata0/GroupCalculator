@@ -12,17 +12,6 @@ def create_socket():
     sock.settimeout(3)
     return sock
 
-
-def escuta(sock, receive_id):
-    while True:
-        try:
-            sock.settimeout(3)
-            dat, address = sock.recvfrom(receive_id)
-            return dat
-        except socket.timeout:
-            return 0
-
-
 def connect_server(remote, entrada):
     is_connected = False
     sock = create_socket()
@@ -38,7 +27,8 @@ def connect_server(remote, entrada):
         mensagem = entrada.encode('ascii')
         sock.send(mensagem)
 
-        escuta(sock, port)
+        sock.recvfrom(port) #receive initial value from server
+
         is_connected = True
 
     except ConnectionRefusedError:
@@ -68,7 +58,5 @@ def main(argv):
                 sock.close()
 
 
-# if __name__ == "__main__":
-#     main(sys.argv[0:])
-
-main(0)
+if __name__ == "__main__":
+    main(sys.argv[0:])
