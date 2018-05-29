@@ -71,10 +71,6 @@ class ServerTCP(threading.Thread):
             print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
             sys.stdout.flush()
             if g_HealthMonitor.leader() == self.Id:
-                # send response
-                # msg = 'Connected to ' + g_Host + ":" + str(self.port) + "\r\n"
-                # conn.send(msg.encode('ascii'))
-
                 client = ServeClient(conn, addr[0])
                 client.start()
 
