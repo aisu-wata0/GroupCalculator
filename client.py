@@ -39,9 +39,7 @@ def check_if_connection_is_fine(remote):
 
 
 def main(argv):
-    re = remotes.create_remote_list(-1, "")
-
-    remote_list = re['remote_list']
+    remote_list, _ = remotes.create_remote_list(-1, "")
 
     for idx, remote in enumerate(remote_list):
         print("[Client] Requesting server #%d" % idx)

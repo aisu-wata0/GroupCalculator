@@ -287,10 +287,7 @@ def main(argv):
         exit(0)
 
     my_port = int(argv[1])
-    remote = remotes.create_remote_list(my_port, g_Host)
-
-    remote_list = remote['remote_list']
-    server_id = remote['server_id']
+    remote_list, server_id = remotes.create_remote_list(my_port, g_Host)
 
     g_ThreadTCP = ServerTCP(server_id, my_port)
     g_ThreadTCP.start()

@@ -19,4 +19,4 @@ def create_remote_list(my_port, my_name):
             print("I am server #%d" % server_id)
         index += 1
 
-    return {'remote_list': remote_list, "server_id": server_id}
+    return remote_list, server_id
