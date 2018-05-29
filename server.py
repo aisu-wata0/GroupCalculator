@@ -5,7 +5,7 @@ import threading
 from threading import Timer
 import sys
 import struct
-from datetime import datetime
+import datetime
 import select
 import time
 
@@ -104,6 +104,7 @@ class RepeatedTimer(object):
         self.is_running = False
 
 
+# Tries to send heartbeats to the remote continuously by the interval constant defined
 class Heartbeat:
     def __init__(self, remote):
         global g_heartbeatInterval
@@ -153,6 +154,8 @@ class Heartbeat:
         global g_heartbeatInterval
         return int(g_heartbeatInterval/2)
 
+
+# Stores information of other remotes
 class Remote:
     def __init__(self, addr, port, Id):
         self.addr = addr
@@ -161,74 +164,103 @@ class Remote:
         print("[Remote %d] created" % self.Id)
         sys.stdout.flush()
         self.delta = 0
-        self.lastHeartbeat = datetime.now()
+        self.lastHeartbeat = datetime.datetime.now()
 
     # heartbeat port
     def portHB(self):
         return self.port + 1
 
 
+def timedelta_ms(timedelta):
+    delta_ms = timedelta.total_seconds() * 1000
+    delta_ms += timedelta.microseconds / 1000
+    return delta_ms
+
+
+# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
 class HealthMonitor(threading.Thread):
     def __init__(self, remoteList):
         threading.Thread.__init__(self)
-        self.remotes = []
-
-        print("[HealthMonitor] started thread %s" % str(threading.current_thread().ident))
+        print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
         sys.stdout.flush()
 
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        # remote array
+        self.remotes = []
+        # create socket
+        self.socketListenHeartbeats = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socketListenHeartbeats.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # heartbeat queue size
         self.queueSize = len(remoteList)*3
 
+        # Heartbeat sending list
         heartbeatList = []
-        # Construction parameters
+        # Construct remotes and Heartbeat list
         for idx, remote in enumerate(remoteList):
             addr = remote[0]
             port = remote[1]
+            # create remote info
             remote = Remote(addr, port, idx)
+            # add to list
             self.remotes.append(remote)
+            # If not myself, send heartbeats to it
             if idx != g_ThreadTCP.Id:
+                # create and add Heartbeat
                 heartbeatList.append(Heartbeat(remote))
 
     # Thread method invoked when started
     def run(self):
         print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ThreadTCP.portHB()))
         sys.stdout.flush()
-        self.socket.bind((g_Host, g_ThreadTCP.portHB()))
+        # receive from any source, in 'portHG()' port
+        self.socketListenHeartbeats.bind((g_Host, g_ThreadTCP.portHB()))
 
         print("[HealthMonitor] listening for heartbeats...")
         sys.stdout.flush()
-        self.socket.listen(self.queueSize)
+        self.socketListenHeartbeats.listen(self.queueSize)
 
         while True:
-            # receive heartbeats
-            conn, addr = self.socket.accept()
+            # accept connection
+            conn, addr = self.socketListenHeartbeats.accept()
             print("[HealthMonitor] Connected %s:%d" % (str(addr[0]), addr[1]))
             sys.stdout.flush()
+            # receive heartbeat
             data = conn.recv(BUFSIZ)
             # heartbeat has the server id
             idx = data.decode('ascii')
             print("[HealthMonitor] Heartbeat from %s" % idx)
             sys.stdout.flush()
             idx = int(idx)
-            # Calculate time since last heartbeat from this server
-            last = self.remotes[idx].lastHeartbeat
+            # Calculate delta time since last heartbeat from this server
+            prev = self.remotes[idx].lastHeartbeat
             # update heartbeat time
-            self.remotes[idx].lastHeartbeat = datetime.now()
-            time_delta = self.remotes[idx].lastHeartbeat - last
-            delta = time_delta.total_seconds() * 1000
-            delta += time_delta.microseconds / 1000
-            self.remotes[idx].delta = delta
-            print("[HealthMonitor] Server %d heartbeat, delta = %dms" % (idx, delta))
+            self.remotes[idx].lastHeartbeat = datetime.datetime.now()
+            timedelta = self.remotes[idx].lastHeartbeat - prev
+            # update delta time
+            self.remotes[idx].delta = timedelta_ms(timedelta)
+            print("[HealthMonitor] Server %d heartbeat, delta = %dms" % (idx, self.remotes[idx].delta))
             sys.stdout.flush()
+            # close connection
             conn.close()
 
     def leader(self):
         global g_heartbeatInterval
-
+        print("[HealthMonitor] leader calc")
+        sys.stdout.flush()
+        # calculate tolerance
+        now = datetime.datetime.now()
+        tolerance = now - datetime.timedelta(milliseconds=int(1000*1.5*g_heartbeatInterval))
+        # return first remote Id considered available
         for re in self.remotes:
-            if re.delta <= g_heartbeatInterval+g_heartbeatInterval/2:
+            if re.delta == 0:  # local
+                print("[HealthMonitor] Leader is %d, me" % re.Id)
+                sys.stdout.flush()
+                return re.Id
+            last = re.lastHeartbeat
+            delta = (last - tolerance).total_seconds()
+            print("[HealthMonitor] %d delta = %dms" % (re.Id, timedelta_ms(delta)))
+            sys.stdout.flush()
+            # inside tolerance
+            if delta > 0:  # TODO test this
                 print("[HealthMonitor] Leader is %d" % re.Id)
                 sys.stdout.flush()
                 return re.Id
