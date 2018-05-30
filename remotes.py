@@ -28,5 +28,5 @@ def create_remote_list(my_name="", my_port=-1):
             server_id = index
             print("I am server #%d" % server_id)
         index += 1
-
-    return remote_list, server_id
+    # sort by the address and port number and return it with the server_id
+    return sorted(remote_list, key=lambda tup: (tup[0],tup[1])), server_id
