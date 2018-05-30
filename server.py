@@ -6,7 +6,7 @@ from threading import Timer
 import sys
 import struct
 import datetime
-import pyparsingtest
+import parse
 
 import remotes
 import logger
@@ -45,7 +45,7 @@ class ServeClient(threading.Thread):
         result = 0.0
         message = ""
         try:
-            result = pyparsingtest.create_result(expression)
+            result = parse.create_result(expression)
             print("received: " + expression + " result: " + str(result))
             message = str(result)
         except ZeroDivisionError:
