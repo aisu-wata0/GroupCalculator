@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Redes 2</title>
+    <link href="./cssfiles/bootstrap.min.css" rel="stylesheet">
+    <link href="./cssfiles/docs.min.css" rel="stylesheet">
+
+<body class="container">
+<section class="row flex-nowrap">
+
+        <main class="col-8 col-md-9 col-xl-10 py-md-3 pl-md-5 pl-5 bd-content" role="main">
+            <h1 class="bd-title" id="content">Redes 2 - Trabalho</h1>
+            <p class="bd-lead">Bernardo Ferrari<br>Bruno Serbena</p>
+
+            <p>O trabalho de Redes 2 desse semestre consistiu na implementação de uma calculadora remota altamente-disponível, baseada
+                em um grupo multicacast de N servidores.
+            </p>
+            <p>
+                Para isso, a partir do arquivo servers.txt, que contém uma lista com o nome local e o número da porta de
+                cada servidor possível que queremos conectar, cada servidor tenta se conectar com todos os endereços da
+                lista em busca de outros servidores. Se encontrar, verifica qual possui o menor identificador. O servidor que,
+                ao realizar essa busca, perceber que nenhum outro servidor conectado tem endereço menor que o dele, será
+                marcado/promovido a líder, que será quem responde a todas as requisições do cliente.
+            </p>
+            <p>
+                Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão aritmética desejada,
+                como 1+1, e o cliente tenta conectar a cada servidor, enviando a requisição se sucesso.
+
+                Após isso, o servidor com menor identificação (líder) retorna o resultado da conta. Se acontecer algo com
+                o líder, o programa aguarda o timeout e <strong>faz o que?? Erro?</strong>
+
+                O servidor líder, tendo sido encontrado e funcionando perfeitamente, efetua a expressão matemática, usando
+                a biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a>.
+            </p>
+
+                <p>A biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a> é uma biblioteca, disponível em
+                código aberto, que permite transformar um texto em uma gramática simples, e a partir disso efetuar as operações
+                matemáticas. É uma forma muito mais segura e, em muitos casos, mais rápida, que o uso do tradicional Eval.
+                    É possível, portanto, efetuar as operações de soma (+), subtração (-), divisião (/), multiplicação (*), exponenciação (^),
+                    seno (sin), cosseno (cos), tangente (tan), módulo (abs), concatenação (trunc) e aproximação (round).
+            </p>
+
+            <p>
+                Após ter sido feita essa operação, o líder devolve a resposta para o cliente. Caso tenha ocorrido algum erro,
+                o programa irá retornar a string "zero division" em caso de divisão por zero, ou "exception" em caso de outra
+                exceção, o que significa que a expressão não foi escrita corretamente. Usar o valor "www" como entrada produz
+                esse erro.
+            </p>
+
+            <p>
+                Tendo a resposta do líder, o cliente imprime o valor retornado, ou o erro que aconteceu seguido de uma sugestão,
+                escrever uma expressão matemática válida. Feito tudo isso, o usuário pode digitar outra expressão, que o programa
+                realizará as mesmas etapas de novo. Para finalizar, é só usar o atalho Ctrl+C.
+            </p>
+
+            <h3>Arquivos:</h3>
+            <h4>server.txt</h4>
+            <p>
+                Esse arquivo possui uma lista com todos os servidores que fazem parte da rede e estão interessados em participar
+                da calculadora. Como estamos fazendo um Multicast e não um Broadcast, essa lista é o grupo de servidores.
+            </p>
+
+            <h4>pyparsing.py e pyparsingtest.py</h4>
+            <p>
+                pyparsing.py é a biblioteca para converter texto em gramática.
+                <br>pyparsingtest.py é um grupo de funções para converter a gramática, produzida pelo pyparsing, em expressões
+                matemáticas e resolver elas.
+
+                Exemplo:
+                <br>
+                <p style="font-size: smaller"> 9 + 3 + 6 = ['9', '+', '3', '+', '6'] = ['9', '3', '+', '6', '+'] => 18.0</p>
+                <p style="font-size: smaller">9 + 3 / 11 = ['9', '+', '3', '/', '11'] = ['9', '3', '11', '/', '+'] => = 9.27272727273</p>
+            <p style="font-size: smaller">PI * PI / 10 = ['PI', 'PI', '*', '10', '/'] = ['PI', '*', 'PI', '/', '10'] => 0.986960440109</p>
+            </p>
+            <h4>client.py</h4>
+            <p>
+
+                Vou arrumar o restante amanhã.
+            </p>
+            <h4> server.py</h4>
+            <p>
+
+            </p>
+
+            <h3>Conclusão:</h3>
+            <p>
+
+            </p><br>
+            <pre>
+> 2 clientes:
+- Mensagem
+- Mensagem
+
+> 6 clientes:
+- Mensagem
+- Mensagem
+- Mensagem
+- Mensagem
+
+> 18 clientes:
+- Mensagem
+- Mensagem
+- Mensagem
+- Mensagem
+
+> 54 clientes:
+- Mensagem
+- Mensagem
+- Mensagem
+- Mensagem
+
+> 162 clientes:
+- Mensagem
+- Mensagem
+- Mensagem
+- Mensagem
+		</pre>
+            <h3>Exemplo de modo de uso:</h3>
+            <h6>
+                    * Deve-se usar python3 para execução do trabalho;
+                    <br>
+                    * Para terminar a execução do servidor é necessária a interrupção Ctrl+C
+            </h6>
+            <br>
+        </main>
+    </section>
+</body>
+</html>
