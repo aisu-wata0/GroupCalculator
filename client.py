@@ -76,22 +76,34 @@ def main(argv):
         is_connected = False
         for idx, remote in enumerate(remote_list):
             g_ClientLog.print("[Client] Requesting server #%d" % idx)
+
             # tenta conectar no servidor da iteracao atual
             is_connected, sock = connect_server(remote)
+
             # caso não esteja conectado, não faz nada e procede para a próxima
             # iteração, o socket está fechado.
             if is_connected:
                 g_ClientLog.print("[Client] Sending expression " + expression)
+
                 # mensagem é codificada em ascii
                 msg = expression.encode('ascii')
+
                 # mensagem é enviada ao servidor da iteracao atual
                 sock.send(msg)
                 g_ClientLog.print("[Client] Waiting server result")
+
                 # outra mensagem é recebida com a resolução da primeira e decodificada
                 try:
                     result = sock.recv(BUFSIZ).decode('ascii')
+
                     # print expression result received from server
-                    print("result = " + result)
+                    if result == "exception":
+                        print("[Client] An exception was detected. Try a valid mathematical expression")
+                    elif result == "zero division":
+                        print("[Client] A division by zero was detected. Try a valid mathematical expression")
+                    else:
+                        print("result = " + result)
+
                     sys.stdout.flush()
                 except socket.timeout:
                     g_ClientLog.print("[Client] Server connected but didn't respond")
@@ -112,7 +124,6 @@ def main(argv):
             g_ClientLog.print("[Client] No server could connect")
             print("All servers down")
             sys.stdout.flush()
-
 
 
 if __name__ == "__main__":
