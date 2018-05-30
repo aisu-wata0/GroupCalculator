@@ -2,6 +2,7 @@
 import socket
 import remotes
 import sys
+import select
 
 import logger
 
@@ -74,14 +75,11 @@ def main(argv):
         # e aguarda o recebimento da resposta. Caso contrário, procede para a
         # próxima iteração.
         is_connected = False
+        shouldloop = True
+
+        socketlist = []
         for idx, remote in enumerate(remote_list):
-            g_ClientLog.print("[Client] Requesting server #%d" % idx)
-
-            # tenta conectar no servidor da iteracao atual
             is_connected, sock = connect_server(remote)
-
-            # caso não esteja conectado, não faz nada e procede para a próxima
-            # iteração, o socket está fechado.
             if is_connected:
                 g_ClientLog.print("[Client] Sending expression " + expression)
 
@@ -90,11 +88,19 @@ def main(argv):
 
                 # mensagem é enviada ao servidor da iteracao atual
                 sock.send(msg)
-                g_ClientLog.print("[Client] Waiting server result")
+                socketlist.append(sock)
+
+        while shouldloop:
+            # this will block until at least one socket is ready
+            ready_socks, _, _ = select.select(socketlist, [], [])
+            for sock in ready_socks:
+                shouldloop = False
 
                 # outra mensagem é recebida com a resolução da primeira e decodificada
                 try:
-                    result = sock.recv(BUFSIZ).decode('ascii')
+                    data, addr = sock.recvfrom(BUFSIZ)  # This is will not block
+                    result = data.decode('ascii')
+                    print("received message:", result)
 
                     # print expression result received from server
                     if result == "exception":
@@ -115,12 +121,7 @@ def main(argv):
                 finally:
                     g_ClientLog.print("[Client] Closing socket")
                     sock.close()
-                # não precisamos continuar iterando pelos próximos servidores, se
-                # encontramos o de menor número, que é o líder, e ele já nos devolveu
-                # a resposta. Logo, break irá retornar para o While que irá pedir
-                # outra expressão aritmética para o usuário.
-                break
-        if not is_connected:
+        if socketlist is []:
             g_ClientLog.print("[Client] No server could connect")
             print("All servers down")
             sys.stdout.flush()
