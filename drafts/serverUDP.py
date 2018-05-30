@@ -33,7 +33,14 @@ def main():
             data, addr = sock.recvfrom(1024)
             print(data.decode('ascii'))
             print('from ' + str(addr))
-            sock.sendto("response msg".encode('ascii'), addr)
+            # create another socket to respond
+            conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            try:
+                conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            except AttributeError:
+                pass
+            conn.sendto("response msg".encode('ascii'), addr)
+            conn.close()
         except Exception as e:  # Other exception
             print('Exception' % str(e))
             hex_data = binascii.hexlify(data)
