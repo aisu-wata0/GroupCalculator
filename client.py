@@ -11,6 +11,7 @@ BUFSIZ = 8192
 
 # Creates a TCP socket file descriptor with timeout
 def create_socket():
+    g_ClientLog.print("[Client] Created socket")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(3)
     return sock

@@ -40,7 +40,7 @@ class ServeClient(threading.Thread):
         expression = self.conn.recv(BUFSIZ).decode('ascii')
         # calculate result
         g_ServerLog.print(
-            "[ServerTCP] Client %s: Calculating expression = %s" % (self.addr, expression))
+            "[ServerTCP] Client %s: Calculating expression: %s" % (self.addr, expression))
         try:
             result = pyparsingtest.create_result(expression)
         except Exception as e:  # Other exception
@@ -98,6 +98,7 @@ class ServerTCP(threading.Thread):
         return self.port + 1
 
 
+# calls function periodically, interval is in seconds
 class RepeatedTimer(object):
     def __init__(self, interval, fun, *args, **kwargs):
         self._timer = None
@@ -115,6 +116,7 @@ class RepeatedTimer(object):
 
     def start(self):
         if not self.is_running:
+            # start timer for next run
             self._timer = Timer(self.interval, self._run)
             self._timer.start()
             self.is_running = True
@@ -130,11 +132,10 @@ class Heartbeat:
         global g_heartbeatInterval
 
         self.remote = remote
-        g_HeartbeatLog.print("[Remote %d] Creating socket" % remote.Id)
         g_HeartbeatLog.print("[Remote %d] Starting heartbeat" % remote.Id)
-
         self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
+    # Sends heartbeat to this remote
     def heartbeat(self):
         global g_heartbeatInterval
 
@@ -143,9 +144,9 @@ class Heartbeat:
             "[Remote %d] Sending heartbeat %s:%d"
             % (self.remote.Id, host, self.remote.port_heart()))
 
-        sock_fd = Heartbeat.create_socket()
-        sock_fd.settimeout(self.timeout())
-        try:
+        sock_fd = self.create_socket()
+        sock_fd.settimeout(self.send_timeout())
+        try:  # try to connect to remote
             sock_fd.connect((host, self.remote.port_heart()))
             # send my id as heartbeat
             msg = str(g_Server.Id)
@@ -154,27 +155,30 @@ class Heartbeat:
             g_HeartbeatLog.print(
                 "[Remote %d] Refused heartbeat" % self.remote.Id)
             pass
+        except Exception as e:  # Other exception
+            g_HeartbeatLog.print(
+                "[Client] Heartbeat failed, Exception: " + str(e))
         finally:
             g_HeartbeatLog.print(
                 "[Remote %d] Closing socket" % self.remote.Id)
 
             sock_fd.close()
 
-    @staticmethod
-    def create_socket():
+    def create_socket(self):
         global g_heartbeatInterval
 
+        g_HeartbeatLog.print("[Remote %d] Creating socket" % self.remote.Id)
         sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # set timeout
-        secs = int(Heartbeat.timeout())
+        secs = int(Heartbeat.send_timeout())
         micro_secs = int(0)
         timeval = struct.pack('ll', secs, micro_secs)
         sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, timeval)
         return sock_fd
 
     @staticmethod
-    def timeout():
+    def send_timeout():
         global g_heartbeatInterval
         return int(g_heartbeatInterval / 2)
 
