@@ -7,6 +7,7 @@ import sys
 import struct
 import datetime
 import parse
+from abc import ABC, abstractmethod
 
 import remotes
 import logger
@@ -25,86 +26,137 @@ g_HealthMonitorLog = None
 g_HeartbeatLog = None
 
 
-class ServeClient(threading.Thread):
-    def __init__(self, conn, addr):
+class Client(threading.Thread):
+    def __init__(self, connection):
         threading.Thread.__init__(self)
         # Construction parameters
-        self.conn = conn
+        sock, addr = connection
+        self.sock = sock
         self.addr = addr
+        g_ServerLog.print("[Client %s] Started" % str(self.addr))
 
     # Thread method invoked when started
     def run(self):
         # receive expression
-        g_ServerLog.print(
-            "[ServerTCP] Client %s: Waiting expression" % self.addr)
-        expression = self.conn.recv(BUFSIZ).decode('ascii')
-        # calculate result
-        g_ServerLog.print(
-            "[ServerTCP] Client %s: Calculating expression = %s" % (self.addr, expression))
+        expression = self.receive_exp()
 
-        result = 0.0
+        # calculate result
+        g_ServerLog.print("[Client %s] Calculating expression: %s"
+                          % (str(self.addr), expression))
         message = ""
         try:
             result = parse.create_result(expression)
-            print("received: " + expression + " result: " + str(result))
+            g_ServerLog.print("[Client %s] result = %s" % (str(self.addr), result))
+            print("received: " + str(expression) + " result: " + str(result))
             message = str(result)
         except ZeroDivisionError:
             print("received: Error! Division by Zero!")
             message = "zero division"
             pass
-        except Exception:  # Other exception
+        except Exception as e:  # Other exception
+            g_ServerLog.print(
+                "[Client %s] Exception %s" % (str(self.addr), e))
             print("received: Error! Invalid expression!")
             message = "exception"
         finally:
             sys.stdout.flush()
-
             # respond with the result
-            g_ServerLog.print(
-                "[ServerTCP] Client %s: Sending result = %s" % (self.addr, str(result)))
-            self.conn.send(message.encode("ascii"))
-
+            self.respond(message)
             # end connection
-            self.conn.close()
+            self.sock.close()
+
+    @abstractmethod
+    def receive_exp(self):
+        pass
+
+    @abstractmethod
+    def respond(self, msg):
+        pass
 
 
-class ServerTCP(threading.Thread):
+class ClientTCP(Client):
+    def receive_exp(self):
+        g_ServerLog.print("[ClientTCP %s] Waiting expression" % str(self.addr))
+        expression = self.sock.recv(BUFSIZ).decode('ascii')
+        return expression
+
+    # respond with the result
+    def respond(self, msg):
+        g_ServerLog.print(
+            "[ClientTCP %s] Sending result = %s" % (str(self.addr), msg))
+        self.sock.send(msg.encode("ascii"))
+        pass
+
+
+class Server(threading.Thread):
     def __init__(self, server_id, port):
         threading.Thread.__init__(self)
         # Construction parameters
         self.Id = server_id
         self.port = port
+        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
         # client thread array
         # self.clients = []
-        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
-
-        g_ServerLog.print("[ServerTCP] Creating TCP socket")
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        # Listening socket
+        self.socket = self.create_socket()
         self.queueSize = 5
+
+    @abstractmethod
+    def create_socket(self):
+        pass
 
     # Thread method invoked when started
     def run(self):
         global g_Host
         global g_ServerLog
 
+        self.start_listening()
+
+        while True:
+            # establish connection
+            connection = self.wait_client()
+            if g_HealthMonitor.leader() == self.Id:
+                client = self.create_client(connection)
+                client.start()
+
+    @abstractmethod
+    def start_listening(self):
+        pass
+
+    @abstractmethod
+    def wait_client(self):
+        pass
+
+    @abstractmethod
+    def create_client(self, connection):
+        pass
+
+    # heartbeat port
+    def port_heart(self):
+        return self.port + 1
+
+
+class ServerTCP(Server):
+    def create_socket(self):
+        g_ServerLog.print("[ServerTCP] Creating TCP socket")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return sock
+
+    def start_listening(self):
         g_ServerLog.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
         self.socket.bind((g_Host, self.port))
 
         g_ServerLog.print("[ServerTCP] listening...")
         self.socket.listen(self.queueSize)
 
-        while True:
-            # establish connection
-            conn, addr = self.socket.accept()
-            g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
-            if g_HealthMonitor.leader() == self.Id:
-                client = ServeClient(conn, addr[0])
-                client.start()
+    def wait_client(self):
+        connection = sock, addr = self.socket.accept()
+        g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
+        return connection
 
-    # heartbeat port
-    def port_heart(self):
-        return self.port + 1
+    def create_client(self, connection):
+        return ClientTCP(connection)
 
 
 class RepeatedTimer(object):
