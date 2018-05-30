@@ -41,7 +41,13 @@ class ServeClient(threading.Thread):
         # calculate result
         g_ServerLog.print(
             "[ServerTCP] Client %s: Calculating expression = %s" % (self.addr, expression))
-        result = pyparsingtest.create_result(expression)
+        try:
+            result = pyparsingtest.create_result(expression)
+        except Exception as e:  # Other exception
+            g_ServerLog.print(
+                "[ServerTCP] Exception on expression evaluation: " + str(e))
+            result = "Exception on expression evaluation"
+            pass
         print("received: " + expression + " result: " + str(result))
         sys.stdout.flush()
         # respond result
