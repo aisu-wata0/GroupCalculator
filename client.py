@@ -2,62 +2,46 @@
 import socket
 import remotes
 import sys
+import select
 
 import logger
 
 # buffer size
 BUFSIZ = 8192
+TIMEOUT = 4
 
 
-# Creates a TCP socket file descriptor with timeout
+# Creates a non-blocking TCP socket file descriptor
 def create_socket():
     g_ClientLog.print("[Client] Created socket")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(3)
+    sock.setblocking(0)
     return sock
 
 
-# Essa função recebe uma tuple (host, porta) cria um socket e tenta fazer uma conexão.
-# Caso a conexão ocorra, a função retorna True e o socket (que será usado posteriormente).
-# Caso ocorra uma exceção durante a conexão, fecha o socket
-# e retorna False e o socket fechado, que não será mais usado.
+# This function receives a tuple (host, port) and creates a non-blocking socket attempting connection
+# To use the sockets use the blocking instruction:
+# ready_to_read, ready_to_write, in_error = select.select([], socks, [], TIMEOUT)
+# socks is a list of sockets returned by this function
+# ready_to_write will be the list of sockets in which connection was successful
+# ready_to_read will be the list of sockets in which a message is ready to be read
 def connect_server(remote):
-    is_connected = False
-
     sock = create_socket()
     # Get remote info
     host, port = remote
-
     try:
         # get remote address
         host = socket.gethostbyname(host)
         # Tries to establish connection
-        # if refused, ConnectionRefusedError exception will be thrown.
-        sock.connect((host, port))
-        g_ClientLog.print("[Client] Connected: server %s:%d" % (host, port))
-        # Connection successful
-        is_connected = True  # set return value
-    except ConnectionRefusedError:
-        # Connection refused
-        g_ClientLog.print("[Client] Refused: server %s:%d" % (host, port))
-        pass
+        sock.connect_ex((host, port))
     except Exception as e:  # Other exception
-        g_ClientLog.print("[Client] Exception: " + str(e) + " for server %s:%d" % (host, port))
-    finally:
-        # If the socket couldn't connect, close it
-        if not is_connected:
-            g_ClientLog.print("[Client] Closing socket")
-            sock.close()
+        g_ClientLog.print("[Client] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
 
-        # Return (success, socket)
-        # if successful, socket can be used to send/receive messages
-        return is_connected, sock
+    # return the non-blocking socket attempting connection
+    return sock
 
 
 def main(argv):
-    # remote_list returns a array of tuples (hostname, port) from servers.txt
-    remote_list, _ = remotes.create_remote_list()
-
     # Create Loggers
     global g_ClientLog
     # serverLogFile = open("Client.log", "w")
@@ -65,37 +49,52 @@ def main(argv):
     g_ClientLog = logger.Logger(sys.stdout)
     g_ClientLog.header("Client")
 
+    # remote_list returns a array of tuples (hostname, port) from servers.txt
+    remote_list, _ = remotes.create_remote_list()
+
     while True:
         # recebe a expressão aritmética do usuário.
         expression = input("Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3\n")
-
+        received_result = False
         # para cada endereço local do remote_list, iremos iterar.
         # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
         # e aguarda o recebimento da resposta. Caso contrário, procede para a
         # próxima iteração.
-        is_connected = False
+        socks = []
         for idx, remote in enumerate(remote_list):
             g_ClientLog.print("[Client] Requesting server #%d" % idx)
-
             # tenta conectar no servidor da iteracao atual
-            is_connected, sock = connect_server(remote)
+            # non blocking
+            sock = connect_server(remote)
+            socks.append(sock)
 
-            # caso não esteja conectado, não faz nada e procede para a próxima
-            # iteração, o socket está fechado.
-            if is_connected:
+        g_ClientLog.print("[Client] Waiting any server for %ds..." % TIMEOUT)
+        # this will block until at least one socket is ready || Timeout
+        _, ready_to_write, in_error = select.select([], socks, [], TIMEOUT)
+        # if not timeout
+        if ready_to_write:
+            # for all those that connected
+            for sock in ready_to_write:
+                g_ClientLog.print("[Client] Connected to " + str(sock.getsockname()))
                 g_ClientLog.print("[Client] Sending expression " + expression)
-
                 # mensagem é codificada em ascii
                 msg = expression.encode('ascii')
-
                 # mensagem é enviada ao servidor da iteracao atual
-                sock.send(msg)
-                g_ClientLog.print("[Client] Waiting server result")
+                sock.send(msg)  # This is will not block
 
-                # outra mensagem é recebida com a resolução da primeira e decodificada
+            g_ClientLog.print("[Client] Waiting any server result")
+            # this will block until at least one socket is ready
+            # wait response from one of the connections, select only from those you wrote
+            ready_to_read, _, in_error = select.select(ready_to_write, [], [], TIMEOUT)
+
+            # only the leader should be ready
+            for sock in ready_to_read:
                 try:
+                    # mensagem é recebida com a resolução da primeira
+                    sock.setblocking(1)
+                    g_ClientLog.print("[Client] Receiving from " + str(sock.getsockname()))
                     result = sock.recv(BUFSIZ).decode('ascii')
-
+                    received_result = True
                     # print expression result received from server
                     if result == "exception":
                         print("[Client] An exception was detected. Try a valid mathematical expression")
@@ -103,24 +102,20 @@ def main(argv):
                         print("[Client] A division by zero was detected. Try a valid mathematical expression")
                     else:
                         print("result = " + result)
-
                     sys.stdout.flush()
                 except socket.timeout:
-                    g_ClientLog.print("[Client] Server connected but didn't respond")
+                    g_ClientLog.print("[Client] Server received expression but didn't respond")
                     print("Server timeout, try again")
                     sys.stdout.flush()
                     pass
                 except Exception as e:  # Other exception
                     g_ClientLog.print("[Client] Exception: " + str(e))
-                finally:
-                    g_ClientLog.print("[Client] Closing socket")
-                    sock.close()
-                # não precisamos continuar iterando pelos próximos servidores, se
-                # encontramos o de menor número, que é o líder, e ele já nos devolveu
-                # a resposta. Logo, break irá retornar para o While que irá pedir
-                # outra expressão aritmética para o usuário.
-                break
-        if not is_connected:
+
+        for sock in socks:
+            g_ClientLog.print("[Client] Closing socket " + str(sock.getsockname()))
+            sock.close()
+
+        if not received_result:
             g_ClientLog.print("[Client] No server could connect")
             print("All servers down")
             sys.stdout.flush()

@@ -301,26 +301,6 @@ class HealthMonitor(threading.Thread):
 
 
 def main(argv):
-    global g_Host
-
-    # get my host
-    g_Host = socket.gethostbyname(socket.getfqdn())
-
-    # check parameters
-    if len(argv) < 2:
-        print("Hostname: %s" % g_Host)
-        print("Usage %s [port]" % argv[0])
-        sys.exit(0)
-    # get parameters
-    my_port = int(argv[1])
-
-    # get remotes registered
-    remote_list, server_id = remotes.create_remote_list(g_Host, my_port)
-    if server_id == -1:
-        print("Error: I'm not registered on servers.txt\nlocalhost is not a valid entry: use the machine name")
-        sys.stdout.flush()
-        sys.exit(1)
-
     # Create Loggers
     global g_ServerLog
     # ServerLogFile = open("log/Server.log", "w")
@@ -339,6 +319,25 @@ def main(argv):
     # g_HeartbeatLog = logger.Logger(HeartbeatFile)
     g_HeartbeatLog = logger.Logger(sys.stdout)
     g_HeartbeatLog.header("Heartbeat")
+
+    global g_Host
+    # get my host
+    g_Host = socket.gethostbyname(socket.getfqdn())
+
+    # check parameters
+    if len(argv) < 2:
+        print("Hostname: %s" % g_Host)
+        print("Usage %s [port]" % argv[0])
+        sys.exit(0)
+    # get parameters
+    my_port = int(argv[1])
+
+    # get remotes registered
+    remote_list, server_id = remotes.create_remote_list(g_Host, my_port)
+    if server_id == -1:
+        print("Error: I'm not registered on servers.txt\nlocalhost is not a valid entry: use the machine name")
+        sys.stdout.flush()
+        sys.exit(1)
 
     # Start Server
     global g_Server
