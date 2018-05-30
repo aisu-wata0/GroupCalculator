@@ -174,14 +174,39 @@ class Heartbeat:
 
 
 # Stores information of other remotes
+# such as: lastHeartbeat date, heartbeat deviation.
 class Remote:
     def __init__(self, addr, port, idx):
-        self.addr = addr
-        self.port = port
+        # Set parameters
+        self.addr = addr  # address
+        self.port = port  # port the client uses
         self.Id = idx
         g_HeartbeatLog.print("[Remote %d] created" % self.Id)
+        # Deviation of the heartbeats
         self.devHB = 0
+        # Initialize lastHeartbeat as invalid, too long ago
+        # only sure the server in on when first heartbeat is received
+        now = datetime.datetime.now()
+        self.lastHeartbeat = now - self.timeout_delta()
+
+    def beat(self):
+        # Calculate delta time since last heartbeat from this server
+        prev = self.lastHeartbeat
+        # update heartbeat time
         self.lastHeartbeat = datetime.datetime.now()
+        timedelta = self.lastHeartbeat - prev
+        # update deviation
+        dev = 0.75 * self.devHB \
+            + 0.25 * abs(timedelta_ms(timedelta) - 1000 * g_heartbeatInterval)
+        self.devHB = dev
+        return timedelta
+
+    # Fair timeout value for the heartbeats to assume server dead
+    # Takes the deviation calculated with heartbeats into account
+    def timeout_delta(self):
+        global g_heartbeatInterval
+        return datetime.timedelta(
+            milliseconds=int(1000 * g_heartbeatInterval + 4 * self.devHB))
 
     # heartbeat port
     def port_heart(self):
@@ -194,13 +219,13 @@ def timedelta_ms(timedelta):
     return delta_ms
 
 
-# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+# Monitors other remotes by listening heartbeats
+# also creates Heartbeats to inform others periodically
 class HealthMonitor(threading.Thread):
     def __init__(self, remote_list):
         threading.Thread.__init__(self)
         g_HealthMonitorLog.print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
-
-        # remote array
+        # Remote array, see Remote class
         self.remotes = []
         # create socket
         self.socketListenHeartbeats \
@@ -209,20 +234,18 @@ class HealthMonitor(threading.Thread):
             .setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # heartbeat queue size
         self.queueSize = len(remote_list)*3
-
         # Heartbeat sending list
         heartbeat_list = []
-        # Construct remotes and Heartbeat list
+        # Construct Remotes and Heartbeat list
         for idx, remote in enumerate(remote_list):
-            addr = remote[0]
-            port = remote[1]
-            # create remote info
+            # get remote info
+            addr, port = remote
+            # create Remote object
             remote = Remote(addr, port, idx)
-            # add to list
             self.remotes.append(remote)
             # If not myself, send heartbeats to it
             if idx != g_Server.Id:
-                # create and add Heartbeat
+                # create and add Heartbeat, see its class
                 heartbeat_list.append(Heartbeat(remote))
 
     # Thread method invoked when started
@@ -245,15 +268,8 @@ class HealthMonitor(threading.Thread):
             idx = data.decode('ascii')
             g_HealthMonitorLog.print("[HealthMonitor] Heartbeat from %s" % idx)
             idx = int(idx)
-            # Calculate delta time since last heartbeat from this server
-            prev = self.remotes[idx].lastHeartbeat
-            # update heartbeat time
-            self.remotes[idx].lastHeartbeat = datetime.datetime.now()
-            timedelta = self.remotes[idx].lastHeartbeat - prev
-            # update deviation
-            dev = 0.75*self.remotes[idx].devHB\
-                + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
-            self.remotes[idx].devHB = dev
+            # Inform remote it had a heartbeat
+            timedelta = self.remotes[idx].beat()
             g_HealthMonitorLog.print(
                 "[HealthMonitor] Server %d heartbeat, delta = %dms; dev = %d"
                 % (idx, timedelta_ms(timedelta), self.remotes[idx].devHB))
@@ -263,21 +279,20 @@ class HealthMonitor(threading.Thread):
     def leader(self):
         global g_heartbeatInterval
         g_HealthMonitorLog.print("[HealthMonitor] leader calc")
-        # calculate tolerance
-        now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
             if re.Id == g_Server.Id:  # local
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 return re.Id
-            timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
+            timeout = re.timeout_delta()
             g_HealthMonitorLog.print(
-                "[HealthMonitor] %d timeoutInterval = %dms"
+                "[HealthMonitor] Remote %d timeoutInterval = %dms"
                 % (re.Id, 1000*timeout.total_seconds()))
-            tolerance = now - timeout
+            # calculate tolerance
+            tolerance = datetime.datetime.now() - timeout
             last = re.lastHeartbeat
             delta = timedelta_ms(last - tolerance)
-            g_HealthMonitorLog.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
+            g_HealthMonitorLog.print("[HealthMonitor] Remote %d delta = %dms" % (re.Id, delta))
             # inside tolerance
             if delta > 0:  # TODO test this
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
