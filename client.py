@@ -74,13 +74,13 @@ def main(argv):
         # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
         # e aguarda o recebimento da resposta. Caso contrário, procede para a
         # próxima iteração.
-        is_connected = False
-        shouldloop = True
+        shouldloop = False
 
         socketlist = []
         for idx, remote in enumerate(remote_list):
             is_connected, sock = connect_server(remote)
             if is_connected:
+                shouldloop = True
                 g_ClientLog.print("[Client] Sending expression " + expression)
 
                 # mensagem é codificada em ascii
@@ -92,35 +92,36 @@ def main(argv):
 
         while shouldloop:
             # this will block until at least one socket is ready
-            ready_socks, _, _ = select.select(socketlist, [], [])
+            ready_socks = []
+            try:
+                ready_socks, _, _ = select.select(socketlist, [], [], 3)
+            except socket.timeout:
+                g_ClientLog.print("[Client] Server connected but didn't respond")
+                print("Server timeout, try again")
+                break
+            except Exception as e:  # Other exception
+                g_ClientLog.print("[Client] Exception: " + str(e))
+
             for sock in ready_socks:
                 shouldloop = False
 
                 # outra mensagem é recebida com a resolução da primeira e decodificada
-                try:
-                    data, addr = sock.recvfrom(BUFSIZ)  # This is will not block
-                    result = data.decode('ascii')
-                    print("received message:", result)
+                data, addr = sock.recvfrom(BUFSIZ)  # This is will not block
+                result = data.decode('ascii')
+                print("received message:", result)
 
-                    # print expression result received from server
-                    if result == "exception":
-                        print("[Client] An exception was detected. Try a valid mathematical expression")
-                    elif result == "zero division":
-                        print("[Client] A division by zero was detected. Try a valid mathematical expression")
-                    else:
-                        print("result = " + result)
+                # print expression result received from server
+                if result == "exception":
+                    print("[Client] An exception was detected. Try a valid mathematical expression")
+                elif result == "zero division":
+                    print("[Client] A division by zero was detected. Try a valid mathematical expression")
+                else:
+                    print("result = " + result)
 
-                    sys.stdout.flush()
-                except socket.timeout:
-                    g_ClientLog.print("[Client] Server connected but didn't respond")
-                    print("Server timeout, try again")
-                    sys.stdout.flush()
-                    pass
-                except Exception as e:  # Other exception
-                    g_ClientLog.print("[Client] Exception: " + str(e))
-                finally:
-                    g_ClientLog.print("[Client] Closing socket")
-                    sock.close()
+                sys.stdout.flush()
+                g_ClientLog.print("[Client] Closing socket")
+                sock.close()
+
         if socketlist is []:
             g_ClientLog.print("[Client] No server could connect")
             print("All servers down")
