@@ -1,6 +1,5 @@
 
 import datetime
-from sys import stdout
 
 
 # log generator

@@ -40,8 +40,7 @@ def connect_server(remote):
         # Connection refused
         g_ClientLog.print("[Client] Refused: server %s:%d" % (host, port))
         pass
-    except Exception as e:
-        # Other exception
+    except Exception as e:  # Other exception
         g_ClientLog.print("[Client] Exception: " + str(e) + " for server %s:%d" % (host, port))
     finally:
         # If the socket couldn't connect, close it
@@ -73,6 +72,7 @@ def main(argv):
         # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
         # e aguarda o recebimento da resposta. Caso contrário, procede para a
         # próxima iteração.
+        is_connected = False
         for idx, remote in enumerate(remote_list):
             g_ClientLog.print("[Client] Requesting server #%d" % idx)
             # tenta conectar no servidor da iteracao atual
@@ -87,18 +87,31 @@ def main(argv):
                 sock.send(msg)
                 g_ClientLog.print("[Client] Waiting server result")
                 # outra mensagem é recebida com a resolução da primeira e decodificada
-                result = sock.recv(BUFSIZ).decode('ascii')
-                g_ClientLog.print("[Client] Closing socket")
-
-                sock.close()
-                # print expression result received from server
-                print("result = " + result)
-                sys.stdout.flush()
+                try:
+                    result = sock.recv(BUFSIZ).decode('ascii')
+                    # print expression result received from server
+                    print("result = " + result)
+                    sys.stdout.flush()
+                except socket.timeout:
+                    g_ClientLog.print("[Client] Server connected but didn't respond")
+                    print("Server timeout, try again")
+                    sys.stdout.flush()
+                    pass
+                except Exception as e:  # Other exception
+                    g_ClientLog.print("[Client] Exception: " + str(e))
+                finally:
+                    g_ClientLog.print("[Client] Closing socket")
+                    sock.close()
                 # não precisamos continuar iterando pelos próximos servidores, se
                 # encontramos o de menor número, que é o líder, e ele já nos devolveu
                 # a resposta. Logo, break irá retornar para o While que irá pedir
                 # outra expressão aritmética para o usuário.
                 break
+        if not is_connected:
+            g_ClientLog.print("[Client] No server could connect")
+            print("All servers down")
+            sys.stdout.flush()
+
 
 
 if __name__ == "__main__":
