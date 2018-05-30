@@ -32,6 +32,8 @@ def main():
         try:
             data, addr = sock.recvfrom(1024)
             print(data.decode('ascii'))
+            print('from ' + str(addr))
+            sock.sendto("response msg".encode('ascii'), addr)
         except Exception as e:  # Other exception
             print('Exception' % str(e))
             hex_data = binascii.hexlify(data)
