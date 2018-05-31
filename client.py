@@ -14,15 +14,10 @@ TIMEOUT = 4
 MCAST_GRP = '224.1.1.1'
 MCAST_PORT = 5007
 
-blocking_connection = False
-
-
 # Creates a non-blocking TCP socket file descriptor
 def create_socket():
     g_ClientLog.print("[ClientTCP] Created socket")
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    if blocking_connection:
-        sock.setblocking(0)
     return sock
 
 
@@ -153,7 +148,6 @@ def main(argv):
     if len(sys.argv) == 2:
         if sys.argv[1].lower() == "tcp":
             # remote_list returns a array of tuples (hostname, port) from servers.txt
-            blocking_connection = True
             remote_list, _ = remotes.create_remote_list()
             client = ClientTCP(remote_list)
         elif sys.argv[1].lower() == "udp":
