@@ -25,34 +25,40 @@
                 marcado/promovido a líder, que será quem responde a todas as requisições do cliente.
             </p>
             <p>
-                Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão aritmética desejada,
-                como 1+1, e o cliente tenta conectar a cada servidor, enviando a requisição se sucesso.
-
-                Após isso, o servidor com menor identificação (líder) retorna o resultado da conta. Se acontecer algo com
-                o líder, o programa aguarda o timeout e <strong>faz o que?? Erro?</strong>
-
-                O servidor líder, tendo sido encontrado e funcionando perfeitamente, efetua a expressão matemática, usando
-                a biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a>.
+                Fizemos o trabalho em <strong>TCP e UDP</strong>. O server.py roda os dois ao mesmo tempo! No caso do TCP,
+                ele tenta conectar de um em um. No caso do UDP, ele faz uso do multicast para enviar de uma vez para o grupo.
             </p>
+            <p>
+                Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão matemática desejada,
+                como 1+1, e o cliente tenta criar uma conexão com cada cada servidor, usando <a href="https://docs.python.org/3/library/socket.html">socket</a>, e enviando a requisição caso consiga.
 
-                <p>A biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a> é uma biblioteca, disponível em
-                código aberto, que permite transformar um texto em uma gramática simples, e a partir disso efetuar as operações
-                matemáticas. É uma forma muito mais segura e, em muitos casos, mais rápida, que o uso do tradicional Eval.
+                Feito isso, o cliente usa a biblioteca nativa <a href="https://docs.python.org/3/library/select.html">select</a>
+                para escutar por todos os servidores. O servidor de menor identificação (líder) efetua a operação matemática
+                e retorna o resultado da conta.
+            </p>
+                <p>Para efetuar o cálculo da expressão matemática e poder devolver o resultado esperado (ou erro, em caso de divisão por zero,
+                    ou expressão inválida), decidimos por usar a biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a>, disponível em
+                código aberto, que permite transformar um texto em uma gramática simples. A partir disso, usamos um grupo de funções que transformam
+                    em uma operação matemática e a resolve. É uma forma muito mais segura e, em muitos casos, mais rápida, e mais customizável que o uso do tradicional Eval.
                     É possível, portanto, efetuar as operações de soma (+), subtração (-), divisião (/), multiplicação (*), exponenciação (^),
                     seno (sin), cosseno (cos), tangente (tan), módulo (abs), concatenação (trunc) e aproximação (round).
             </p>
-
             <p>
-                Após ter sido feita essa operação, o líder devolve a resposta para o cliente. Caso tenha ocorrido algum erro,
-                o programa irá retornar a string "zero division" em caso de divisão por zero, ou "exception" em caso de outra
-                exceção, o que significa que a expressão não foi escrita corretamente. Usar o valor "www" como entrada produz
-                esse erro.
+                Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout, implementado
+                no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
+                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática. Existem duas mensagens de erro:
+                "zero-division" e "exception". A primeira é provocada por uma divisão por zero, e a segunda pela sintaxe estar errada. Usar, por exemplo,
+                o valor "www" como entrada produz esse erro, já que não é uma expressão matemática. O cliente, ao receber essas mensagens, que irá
+                mostrar a mensagem de erro completa. Fizemos assim pensando em um menor tráfego na rede e na eventual possiblidade de múltiplos idiomas, como a mensagem é a mesma
+                e não depende do idioma, cada um poderia mostrar o erro no próprio idioma. Por fim, o cliente fecha todas as conexões que foram abertas
+                e pede para o usuário digitar outra expressão matemática.
             </p>
-
             <p>
-                Tendo a resposta do líder, o cliente imprime o valor retornado, ou o erro que aconteceu seguido de uma sugestão,
-                escrever uma expressão matemática válida. Feito tudo isso, o usuário pode digitar outra expressão, que o programa
-                realizará as mesmas etapas de novo. Para finalizar, é só usar o atalho Ctrl+C.
+                Caso tudo ocorra com sucesso, o select irá interpretar a mensagem recebida e o cliente irá imprimir o resultado;
+                se for um número, mostrar ele; se for uma mensagem de erro, transforma em texto e mostra, como descrito acima.
+                Feito tudo isso, o usuário pode digitar outra expressão, que o programa realizará as mesmas etapas de novo.
+
+                Para finalizar a execução do programa, basta usar o atalho Ctrl+C.
             </p>
 
             <h3>Arquivos:</h3>

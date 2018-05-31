@@ -41,7 +41,7 @@ def connect_server(remote):
     return sock
 
 
-def main(argv):
+def main_tcp():
     # Create Loggers
     global g_ClientLog
     # serverLogFile = open("Client.log", "w")
@@ -121,5 +121,57 @@ def main(argv):
             sys.stdout.flush()
 
 
+# TCP code
+MCAST_GRP = '224.1.1.1'
+MCAST_PORT = 5007
+
+
+def main_udp():
+    # Create Loggers
+    global g_ClientLog
+    # serverLogFile = open("Client.log", "w")
+    # g_ClientLog = logger.Logger(serverLogFile)
+    g_ClientLog = logger.Logger(sys.stdout)
+    g_ClientLog.header("Client")
+
+    # remote_list returns a array of tuples (hostname, port) from servers.txt
+    remote_list, _ = remotes.create_remote_list()
+
+    while True:
+        # recebe a expressão aritmética do usuário.
+        expression = input("Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3\n")
+        # para cada endereço local do remote_list, iremos iterar.
+        # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
+        # e aguarda o recebimento da resposta. Caso contrário, procede para a
+        # próxima iteração.
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+        # sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+        data = expression.encode('ascii')
+        sock.sendto(data, (MCAST_GRP, MCAST_PORT))
+        try:
+            data, addr = sock.recvfrom(1024)
+            expression = data.decode('ascii')
+            print(expression)
+            print('from ' + str(addr))
+        except socket.timeout:
+            g_ClientLog.print("[Client] No server responded")
+            print("Server timeout, try again")
+            sys.stdout.flush()
+        g_ClientLog.print("[ClientUDP] Closing socket " + str(sock.getsockname()))
+        sock.close()
+
+
 if __name__ == "__main__":
-    main(sys.argv[0:])
+    if sys.argv.__len__() < 2:
+        print("Wrong parameters! ./python3 client [TCP/UDP]")
+        exit()
+    if sys.argv[1].lower() == "tcp":
+        main_tcp()
+    elif sys.argv[1].lower() == "udp":
+        main_udp()
+    else:
+        print("Wrong parameters! ./python3 client [TCP/UDP]")
+        exit()
