@@ -151,7 +151,7 @@
                 Para executar:<br><strong>UDP e TCP</strong>: <em>python3 server.py [porta]</em><br><strong>TCP</strong>: <em>python3 server.py [porta] TCP</em>
             <br>Onde porta é o número da porta (por exemplo, 69477). Esse número precisa estar dentro do arquivo servers.txt, que contém o nosso grupo de servidores.
             </p>
-                <br>No caso do TCP, o servidor irá periodicamente verificar quem está acordado iterando sobre a lista obtida
+                No caso do TCP, o servidor irá periodicamente verificar quem está acordado iterando sobre a lista obtida
                 no remotes.py, tentando criar conexão e enviando mensagem, para ver descobrir o identificador dos outros servidores
                 e poder saber se ele é ou não o líder. Ele também estará escutando pelo cliente e pelos outros servidores que poderão estar procurando por ele.
                 <br>No caso do UDP, o servidor irá periodicamente verificar quem está acordado enviando mensagens com o próprio identificador para
