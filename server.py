@@ -267,6 +267,7 @@ class ServerUDP(Server):
         return ClientUDP(connection)
 
 
+# calls function periodically, interval is in seconds
 class RepeatedTimer(object):
     def __init__(self, interval, fun, *args, **kwargs):
         self._timer = None
@@ -284,6 +285,7 @@ class RepeatedTimer(object):
 
     def start(self):
         if not self.is_running:
+            # start timer for next run
             self._timer = Timer(self.interval, self._run)
             self._timer.start()
             self.is_running = True
@@ -293,12 +295,15 @@ class RepeatedTimer(object):
         self.is_running = False
 
 
-# Tries to send heartbeats to the remote continuously by the interval constant defined
-class Heartbeat:
+# Tries to send heartbeats to the remote repeatedly
+# repeats by the interval constant defined 'g_heartbeatInterval'
+# Used by HealthMonitor to send heartbeats to your group
+# Only used by TCP since UDP can multicast
+class Heartbeater:
     def __init__(self, remote):
         self.remote = remote
         g_HeartbeatLog.print("[Remote %d] Starting heartbeat" % self.remote.Id)
-
+        # create a repeated timer that calls self.heartbeat()
         self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
     # Sends heartbeat to remote
@@ -313,12 +318,12 @@ class Heartbeat:
             msg = str(g_ServerTCP.Id)
             sock_fd.send(msg.encode('ascii'))
         except ConnectionRefusedError:
-            g_HeartbeatLog.print(
-                "[Remote %d] Refused heartbeat" % self.remote.Id)
+            g_HeartbeatLog.print("[Remote %d] Refused heartbeat" % self.remote.Id)
             pass
+        except Exception as e:  # Other exception
+            g_HeartbeatLog.print("[Client] Heartbeat failed, Exception: " + str(e))
         finally:
-            g_HeartbeatLog.print(
-                "[Remote %d] Closing socket" % self.remote.Id)
+            g_HeartbeatLog.print("[Remote %d] Closing socket" % self.remote.Id)
             sock_fd.close()
 
     # creates a socket to send heartbeats with timeout
@@ -346,14 +351,22 @@ def timedelta_ms(timedelta):
 
 
 # Stores information of other remotes
+# such as: lastHeartbeat date, heartbeat deviation.
+# calculates the timeout value to use taking the devitaion into consideration
 class Remote:
     def __init__(self, addr, port, idx):
+        # Address : Port
         self.addr = addr
         self.port = port
+        # Remote ID
         self.Id = idx
         g_HeartbeatLog.print("[Remote %d] created" % self.Id)
+        # Heartbeat deviation
         self.devHB = 0
-        self.lastHeartbeat = datetime.datetime.now()
+        # Initialize lastHeartbeat as invalid, too long ago
+        # only sure the server in on when first heartbeat is received
+        now = datetime.datetime.now()
+        self.lastHeartbeat = now - self.timeout_delta()
 
     # heartbeat port
     def port_heart(self):
@@ -366,27 +379,38 @@ class Remote:
         self.lastHeartbeat = datetime.datetime.now()
         timedelta = self.lastHeartbeat - prev
         # update deviation
-        self.devHB = 0.75*self.devHB\
+        self.devHB = 0.75 * self.devHB\
             + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
         g_HealthMonitorLog.print("[Remote %d] Heartbeat, delta = %dms; dev = %d"
                                  % (self.Id, timedelta_ms(timedelta), self.devHB))
 
+    # Fair timeout value for the heartbeats to assume server dead
+    # Takes the deviation calculated with heartbeats into account
+    def timeout_delta(self):
+        global g_heartbeatInterval
+        return datetime.timedelta(
+            milliseconds=int(1000 * g_heartbeatInterval + 4 * self.devHB))
+
 
 # Monitors other remotes by listening heartbeats
 # Also sends heartbeats to others
+# Calculates group leader
 class HealthMonitor(threading.Thread):
     def __init__(self, remote_list):
         threading.Thread.__init__(self)
         g_HealthMonitorLog.print("[HealthMonitor] created thread %s"
                                  % str(threading.current_thread().ident))
         # create socket to listen to heartbeats
-        self.socketHB = self.create_socket_listen_hb()
-        # Construct remotes and Heartbeat list
+        self.socketHB = self.create_socket_hb()
+        # Construct remotes and Heartbeater list
+        # Remote array, see Remote class
         self.remotes = []
+        # see the concrete classes implementation of heartbeats
         self.heartbeat_setup()
         for idx, remote in enumerate(remote_list):
+            # get remote info
             addr, port = remote
-            # create remote info
+            # create Remote object
             remote = Remote(addr, port, idx)
             self.remotes.append(remote)  # add to list
             # If not myself, send heartbeats to it
@@ -399,10 +423,10 @@ class HealthMonitor(threading.Thread):
 
     # Creates socket to listen to heartbeats
     @abstractmethod
-    def create_socket_listen_hb(self):
+    def create_socket_hb(self):
         pass
 
-    # Creates a Heartbeat if needed
+    # Creates a Heartbeater if needed
     @abstractmethod
     def heartbeat_create(self, idx, remote):
         pass
@@ -415,6 +439,7 @@ class HealthMonitor(threading.Thread):
             # Blocks until a heartbeat is received
             idx = self.receive_heartbeat()
             g_HealthMonitorLog.print("[HealthMonitor] Heartbeat from %s" % str(idx))
+            # Inform Remote I heard it's heartbeat
             self.remotes[idx].beat()
 
     # setup to start listening
@@ -437,30 +462,33 @@ class HealthMonitor(threading.Thread):
             if re.Id == g_ServerTCP.Id:  # local
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 return re.Id
-            timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
+            timeout = re.timeout_delta()
             g_HealthMonitorLog.print(
-                "[HealthMonitor] %d timeoutInterval = %dms"
+                "[HealthMonitor] Remote %d timeoutInterval = %dms"
                 % (re.Id, 1000*timeout.total_seconds()))
+            # calculate tolerance
             tolerance = now - timeout
             last = re.lastHeartbeat
             delta = timedelta_ms(last - tolerance)
             g_HealthMonitorLog.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
-            # inside tolerance
+            # If inside tolerance
             if delta > 0:  # TODO test this
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 return re.Id
         return -1  # should be impossible, I will always find myself
 
 
-# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+# Monitors other remotes by listening heartbeats
+# creates Heartbeats to inform others
+# Calculates group leader
 class HealthMonitorTCP(HealthMonitor):
     def __init__(self, remote_list):
-        # Heartbeat sending list
+        # Heartbeater sending list
         self.heartbeat_list = []
 
         super().__init__(remote_list)
 
-    def create_socket_listen_hb(self):
+    def create_socket_hb(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
@@ -473,11 +501,11 @@ class HealthMonitorTCP(HealthMonitor):
     def heartbeat_setup(self):
         pass
 
-    # Creates a Heartbeat if needed
+    # Creates a Heartbeater if needed
     def heartbeat_create(self, idx, remote):
         if idx != g_ServerTCP.Id:
-            # create and add Heartbeat
-            self.heartbeat_list.append(Heartbeat(remote))
+            # create and add Heartbeater, see it's class
+            self.heartbeat_list.append(Heartbeater(remote))
 
     # setup to start listening
     def setup_listening(self):
@@ -503,15 +531,18 @@ class HealthMonitorTCP(HealthMonitor):
         return int(idx)
 
 
-# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+# Monitors other remotes by listening heartbeats
+# UDP implementation uses multicast, no need to create Heartbeaters
+# multicasts your own Id to your server group
+# Calculates group leader
 class HealthMonitorUDP(HealthMonitor):
     def __init__(self, remote_list):
-        # Heartbeat sender
-        self.hb = None
+        # Heartbeater sender
+        self.heartbeatRepeatedSender = None
 
         super().__init__(remote_list)
 
-    def create_socket_listen_hb(self):
+    def create_socket_hb(self):
         g_ServerLog.print("[HealthMonitorUDP] Creating UDP socket multicast")
         sock = create_socket_multicast()
         return sock
@@ -519,16 +550,17 @@ class HealthMonitorUDP(HealthMonitor):
     # Setup for heartbeat generation
     def heartbeat_setup(self):
         g_HeartbeatLog.print("[HealthMonitorUDP] Starting heartbeat sender")
-        self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
+        # create a repeated timer that calls self.heartbeat()
+        self.heartbeatRepeatedSender = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
     # Sends heartbeat to remote
     def heartbeat(self):
-        g_HeartbeatLog.print("[Heartbeat UDP] Sending heartbeat multicast")
+        g_HeartbeatLog.print("[HealthMonitorUDP] Sending heartbeat multicast")
         # send my id as heartbeat
         msg = str(g_ServerTCP.Id)
         self.socketHB.sendto(msg.encode('ascii'), (MULTICAST_GRP_HB, MULTICAST_PORT_HB))
 
-    # Creates a Heartbeat if needed
+    # Creates a Heartbeater if needed
     def heartbeat_create(self, idx, remote):
         pass
 
@@ -566,10 +598,10 @@ def main(argv):
     g_HealthMonitorLog.header("HealthMonitor")
 
     global g_HeartbeatLog
-    # HeartbeatFile = open("log/Heartbeat.log", "w")
+    # HeartbeatFile = open("log/Heartbeater.log", "w")
     # g_HeartbeatLog = logger.Logger(HeartbeatFile)
     g_HeartbeatLog = logger.Logger(sys.stdout)
-    g_HeartbeatLog.header("Heartbeat")
+    g_HeartbeatLog.header("Heartbeater")
 
     global g_Host
     # get my host
