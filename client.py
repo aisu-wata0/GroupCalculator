@@ -71,7 +71,7 @@ class Client:
 class ClientTCP(Client):
     def __init__(self, remote_list):
         self.remote_list = remote_list
-        self.ready_to_write = []
+        self.sent_socks = []
         self.socks = []
 
     # Blocks to connect to servers || Timeout
@@ -95,11 +95,13 @@ class ClientTCP(Client):
 
         g_ClientLog.print("[ClientTCP] Waiting any server for %ds..." % TIMEOUT)
         # this will block until at least one socket is ready to write || Timeout
-        _, self.ready_to_write, in_error = select.select([], self.socks, [], TIMEOUT)
+        _, ready_to_write, in_error = select.select([], self.socks, [], TIMEOUT)
+
+        self.sent_socks = []
         # if not timeout
-        if self.ready_to_write:
+        if ready_to_write:
             # for all those that connected
-            for sock in self.ready_to_write:
+            for sock in ready_to_write:
                 g_ClientLog.print("[ClientTCP] Connected to " + str(sock.getsockname()))
                 g_ClientLog.print("[ClientTCP] Sending expression: " + expression)
                 # mensagem é codificada em ascii
@@ -107,20 +109,20 @@ class ClientTCP(Client):
                 try:
                     # mensagem é enviada ao servidor da iteracao atual
                     sock.send(data)  # This is will not block
+                    self.sent_socks.append(sock)
                 except Exception as e:
                     g_ClientLog.print("[ClientTCP] Exception in send: " + str(e))
-                    # TODO remove sock from ready_to_write
                     pass
 
     # If you tried to send to a connected server,
     #   blocks until socket is ready to be read || Timeout
     def receive_result(self):
         # if you actually sent something
-        if self.ready_to_write:
+        if self.sent_socks:
             g_ClientLog.print("[ClientTCP] Waiting any server result")
             # this will block until at least one socket is ready to read
             # wait response from one of the connections, select only from those you wrote
-            ready_to_read, _, in_error = select.select(self.ready_to_write, [], [], TIMEOUT)
+            ready_to_read, _, in_error = select.select(self.sent_socks, [], [], TIMEOUT)
             # only the leader should be ready
             for sock in ready_to_read:
                 result = sock.recv(BUFSIZ).decode('ascii')
