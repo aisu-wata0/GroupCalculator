@@ -91,7 +91,10 @@ class ClientTCP(Client):
                 # mensagem é codificada em ascii
                 msg = expression.encode('ascii')
                 # mensagem é enviada ao servidor da iteracao atual
-                sock.send(msg)  # This is will not block
+                try:
+                    sock.send(msg)  # This is will not block
+                except: # except to catch when server isn't ready to write even thought select detected it was.
+                    pass
 
     def receive_result(self):
         g_ClientLog.print("[ClientTCP] Waiting any server result")
@@ -120,7 +123,7 @@ class ClientUDP(Client):
         self.sock.settimeout(TIMEOUT)
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
         # sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-        g_ClientLog.print("[ClientUDP] Multicasting "+str((MCAST_GRP, MCAST_PORT))+" expression: " + expression)
+        g_ClientLog.print("[ClientUDP] Multicasting " + str((MCAST_GRP, MCAST_PORT)) + " expression: " + expression)
         data = expression.encode('ascii')
         self.sock.sendto(data, (MCAST_GRP, MCAST_PORT))
 
