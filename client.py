@@ -38,6 +38,9 @@ def connect_server(remote):
         host = socket.gethostbyname(host)
         # Tries to establish connection
         sock.connect((host, port))
+    except BlockingIOError:
+        g_ClientLog.print("[ClientTCP] Non-blocking connection in progress...")
+        pass
     except Exception as e:  # Other exception
         g_ClientLog.print("[ClientTCP] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
 
@@ -101,8 +104,13 @@ class ClientTCP(Client):
                 g_ClientLog.print("[ClientTCP] Sending expression: " + expression)
                 # mensagem é codificada em ascii
                 data = expression.encode('ascii')
-                # mensagem é enviada ao servidor da iteracao atual
-                sock.send(data)  # This is will not block
+                try:
+                    # mensagem é enviada ao servidor da iteracao atual
+                    sock.send(data)  # This is will not block
+                except Exception as e:
+                    g_ClientLog.print("[ClientTCP] Exception in send: " + str(e))
+                    # TODO remove sock from ready_to_write
+                    pass
 
     # If you tried to send to a connected server,
     #   blocks until socket is ready to be read || Timeout
