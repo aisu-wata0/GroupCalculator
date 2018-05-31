@@ -16,10 +16,13 @@ import logger
 BUFSIZ = 8192
 g_heartbeatInterval = 4
 
-g_Server = None
+g_ServerTCP = None
+g_ServerUDP = None
 g_HealthMonitor = None
 
 g_Host = ""
+MULTICAST_GRP = '224.1.1.1'
+MULTICAST_PORT = 5007
 
 g_ServerLog = None
 g_HealthMonitorLog = None
@@ -85,7 +88,28 @@ class ClientTCP(Client):
         g_ServerLog.print(
             "[ClientTCP %s] Sending result = %s" % (str(self.addr), msg))
         self.sock.send(msg.encode("ascii"))
-        pass
+
+
+class ClientUDP(Client):
+    def __init__(self, connection):
+        super().__init__(connection)
+        # Construction parameters
+        self.expression = self.sock
+        # create another socket to respond
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        try:
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
+
+    def receive_exp(self):
+        return self.expression
+
+    # respond with the result
+    def respond(self, msg):
+        g_ServerLog.print(
+            "[ClientUDP %s] Sending result = %s" % (str(self.addr), msg))
+        self.sock.sendto(msg.encode('ascii'), self.addr)
 
 
 class Server(threading.Thread):
@@ -159,6 +183,41 @@ class ServerTCP(Server):
         return ClientTCP(connection)
 
 
+class ServerUDP(Server):
+    def create_socket(self):
+        g_ServerLog.print("[ServerUDP] Creating UDP socket")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        return sock
+
+    def start_listening(self):
+        host = ''
+        # host = MULTICAST_GRP
+        g_ServerLog.print("[ServerUDP] Bind UDP %s:%d" % (MULTICAST_GRP, self.port))
+        self.socket.bind((host, self.port))
+
+        mreq = socket.inet_aton(MULTICAST_GRP) + socket.inet_aton(g_Host)
+        # mreq = struct.pack("4sl", socket.inet_aton(MULTICAST_GRP), socket.INADDR_ANY)
+
+        self.socket.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(g_Host))
+        self.socket.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        g_ServerLog.print("[ServerUDP] listening...")
+
+    def wait_client(self):
+        connection = data, addr = self.socket.recvfrom(BUFSIZ)
+        g_ServerLog.print("[ServerUDP] Received from %s:%d" % (str(addr[0]), addr[1]))
+        return connection
+
+    def create_client(self, connection):
+        return ClientUDP(connection)
+
+
 class RepeatedTimer(object):
     def __init__(self, interval, fun, *args, **kwargs):
         self._timer = None
@@ -209,7 +268,7 @@ class Heartbeat:
         try:
             sock_fd.connect((host, self.remote.port_heart()))
             # send my id as heartbeat
-            msg = str(g_Server.Id)
+            msg = str(g_ServerTCP.Id)
             sock_fd.send(msg.encode('ascii'))
         except ConnectionRefusedError:
             g_HeartbeatLog.print(
@@ -288,15 +347,15 @@ class HealthMonitor(threading.Thread):
             # add to list
             self.remotes.append(remote)
             # If not myself, send heartbeats to it
-            if idx != g_Server.Id:
+            if idx != g_ServerTCP.Id:
                 # create and add Heartbeat
                 heartbeat_list.append(Heartbeat(remote))
 
     # Thread method invoked when started
     def run(self):
-        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_Server.port_heart()))
+        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ServerTCP.port_heart()))
         # receive from any source, in 'portHG()' port
-        self.socketListenHeartbeats.bind((g_Host, g_Server.port_heart()))
+        self.socketListenHeartbeats.bind((g_Host, g_ServerTCP.port_heart()))
 
         g_HealthMonitorLog.print("[HealthMonitor] listening for heartbeats...")
         self.socketListenHeartbeats.listen(self.queueSize)
@@ -334,7 +393,7 @@ class HealthMonitor(threading.Thread):
         now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
-            if re.Id == g_Server.Id:  # local
+            if re.Id == g_ServerTCP.Id:  # local
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 return re.Id
             timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
@@ -392,9 +451,12 @@ def main(argv):
         sys.exit(1)
 
     # Start Server
-    global g_Server
-    g_Server = ServerTCP(server_id, my_port)
-    g_Server.start()
+    global g_ServerTCP
+    g_ServerTCP = ServerTCP(server_id, my_port)
+    g_ServerTCP.start()
+    global g_ServerUDP
+    g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
+    g_ServerUDP.start()
 
     # Start HealthMonitor
     global g_HealthMonitor
