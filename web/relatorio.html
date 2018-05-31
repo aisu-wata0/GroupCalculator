@@ -18,16 +18,33 @@
                 em um grupo multicacast de N servidores.
             </p>
             <p>
-                Para isso, a partir do arquivo servers.txt, que contém uma lista com o nome local e o número da porta de
-                cada servidor possível que queremos conectar, cada servidor tenta se conectar com todos os endereços da
-                lista em busca de outros servidores. Se encontrar, verifica qual possui o menor identificador. O servidor que,
-                ao realizar essa busca, perceber que nenhum outro servidor conectado tem endereço menor que o dele, será
-                marcado/promovido a líder, que será quem responde a todas as requisições do cliente.
+                Fizemos o trabalho em <strong>TCP e UDP</strong>. O server.py roda os dois ao mesmo tempo! No caso do TCP,
+                ele tenta conectar de um em um, fazendo uso de uma classe chamada HealthMonitor e enviando Heartbeats
+                (batidas de coração) repetidamente. No caso do UDP, ele faz uso do multicast para enviar de uma vez para o grupo.
+                Por causa disso, não é possível executar vários terminais na mesma máquina, são necessárias máquinas diferentes.
+                Para fazer o programa rodar na mesma máquina (portanto, apenas no protocolo TCP), o comando é o seguinte:
+                <br>
+                python3 server.py [numero da porta] <strong>TCP</strong>
+                <br>
             </p>
             <p>
-                Fizemos o trabalho em <strong>TCP e UDP</strong>. O server.py roda os dois ao mesmo tempo! No caso do TCP,
-                ele tenta conectar de um em um. No caso do UDP, ele faz uso do multicast para enviar de uma vez para o grupo.
+            <h5>Servidor TCP:</h5>
+                A partir do arquivo servers.txt, que contém uma lista (como se fosse o grupo) com o nome local e o número da porta de
+                cada servidor que queremos conectar, cada servidor tenta se conectar com todos os endereços da
+                lista em busca de outros servidores. Se encontrar, verifica qual possui o menor identificador. O servidor que,
+                ao realizar essa busca, perceber que nenhum outro servidor conectado tem endereço menor que o dele, será
+                marcado/promovido a líder, que será quem responde a todas as requisições do cliente. Após isso, cada servidor
+            envia "heartbeats" para os demais, batidas de coração, marcando a hora da última vez que o servidor respondeu.
             </p>
+            <h5>Servidor UDP:</h5>
+                O UDP irá lidar com o endereço do grupo multicast e com a porta multicast. A partir desse endereço, cada
+            servidor irá, periodicamente, enviar mensagens em busca dos demais. Cada um, ao receber a mensagem, verifica quem tem o menor identificador,
+            o servidor que enviou, ou ele próprio que recebeu. O que sempre tiver o menor identificador será o líder.
+            Se, por algum motivo, o líder estiver indisponível, os servidores irão eleger um novo.
+            O identificador é escolhido com base no arquivo servers.txt, que contém a lista com nome local e o número da porta de cada servidor que queremos
+            conectar.
+            </p>
+            <h5>Cliente TCP:</h5>
             <p>
                 Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão matemática desejada,
                 como 1+1, e o cliente tenta criar uma conexão com cada cada servidor, usando <a href="https://docs.python.org/3/library/socket.html">socket</a>, e enviando a requisição caso consiga.
@@ -36,6 +53,15 @@
                 para escutar por todos os servidores. O servidor de menor identificação (líder) efetua a operação matemática
                 e retorna o resultado da conta.
             </p>
+
+            <h5>Cliente UDP:</h5>
+            <p>
+                Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão matemática desejada,
+                como 1+1, e o cliente envia essa expressão para o grupo multicast.
+
+                Feito isso, o cliente aguarda a resposta até que ela apareça ou o timeout aconteça.
+            </p>
+            <h5>Cálculo da expressão matemática</h5>
                 <p>Para efetuar o cálculo da expressão matemática e poder devolver o resultado esperado (ou erro, em caso de divisão por zero,
                     ou expressão inválida), decidimos por usar a biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a>, disponível em
                 código aberto, que permite transformar um texto em uma gramática simples. A partir disso, usamos um grupo de funções que transformam
@@ -43,21 +69,28 @@
                     É possível, portanto, efetuar as operações de soma (+), subtração (-), divisião (/), multiplicação (*), exponenciação (^),
                     seno (sin), cosseno (cos), tangente (tan), módulo (abs), concatenação (trunc) e aproximação (round).
             </p>
+            <h5>Exceções UDP</h5>
             <p>
                 Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout, implementado
-                no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
-                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática. Existem duas mensagens de erro:
-                "zero-division" e "exception". A primeira é provocada por uma divisão por zero, e a segunda pela sintaxe estar errada. Usar, por exemplo,
-                o valor "www" como entrada produz esse erro, já que não é uma expressão matemática. O cliente, ao receber essas mensagens, que irá
-                mostrar a mensagem de erro completa. Fizemos assim pensando em um menor tráfego na rede e na eventual possiblidade de múltiplos idiomas, como a mensagem é a mesma
-                e não depende do idioma, cada um poderia mostrar o erro no próprio idioma. Por fim, o cliente fecha todas as conexões que foram abertas
-                e pede para o usuário digitar outra expressão matemática.
+                no próprio <a href="https://docs.python.org/3/library/socket.html">socket</a>, que fará o cliente mostrar uma mensagem de erro,
+                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática.
+            Caso tudo ocorra com sucesso, o select do cliente irá interpretar a mensagem recebida e irá imprimir o resultado.
             </p>
+            <h5>Exceções TCP</h5>
             <p>
-                Caso tudo ocorra com sucesso, o select irá interpretar a mensagem recebida e o cliente irá imprimir o resultado;
-                se for um número, mostrar ele; se for uma mensagem de erro, transforma em texto e mostra, como descrito acima.
-                Feito tudo isso, o usuário pode digitar outra expressão, que o programa realizará as mesmas etapas de novo.
-
+            Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout, implementado
+                no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
+                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática.
+            Caso tudo ocorra com sucesso, o cliente irá interpretar a mensagem recebida pelo multicast e irá imprimir o resultado.
+            </p>
+            <h5>Mensagens de erro:</h5>
+                Colocamos duas mensagens de erro:
+            "zero-division" e "exception". A primeira é provocada por uma divisão por zero, e a segunda pela sintaxe estar errada. Usar, por exemplo,
+                o valor "www" como entrada produz esse erro, já que não é uma expressão matemática. O cliente, após receber essas mensagens, que irá
+                mostrar a mensagem de erro completa. Fizemos assim pensando em um menor tráfego na rede e na eventual possiblidade de múltiplos idiomas: como a mensagem é a mesma
+                e não depende do idioma, cada um poderia mostrar o erro no próprio idioma. Por fim, no TCP o cliente fecha todas as conexões que foram abertas
+                e pede para o usuário digitar outra expressão matemática. No UDP o cliente fecha o socket e pede para o usuário digitar outra expressão matemática.
+            <p>
                 Para finalizar a execução do programa, basta usar o atalho Ctrl+C.
             </p>
 
@@ -66,6 +99,8 @@
             <p>
                 Esse arquivo possui uma lista com todos os servidores que fazem parte da rede e estão interessados em participar
                 da calculadora. Como estamos fazendo um Multicast e não um Broadcast, essa lista é o grupo de servidores.
+                Com base nesse arquivo que o nosso programa sabe os valores dos identificadores e pode selecionar quem é o líder
+                com base no método proposto em sala (menor identificador).
             </p>
 
             <h4>pyparsing.py e pyparsingtest.py</h4>
@@ -79,53 +114,65 @@
                 <p style="font-size: smaller"> 9 + 3 + 6 = ['9', '+', '3', '+', '6'] = ['9', '3', '+', '6', '+'] => 18.0</p>
                 <p style="font-size: smaller">9 + 3 / 11 = ['9', '+', '3', '/', '11'] = ['9', '3', '11', '/', '+'] => = 9.27272727273</p>
             <p style="font-size: smaller">PI * PI / 10 = ['PI', 'PI', '*', '10', '/'] = ['PI', '*', 'PI', '/', '10'] => 0.986960440109</p>
+
+            <p> Como escrito acima, são válidas as operações de soma (+), subtração (-), divisião (/), multiplicação (*), exponenciação (^),
+                    seno (sin), cosseno (cos), tangente (tan), módulo (abs), concatenação (trunc) e aproximação (round).
             </p>
+            <h4>remotes.py</h4>
+            <p>
+                Arquivo para transformar a lista, do "servers.txt", em um array no Python, e descobrir o número de identificação do servidor
+                (para determinar quem é o líder). É usado tanto pelo cliente quanto pelo servidor, por isso colocamos em um arquivo separado.
+                O cliente não irá fazer uso do número de identificação do servidor, mas fará uso da lista.
+            </p>
+
             <h4>client.py</h4>
             <p>
-
-                Vou arrumar o restante amanhã.
+                Para executar:<br><strong>UDP</strong>: <em>python3 cliente.py UDP</em><br><strong>TCP</strong>: <em>python3 cliente.py TCP</em>
             </p>
-            <h4> server.py</h4>
             <p>
-
+                Cliente é o arquivo que será responsável por fazer a interação entre o usuário e os servidores. Ele é iniciado,
+                como descrito acima, passando como parâmetros "TCP" ou "UDP". Após ser inicializado, o usuário digita a expressão
+                matemática a ser calculada.
+                <br>No caso do TCP, o cliente irá tentar criar conexão com cada servidor da lista server.txt,
+                e, se conseguir, irá enviar a requisição do cliente. Após isso irá usar o "select" do Python para escutar todos os sockets
+                que ele criou e ver se a resposta chegou a algum. Se ela chegar, ele processa, verifica se não houve erro, e imprime para o
+                usuário o resultado. Se não chegar, irá ficar esperando 4 segundos até o timeout.
+                Após isso,
+                <br>No caso do UDP, o cliente irá criar uma conexão e enviar para todos os servidores do grupo a requisição do cliente. Após isso,
+                ele aguarda a resposta. Se ela chegar, ele processa, verifica se não houve erro, e imprime para o
+                usuário o resultado. Se não chegar, irá ficar esperando 4 segundos até o timeout.
+            </p>
+            <h4>server.py</h4>
+            <p>
+                Servidor é o arquivo que será responsável por checar se os outros servidores estão funcionando, determinar quem é o líder,
+                e, se for o caso, responder a requisição do cliente. Ele é iniciado com os parâmetros porta e [opcional] "TCP" para desativar
+                o multicast udp (ou seja, para o nosso programa poder funcionar na mesma máquina em terminais diferentes).
+            <p>
+                Para executar:<br><strong>UDP e TCP</strong>: <em>python3 server.py [porta]</em><br><strong>TCP</strong>: <em>python3 server.py [porta] TCP</em>
+            <br>Onde porta é o número da porta (por exemplo, 69477). Esse número precisa estar dentro do arquivo servers.txt, que contém o nosso grupo de servidores.
+            </p>
+                <br>No caso do TCP, o servidor irá periodicamente verificar quem está acordado iterando sobre a lista obtida
+                no remotes.py, tentando criar conexão e enviando mensagem, para ver descobrir o identificador dos outros servidores
+                e poder saber se ele é ou não o líder. Ele também estará escutando pelo cliente e pelos outros servidores que poderão estar procurando por ele.
+                <br>No caso do UDP, o servidor irá periodicamente verificar quem está acordado enviando mensagens com o próprio identificador para
+                o grupo multicast. Simultaneamente, ele está escutando pelos outros servidores que podem estar procurando ele, e pelo cliente.
+                A cada mensagem que chega, ele verifica se o identificador é maior ou menor que o dele e se, portanto, ele é o líder.
             </p>
 
-            <h3>Conclusão:</h3>
+            <h4>Conclusão:</h4>
             <p>
-
+                Foi muito interessante realizar esse trabalho para aprender mais sobre como o Multicast funciona na prática
+                e quais técnicas no TCP podem ser usadas para "simular" ele.
             </p><br>
+            <h4>Logs:</h4>
+
             <pre>
-> 2 clientes:
-- Mensagem
-- Mensagem
+> Logs:
 
-> 6 clientes:
-- Mensagem
-- Mensagem
-- Mensagem
-- Mensagem
-
-> 18 clientes:
-- Mensagem
-- Mensagem
-- Mensagem
-- Mensagem
-
-> 54 clientes:
-- Mensagem
-- Mensagem
-- Mensagem
-- Mensagem
-
-> 162 clientes:
-- Mensagem
-- Mensagem
-- Mensagem
-- Mensagem
 		</pre>
-            <h3>Exemplo de modo de uso:</h3>
+            <h3>Modo de uso:</h3>
             <h6>
-                    * Deve-se usar python3 para execução do trabalho;
+                    * Deve-se usar python3 para execução;
                     <br>
                     * Para terminar a execução do servidor é necessária a interrupção Ctrl+C
             </h6>

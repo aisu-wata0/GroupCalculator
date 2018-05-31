@@ -134,27 +134,27 @@ def main_udp():
     g_ClientLog = logger.Logger(sys.stdout)
     g_ClientLog.header("Client")
 
-    # remote_list returns a array of tuples (hostname, port) from servers.txt
-    remote_list, _ = remotes.create_remote_list()
-
     while True:
         # recebe a expressão aritmética do usuário.
         expression = input("Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3\n")
-        # para cada endereço local do remote_list, iremos iterar.
-        # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
-        # e aguarda o recebimento da resposta. Caso contrário, procede para a
-        # próxima iteração.
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-
+        sock.settimeout(TIMEOUT)
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
         # sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
         data = expression.encode('ascii')
         sock.sendto(data, (MCAST_GRP, MCAST_PORT))
         try:
             data, addr = sock.recvfrom(1024)
-            expression = data.decode('ascii')
-            print(expression)
+            result = data.decode('ascii')
+
+            if result == "exception":
+                print("[Client] An exception was detected. Try a valid mathematical expression")
+            elif result == "zero division":
+                print("[Client] A division by zero was detected. Try a valid mathematical expression")
+            else:
+                print("result = " + result)
+            sys.stdout.flush()
             print('from ' + str(addr))
         except socket.timeout:
             g_ClientLog.print("[Client] No server responded")
