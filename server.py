@@ -504,9 +504,11 @@ def main(argv):
     global g_ServerTCP
     g_ServerTCP = ServerTCP(server_id, my_port)
     g_ServerTCP.start()
-    global g_ServerUDP
-    g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
-    g_ServerUDP.start()
+
+    if len(argv) != 3 or argv[2].lower() != "tcp":
+        global g_ServerUDP
+        g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
+        g_ServerUDP.start()
 
     # Start HealthMonitor
     global g_HealthMonitor
