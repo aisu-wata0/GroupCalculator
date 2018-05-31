@@ -472,7 +472,7 @@ class HealthMonitor(threading.Thread):
             delta = timedelta_ms(last - tolerance)
             g_HealthMonitorLog.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
             # If inside tolerance
-            if delta > 0:  # TODO test this
+            if delta > 0:
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 return re.Id
         return -1  # should be impossible, I will always find myself
