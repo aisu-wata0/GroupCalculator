@@ -94,7 +94,7 @@ class ClientUDP(Client):
     def __init__(self, connection):
         super().__init__(connection)
         # Construction parameters
-        self.expression = self.sock
+        self.expression = self.sock.decode('ascii')
         # create another socket to respond
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
