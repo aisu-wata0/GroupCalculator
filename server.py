@@ -7,6 +7,7 @@ import sys
 import struct
 import datetime
 import parse
+from abc import ABC, abstractmethod
 
 import remotes
 import logger
@@ -15,96 +16,206 @@ import logger
 BUFSIZ = 8192
 g_heartbeatInterval = 4
 
-g_Server = None
+g_ServerTCP = None
+g_ServerUDP = None
 g_HealthMonitor = None
 
 g_Host = ""
+MULTICAST_GRP = '224.1.1.1'
+MULTICAST_PORT = 5007
 
 g_ServerLog = None
 g_HealthMonitorLog = None
 g_HeartbeatLog = None
 
 
-class ServeClient(threading.Thread):
-    def __init__(self, conn, addr):
+class Client(threading.Thread):
+    def __init__(self, connection):
         threading.Thread.__init__(self)
         # Construction parameters
-        self.conn = conn
+        sock, addr = connection
+        self.sock = sock
         self.addr = addr
+        g_ServerLog.print("[Client %s] Started" % str(self.addr))
 
     # Thread method invoked when started
     def run(self):
         # receive expression
-        g_ServerLog.print(
-            "[ServerTCP] Client %s: Waiting expression" % self.addr)
-        expression = self.conn.recv(BUFSIZ).decode('ascii')
-        # calculate result
-        g_ServerLog.print(
-            "[ServerTCP] Client %s: Calculating expression = %s" % (self.addr, expression))
+        expression = self.receive_exp()
 
-        result = 0.0
+        # calculate result
+        g_ServerLog.print("[Client %s] Calculating expression: %s"
+                          % (str(self.addr), expression))
         message = ""
         try:
             result = parse.create_result(expression)
-            print("received: " + expression + " result: " + str(result))
+            g_ServerLog.print("[Client %s] result = %s" % (str(self.addr), result))
+            print("received: " + str(expression) + " result: " + str(result))
             message = str(result)
         except ZeroDivisionError:
             print("received: Error! Division by Zero!")
             message = "zero division"
             pass
-        except Exception:  # Other exception
+        except Exception as e:  # Other exception
+            g_ServerLog.print(
+                "[Client %s] Exception %s" % (str(self.addr), e))
             print("received: Error! Invalid expression!")
             message = "exception"
         finally:
             sys.stdout.flush()
-
             # respond with the result
-            g_ServerLog.print(
-                "[ServerTCP] Client %s: Sending result = %s" % (self.addr, str(result)))
-            self.conn.send(message.encode("ascii"))
-
+            self.respond(message)
             # end connection
-            self.conn.close()
+            self.sock.close()
+
+    @abstractmethod
+    def receive_exp(self):
+        pass
+
+    @abstractmethod
+    def respond(self, msg):
+        pass
 
 
-class ServerTCP(threading.Thread):
+class ClientTCP(Client):
+    def receive_exp(self):
+        g_ServerLog.print("[ClientTCP %s] Waiting expression" % str(self.addr))
+        expression = self.sock.recv(BUFSIZ).decode('ascii')
+        return expression
+
+    # respond with the result
+    def respond(self, msg):
+        g_ServerLog.print(
+            "[ClientTCP %s] Sending result = %s" % (str(self.addr), msg))
+        self.sock.send(msg.encode("ascii"))
+
+
+class ClientUDP(Client):
+    def __init__(self, connection):
+        super().__init__(connection)
+        # Construction parameters
+        self.expression = self.sock.decode('ascii')
+        # create another socket to respond
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        try:
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
+
+    def receive_exp(self):
+        return self.expression
+
+    # respond with the result
+    def respond(self, msg):
+        g_ServerLog.print(
+            "[ClientUDP %s] Sending result = %s" % (str(self.addr), msg))
+        self.sock.sendto(msg.encode('ascii'), self.addr)
+
+
+class Server(threading.Thread):
     def __init__(self, server_id, port):
         threading.Thread.__init__(self)
         # Construction parameters
         self.Id = server_id
         self.port = port
+        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
         # client thread array
         # self.clients = []
-        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
-
-        g_ServerLog.print("[ServerTCP] Creating TCP socket")
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        # Listening socket
+        self.socket = self.create_socket()
         self.queueSize = 5
+
+    @abstractmethod
+    def create_socket(self):
+        pass
 
     # Thread method invoked when started
     def run(self):
         global g_Host
         global g_ServerLog
 
+        self.start_listening()
+
+        while True:
+            # establish connection
+            connection = self.wait_client()
+            if g_HealthMonitor.leader() == self.Id:
+                client = self.create_client(connection)
+                client.start()
+
+    @abstractmethod
+    def start_listening(self):
+        pass
+
+    @abstractmethod
+    def wait_client(self):
+        pass
+
+    @abstractmethod
+    def create_client(self, connection):
+        pass
+
+    # heartbeat port
+    def port_heart(self):
+        return self.port + 1
+
+
+class ServerTCP(Server):
+    def create_socket(self):
+        g_ServerLog.print("[ServerTCP] Creating TCP socket")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return sock
+
+    def start_listening(self):
         g_ServerLog.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
         self.socket.bind((g_Host, self.port))
 
         g_ServerLog.print("[ServerTCP] listening...")
         self.socket.listen(self.queueSize)
 
-        while True:
-            # establish connection
-            conn, addr = self.socket.accept()
-            g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
-            if g_HealthMonitor.leader() == self.Id:
-                client = ServeClient(conn, addr[0])
-                client.start()
+    def wait_client(self):
+        connection = sock, addr = self.socket.accept()
+        g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
+        return connection
 
-    # heartbeat port
-    def port_heart(self):
-        return self.port + 1
+    def create_client(self, connection):
+        return ClientTCP(connection)
+
+
+class ServerUDP(Server):
+    def create_socket(self):
+        g_ServerLog.print("[ServerUDP] Creating UDP socket")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        return sock
+
+    def start_listening(self):
+        host = ''
+        # host = MULTICAST_GRP
+        g_ServerLog.print("[ServerUDP] Bind UDP %s:%d" % (MULTICAST_GRP, self.port))
+        self.socket.bind((host, self.port))
+
+        mreq = socket.inet_aton(MULTICAST_GRP) + socket.inet_aton(g_Host)
+        # mreq = struct.pack("4sl", socket.inet_aton(MULTICAST_GRP), socket.INADDR_ANY)
+
+        self.socket.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(g_Host))
+        self.socket.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        g_ServerLog.print("[ServerUDP] listening...")
+
+    def wait_client(self):
+        connection = data, addr = self.socket.recvfrom(BUFSIZ)
+        g_ServerLog.print("[ServerUDP] Received from %s:%d" % (str(addr[0]), addr[1]))
+        return connection
+
+    def create_client(self, connection):
+        return ClientUDP(connection)
 
 
 class RepeatedTimer(object):
@@ -157,7 +268,7 @@ class Heartbeat:
         try:
             sock_fd.connect((host, self.remote.port_heart()))
             # send my id as heartbeat
-            msg = str(g_Server.Id)
+            msg = str(g_ServerTCP.Id)
             sock_fd.send(msg.encode('ascii'))
         except ConnectionRefusedError:
             g_HeartbeatLog.print(
@@ -236,15 +347,15 @@ class HealthMonitor(threading.Thread):
             # add to list
             self.remotes.append(remote)
             # If not myself, send heartbeats to it
-            if idx != g_Server.Id:
+            if idx != g_ServerTCP.Id:
                 # create and add Heartbeat
                 heartbeat_list.append(Heartbeat(remote))
 
     # Thread method invoked when started
     def run(self):
-        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_Server.port_heart()))
+        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ServerTCP.port_heart()))
         # receive from any source, in 'portHG()' port
-        self.socketListenHeartbeats.bind((g_Host, g_Server.port_heart()))
+        self.socketListenHeartbeats.bind((g_Host, g_ServerTCP.port_heart()))
 
         g_HealthMonitorLog.print("[HealthMonitor] listening for heartbeats...")
         self.socketListenHeartbeats.listen(self.queueSize)
@@ -282,7 +393,7 @@ class HealthMonitor(threading.Thread):
         now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
-            if re.Id == g_Server.Id:  # local
+            if re.Id == g_ServerTCP.Id:  # local
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 return re.Id
             timeout = datetime.timedelta(milliseconds=int(1000 * g_heartbeatInterval + 4 * re.devHB))
@@ -340,9 +451,12 @@ def main(argv):
         sys.exit(1)
 
     # Start Server
-    global g_Server
-    g_Server = ServerTCP(server_id, my_port)
-    g_Server.start()
+    global g_ServerTCP
+    g_ServerTCP = ServerTCP(server_id, my_port)
+    g_ServerTCP.start()
+    global g_ServerUDP
+    g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
+    g_ServerUDP.start()
 
     # Start HealthMonitor
     global g_HealthMonitor
