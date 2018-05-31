@@ -46,14 +46,20 @@ def connect_server(remote):
 
 
 class Client:
+    # Attempts to send a expression to server group
+    # Opens needed sockets
+    # There are no guarantees that the server received it
+    # the timeout job is left to receive_result()
     @abstractmethod
     def send_exp(self, expression):
         pass
 
+    # Blocks until a response is received || Timeout
     @abstractmethod
     def receive_result(self):
         pass
 
+    # Closes sockets
     @abstractmethod
     def close(self):
         pass
@@ -65,6 +71,9 @@ class ClientTCP(Client):
         self.ready_to_write = []
         self.socks = []
 
+    # Blocks to connect to servers || Timeout
+    # If any connected
+    #   sends them the data without blocking
     def send_exp(self, expression):
         # para cada endereço local do remote_list, iremos iterar.
         # tenta conectar no servidor. Se for um sucesso, ele envia a expressão
@@ -80,7 +89,6 @@ class ClientTCP(Client):
 
         g_ClientLog.print("[ClientTCP] Waiting any server for %ds..." % TIMEOUT)
         # this will block until at least one socket is ready to write || Timeout
-        sys.stdout.flush()
         _, self.ready_to_write, in_error = select.select([], self.socks, [], TIMEOUT)
         # if not timeout
         if self.ready_to_write:
@@ -89,20 +97,26 @@ class ClientTCP(Client):
                 g_ClientLog.print("[ClientTCP] Connected to " + str(sock.getsockname()))
                 g_ClientLog.print("[ClientTCP] Sending expression: " + expression)
                 # mensagem é codificada em ascii
-                msg = expression.encode('ascii')
+                data = expression.encode('ascii')
                 # mensagem é enviada ao servidor da iteracao atual
-                sock.send(msg)  # This is will not block
+                sock.send(data)  # This is will not block
 
+    # If you tried to send to a connected server,
+    #   blocks until socket is ready to be read || Timeout
     def receive_result(self):
-        g_ClientLog.print("[ClientTCP] Waiting any server result")
-        # this will block until at least one socket is ready to read
-        # wait response from one of the connections, select only from those you wrote
-        ready_to_read, _, in_error = select.select(self.ready_to_write, [], [], TIMEOUT)
-        # only the leader should be ready
-        for sock in ready_to_read:
-            result = sock.recv(BUFSIZ).decode('ascii')
-            g_ClientLog.print("[ClientTCP] Receiving from " + str(sock.getsockname()))
-            return result
+        # if you actually sent something
+        if self.ready_to_write:
+            g_ClientLog.print("[ClientTCP] Waiting any server result")
+            # this will block until at least one socket is ready to read
+            # wait response from one of the connections, select only from those you wrote
+            ready_to_read, _, in_error = select.select(self.ready_to_write, [], [], TIMEOUT)
+            # only the leader should be ready
+            for sock in ready_to_read:
+                result = sock.recv(BUFSIZ).decode('ascii')
+                g_ClientLog.print("[ClientTCP] Receiving from " + str(sock.getsockname()))
+                return result
+        else:
+            raise socket.timeout
 
     def close(self):
         for sock in self.socks:
@@ -114,6 +128,7 @@ class ClientUDP(Client):
     def __init__(self):
         self.sock = None
 
+    # Sends a non-blocking multicast
     def send_exp(self, expression):
         g_ClientLog.print("[ClientUDP] Creating socket")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -124,6 +139,7 @@ class ClientUDP(Client):
         data = expression.encode('ascii')
         self.sock.sendto(data, (MCAST_GRP, MCAST_PORT))
 
+    # Waits for a server response || Timeout
     def receive_result(self):
         g_ClientLog.print("[ClientUDP] Waiting any server for %ds..." % TIMEOUT)
         data, addr = self.sock.recvfrom(BUFSIZ)
