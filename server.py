@@ -154,7 +154,7 @@ class Server(threading.Thread):
         # Construction parameters
         self.Id = server_id
         self.port = port
-        g_ServerLog.print("[ServerTCP] Creating server #%d" % self.Id)
+        g_ServerLog.print("[Server] Creating server #%d" % self.Id)
         # client thread array
         # self.clients = []
         # Listening socket
@@ -317,11 +317,12 @@ class Heartbeater:
             # send my id as heartbeat
             msg = str(g_ServerTCP.Id)
             sock_fd.send(msg.encode('ascii'))
-        except ConnectionRefusedError:
-            g_HeartbeatLog.print("[Remote %d] Refused heartbeat" % self.remote.Id)
+        except (ConnectionRefusedError, socket.timeout) as e:
+            g_HeartbeatLog.print("[Remote %d] Refused heartbeat " % self.remote.Id + str(e))
             pass
         except Exception as e:  # Other exception
-            g_HeartbeatLog.print("[Client] Heartbeat failed, Exception: " + str(e))
+            g_HeartbeatLog.print("[Remote %d] Heartbeat failed, Exception: "
+                                 % self.remote.Id + str(e))
         finally:
             g_HeartbeatLog.print("[Remote %d] Closing socket" % self.remote.Id)
             sock_fd.close()
@@ -459,7 +460,7 @@ class HealthMonitor(threading.Thread):
         now = datetime.datetime.now()
         # return first remote Id considered available
         for re in self.remotes:
-            if re.Id == g_ServerTCP.Id:  # local
+            if re.Id == self.id():  # local
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d, me" % re.Id)
                 return re.Id
             timeout = re.timeout_delta()
@@ -476,6 +477,11 @@ class HealthMonitor(threading.Thread):
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 return re.Id
         return -1  # should be impossible, I will always find myself
+
+    # returns id of the server in the current program
+    @abstractmethod
+    def id(self):
+        return -1
 
 
 # Monitors other remotes by listening heartbeats
@@ -530,6 +536,10 @@ class HealthMonitorTCP(HealthMonitor):
         idx = data.decode('ascii')
         return int(idx)
 
+    # returns id of the server in the current program
+    def id(self):
+        return g_ServerTCP.Id
+
 
 # Monitors other remotes by listening heartbeats
 # UDP implementation uses multicast, no need to create Heartbeaters
@@ -555,9 +565,9 @@ class HealthMonitorUDP(HealthMonitor):
 
     # Sends heartbeat to remote
     def heartbeat(self):
-        g_HeartbeatLog.print("[HealthMonitorUDP] Sending heartbeat multicast")
         # send my id as heartbeat
-        msg = str(g_ServerTCP.Id)
+        msg = str(g_ServerUDP.Id)
+        g_HeartbeatLog.print("[HealthMonitorUDP] Sending heartbeat multicast: " + msg)
         self.socketHB.sendto(msg.encode('ascii'), (MULTICAST_GRP_HB, MULTICAST_PORT_HB))
 
     # Creates a Heartbeater if needed
@@ -581,6 +591,10 @@ class HealthMonitorUDP(HealthMonitor):
             idx = int(data.decode('ascii'))
 
         return idx
+
+    # returns id of the server in the current program
+    def id(self):
+        return g_ServerUDP.Id
 
 
 def main(argv):
@@ -610,30 +624,37 @@ def main(argv):
     # check parameters
     if len(argv) < 2:
         print("Hostname: %s" % g_Host)
-        print("Usage %s [port]" % argv[0])
+        print("Usage: %s [port|\"UDP\"]" % argv[0])
         sys.exit(0)
+
+    udp = False
+    tcp = False
     # get parameters
+    if argv[1].upper() == "UDP":
+        udp = True
+    else:
+        tcp = True
     my_port = int(argv[1])
 
-    # get remotes registered
-    remote_list, server_id = remotes.create_remote_list(g_Host, my_port)
-    if server_id == -1:
-        print("Error: I'm not registered on servers.txt\nlocalhost is not a valid entry: use the machine name")
-        sys.stdout.flush()
-        sys.exit(1)
+    if tcp:
+        # get remotes registered
+        remote_list, server_id = remotes.create_remote_list(g_Host, my_port)
+        if server_id == -1:
+            print("Error: I'm not registered on servers.txt\nlocalhost is not a valid entry: use the machine name")
+            sys.stdout.flush()
+            sys.exit(1)
+        # Start Server
+        global g_ServerTCP
+        g_ServerTCP = ServerTCP(server_id, my_port)
+        g_ServerTCP.start()
+        # Start HealthMonitor
+        global g_HealthMonitorTCP
+        g_HealthMonitorTCP = HealthMonitorTCP(remote_list)
+        g_HealthMonitorTCP.start()
 
-    # TCP
-    # Start Server
-    global g_ServerTCP
-    g_ServerTCP = ServerTCP(server_id, my_port)
-    g_ServerTCP.start()
-    # Start HealthMonitor
-    global g_HealthMonitorTCP
-    g_HealthMonitorTCP = HealthMonitorTCP(remote_list)
-    g_HealthMonitorTCP.start()
-
-    # UDP
-    if len(argv) != 3 or (len(argv) >= 3 and argv[2].lower() != "tcp"):
+    if udp:
+        # get remotes registered
+        remote_list, server_id = remotes.create_remote_list(g_Host, None, udp)
         # Start Server
         global g_ServerUDP
         g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
