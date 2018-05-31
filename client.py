@@ -79,8 +79,7 @@ class ClientTCP(Client):
             self.socks.append(sock)
 
         g_ClientLog.print("[ClientTCP] Waiting any server for %ds..." % TIMEOUT)
-        # this will block until at least one socket is ready || Timeout
-        print(self.socks)
+        # this will block until at least one socket is ready to write || Timeout
         sys.stdout.flush()
         _, self.ready_to_write, in_error = select.select([], self.socks, [], TIMEOUT)
         # if not timeout
@@ -96,7 +95,7 @@ class ClientTCP(Client):
 
     def receive_result(self):
         g_ClientLog.print("[ClientTCP] Waiting any server result")
-        # this will block until at least one socket is ready
+        # this will block until at least one socket is ready to read
         # wait response from one of the connections, select only from those you wrote
         ready_to_read, _, in_error = select.select(self.ready_to_write, [], [], TIMEOUT)
         # only the leader should be ready
