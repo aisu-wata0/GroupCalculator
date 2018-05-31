@@ -4,10 +4,10 @@ import socket
 import threading
 from threading import Timer
 import sys
-import struct
 import datetime
 import parse
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+# import struct
 
 import remotes
 import logger
@@ -18,15 +18,41 @@ g_heartbeatInterval = 4
 
 g_ServerTCP = None
 g_ServerUDP = None
-g_HealthMonitor = None
+g_HealthMonitorTCP = None
+g_HealthMonitorUDP = None
 
 g_Host = ""
 MULTICAST_GRP = '224.1.1.1'
 MULTICAST_PORT = 5007
+MULTICAST_GRP_HB = '224.1.1.2'
+MULTICAST_PORT_HB = MULTICAST_PORT + 1
 
 g_ServerLog = None
 g_HealthMonitorLog = None
 g_HeartbeatLog = None
+
+
+def socket_listen_multicast(sock, group, port):
+    host = ''  # host = group
+    sock.bind((host, port))
+    # setup multicast
+    mreq = socket.inet_aton(group) + socket.inet_aton(g_Host)
+    # mreq = struct.pack("4sl", socket.inet_aton(group), socket.INADDR_ANY)
+    sock.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(g_Host))
+    sock.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+
+def create_socket_multicast():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    try:
+        # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    except AttributeError:
+        pass
+    # setup multicast
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+    return sock
 
 
 # Abstract class
@@ -141,10 +167,7 @@ class Server(threading.Thread):
 
     # Thread method invoked when started
     def run(self):
-        global g_Host
-        global g_ServerLog
-
-        self.start_listening()
+        self.setup_listening()
 
         while True:
             # blocks until client connects
@@ -155,7 +178,7 @@ class Server(threading.Thread):
 
     # setup to start listening
     @abstractmethod
-    def start_listening(self):
+    def setup_listening(self):
         pass
 
     # Blocks until a client connects
@@ -192,12 +215,13 @@ class ServerTCP(Server):
         return sock
 
     # setup to start listening
-    def start_listening(self):
+    def setup_listening(self):
         g_ServerLog.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
-        self.socket.bind((g_Host, self.port))
         queue_size = 5
-        g_ServerLog.print("[ServerTCP] listening...")
+        # receive from any source
+        self.socket.bind((g_Host, self.port))
         self.socket.listen(queue_size)
+        g_ServerLog.print("[ServerTCP] listening...")
 
     # Blocks until a client connects
     # returns (sock, addr) of the connected client
@@ -209,7 +233,7 @@ class ServerTCP(Server):
 
     # returns the group leader id
     def leader_id(self):
-        return g_HealthMonitor.leader()
+        return g_HealthMonitorTCP.leader()
 
     def create_client(self, connection):
         return ClientTCP(connection)
@@ -218,31 +242,14 @@ class ServerTCP(Server):
 # UDP implementation of Server
 class ServerUDP(Server):
     def create_socket(self):
-        g_ServerLog.print("[ServerUDP] Creating UDP socket")
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        try:
-            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        except AttributeError:
-            pass
-        # setup multicast
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
+        g_ServerLog.print("[ServerUDP] Creating UDP socket multicast")
+        sock = create_socket_multicast()
         return sock
 
     # setup to start listening
-    def start_listening(self):
-        host = ''
-        # host = MULTICAST_GRP
+    def setup_listening(self):
         g_ServerLog.print("[ServerUDP] Bind UDP %s:%d" % (MULTICAST_GRP, self.port))
-        self.socket.bind((host, self.port))
-
-        # setup multicast
-        mreq = socket.inet_aton(MULTICAST_GRP) + socket.inet_aton(g_Host)
-        # mreq = struct.pack("4sl", socket.inet_aton(MULTICAST_GRP), socket.INADDR_ANY)
-
-        self.socket.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(g_Host))
-        self.socket.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+        socket_listen_multicast(self.socket, MULTICAST_GRP, self.port)
 
     # Blocks until a client connects
     # returns (data, addr) of the connected client
@@ -254,7 +261,7 @@ class ServerUDP(Server):
 
     # returns the group leader id
     def leader_id(self):
-        return g_HealthMonitor.leader()
+        return g_HealthMonitorUDP.leader()
 
     def create_client(self, connection):
         return ClientUDP(connection)
@@ -289,26 +296,19 @@ class RepeatedTimer(object):
 # Tries to send heartbeats to the remote continuously by the interval constant defined
 class Heartbeat:
     def __init__(self, remote):
-        global g_heartbeatInterval
-
         self.remote = remote
-        g_HeartbeatLog.print("[Remote %d] Creating socket" % remote.Id)
-        g_HeartbeatLog.print("[Remote %d] Starting heartbeat" % remote.Id)
+        g_HeartbeatLog.print("[Remote %d] Starting heartbeat" % self.remote.Id)
 
         self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
 
+    # Sends heartbeat to remote
     def heartbeat(self):
-        global g_heartbeatInterval
-
-        host = socket.gethostbyname(self.remote.addr)
-        g_HeartbeatLog.print(
-            "[Remote %d] Sending heartbeat %s:%d"
-            % (self.remote.Id, host, self.remote.port_heart()))
-
-        sock_fd = Heartbeat.create_socket()
-        sock_fd.settimeout(self.timeout())
+        remote_host = socket.gethostbyname(self.remote.addr)
+        g_HeartbeatLog.print("[Remote %d] Sending heartbeat %s:%d"
+                             % (self.remote.Id, remote_host, self.remote.port_heart()))
+        sock_fd = self.create_socket()
         try:
-            sock_fd.connect((host, self.remote.port_heart()))
+            sock_fd.connect((remote_host, self.remote.port_heart()))
             # send my id as heartbeat
             msg = str(g_ServerTCP.Id)
             sock_fd.send(msg.encode('ascii'))
@@ -319,30 +319,30 @@ class Heartbeat:
         finally:
             g_HeartbeatLog.print(
                 "[Remote %d] Closing socket" % self.remote.Id)
-
             sock_fd.close()
 
-    @staticmethod
-    def create_socket():
-        global g_heartbeatInterval
-
+    # creates a socket to send heartbeats with timeout
+    def create_socket(self):
+        g_HeartbeatLog.print("[Remote %d] Creating socket" % self.remote.Id)
         sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
             sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except AttributeError:
             pass
-        # set timeout
-        secs = int(Heartbeat.timeout())
-        micro_secs = int(0)
-        timeval = struct.pack('ll', secs, micro_secs)
-        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_SNDTIMEO, timeval)
+        sock_fd.settimeout(self.timeout())
         return sock_fd
 
     @staticmethod
     def timeout():
-        global g_heartbeatInterval
         return int(g_heartbeatInterval / 2)
+
+
+# receives a timedelta, returns its total milliseconds
+def timedelta_ms(timedelta):
+    delta_ms = timedelta.total_seconds() * 1000
+    delta_ms += timedelta.microseconds / 1000
+    return delta_ms
 
 
 # Stores information of other remotes
@@ -359,85 +359,76 @@ class Remote:
     def port_heart(self):
         return self.port + 1
 
+    def beat(self):
+        # Calculate delta time since last heartbeat from this server
+        prev = self.lastHeartbeat
+        # update heartbeat time
+        self.lastHeartbeat = datetime.datetime.now()
+        timedelta = self.lastHeartbeat - prev
+        # update deviation
+        self.devHB = 0.75*self.devHB\
+            + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
+        g_HealthMonitorLog.print("[Remote %d] Heartbeat, delta = %dms; dev = %d"
+                                 % (self.Id, timedelta_ms(timedelta), self.devHB))
 
-def timedelta_ms(timedelta):
-    delta_ms = timedelta.total_seconds() * 1000
-    delta_ms += timedelta.microseconds / 1000
-    return delta_ms
 
-
-# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+# Monitors other remotes by listening heartbeats
+# Also sends heartbeats to others
 class HealthMonitor(threading.Thread):
     def __init__(self, remote_list):
         threading.Thread.__init__(self)
-        g_HealthMonitorLog.print("[HealthMonitor] created thread %s" % str(threading.current_thread().ident))
-
-        # remote array
-        self.remotes = []
-        # create socket
-        self.socketListenHeartbeats \
-            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
-            self.socketListenHeartbeats\
-                .setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        except AttributeError:
-            pass
-        # heartbeat queue size
-        self.queueSize = len(remote_list)*3
-
-        # Heartbeat sending list
-        heartbeat_list = []
+        g_HealthMonitorLog.print("[HealthMonitor] created thread %s"
+                                 % str(threading.current_thread().ident))
+        # create socket to listen to heartbeats
+        self.socketHB = self.create_socket_listen_hb()
         # Construct remotes and Heartbeat list
+        self.remotes = []
+        self.heartbeat_setup()
         for idx, remote in enumerate(remote_list):
-            addr = remote[0]
-            port = remote[1]
+            addr, port = remote
             # create remote info
             remote = Remote(addr, port, idx)
-            # add to list
-            self.remotes.append(remote)
+            self.remotes.append(remote)  # add to list
             # If not myself, send heartbeats to it
-            if idx != g_ServerTCP.Id:
-                # create and add Heartbeat
-                heartbeat_list.append(Heartbeat(remote))
+            self.heartbeat_create(idx, remote)
+
+    # Setup for heartbeat generation
+    @abstractmethod
+    def heartbeat_setup(self):
+        pass
+
+    # Creates socket to listen to heartbeats
+    @abstractmethod
+    def create_socket_listen_hb(self):
+        pass
+
+    # Creates a Heartbeat if needed
+    @abstractmethod
+    def heartbeat_create(self, idx, remote):
+        pass
 
     # Thread method invoked when started
+    # Listen to heartbeats in a loop
     def run(self):
-        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ServerTCP.port_heart()))
-        # receive from any source, in 'portHG()' port
-        self.socketListenHeartbeats.bind((g_Host, g_ServerTCP.port_heart()))
-
-        g_HealthMonitorLog.print("[HealthMonitor] listening for heartbeats...")
-        self.socketListenHeartbeats.listen(self.queueSize)
-
+        self.setup_listening()
         while True:
-            # accept connection
-            conn, addr = self.socketListenHeartbeats.accept()
-            g_HealthMonitorLog.print(
-                '[HealthMonitor] Connected %s:%d' % (str(addr[0]), addr[1]))
-            # receive heartbeat
-            data = conn.recv(BUFSIZ)
-            # heartbeat has the server id
-            idx = data.decode('ascii')
-            g_HealthMonitorLog.print("[HealthMonitor] Heartbeat from %s" % idx)
-            idx = int(idx)
-            # Calculate delta time since last heartbeat from this server
-            prev = self.remotes[idx].lastHeartbeat
-            # update heartbeat time
-            self.remotes[idx].lastHeartbeat = datetime.datetime.now()
-            timedelta = self.remotes[idx].lastHeartbeat - prev
-            # update deviation
-            dev = 0.75*self.remotes[idx].devHB\
-                + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
-            self.remotes[idx].devHB = dev
-            g_HealthMonitorLog.print(
-                "[HealthMonitor] Server %d heartbeat, delta = %dms; dev = %d"
-                % (idx, timedelta_ms(timedelta), self.remotes[idx].devHB))
-            # close connection
-            conn.close()
+            # Blocks until a heartbeat is received
+            idx = self.receive_heartbeat()
+            g_HealthMonitorLog.print("[HealthMonitor] Heartbeat from %s" % str(idx))
+            self.remotes[idx].beat()
+
+    # setup to start listening
+    @abstractmethod
+    def setup_listening(self):
+        pass
+
+    # Blocks until a heartbeat is received
+    # returns id of the server that sent the heartbeat
+    @abstractmethod
+    def receive_heartbeat(self):
+        return -1
 
     def leader(self):
-        global g_heartbeatInterval
         g_HealthMonitorLog.print("[HealthMonitor] leader calc")
         # calculate tolerance
         now = datetime.datetime.now()
@@ -458,7 +449,106 @@ class HealthMonitor(threading.Thread):
             if delta > 0:  # TODO test this
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 return re.Id
-        return -1  # should be impossible, local server delta = 0
+        return -1  # should be impossible, I will always find myself
+
+
+# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+class HealthMonitorTCP(HealthMonitor):
+    def __init__(self, remote_list):
+        # Heartbeat sending list
+        self.heartbeat_list = []
+
+        super().__init__(remote_list)
+
+    def create_socket_listen_hb(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
+        return sock
+
+    # Setup for heartbeat generation
+    def heartbeat_setup(self):
+        pass
+
+    # Creates a Heartbeat if needed
+    def heartbeat_create(self, idx, remote):
+        if idx != g_ServerTCP.Id:
+            # create and add Heartbeat
+            self.heartbeat_list.append(Heartbeat(remote))
+
+    # setup to start listening
+    def setup_listening(self):
+        g_HealthMonitorLog.print("[HealthMonitor] Bind TCP %s:%d" % (g_Host, g_ServerTCP.port_heart()))
+        queueSize = len(self.remotes) * 2
+        # receive from any source
+        self.socketHB.bind((g_Host, g_ServerTCP.port_heart()))
+        self.socketHB.listen(queueSize)
+        g_HealthMonitorLog.print("[HealthMonitor] listening for heartbeats...")
+
+    # Blocks until a heartbeat is received
+    # returns id of the server that sent the heartbeat
+    def receive_heartbeat(self):
+        sock, addr = self.socketHB.accept()
+        g_HealthMonitorLog.print(
+            '[HealthMonitor] Connected %s:%d' % (str(addr[0]), addr[1]))
+        # receive heartbeat
+        data = sock.recv(BUFSIZ)
+        # close connection
+        sock.close()
+        # heartbeat has the server id
+        idx = data.decode('ascii')
+        return int(idx)
+
+
+# Monitors other remotes by listening heartbeats, creates Heartbeats to inform others
+class HealthMonitorUDP(HealthMonitor):
+    def __init__(self, remote_list):
+        # Heartbeat sender
+        self.hb = None
+
+        super().__init__(remote_list)
+
+    def create_socket_listen_hb(self):
+        g_ServerLog.print("[HealthMonitorUDP] Creating UDP socket multicast")
+        sock = create_socket_multicast()
+        return sock
+
+    # Setup for heartbeat generation
+    def heartbeat_setup(self):
+        g_HeartbeatLog.print("[HealthMonitorUDP] Starting heartbeat sender")
+        self.hb = RepeatedTimer(g_heartbeatInterval, self.heartbeat)
+
+    # Sends heartbeat to remote
+    def heartbeat(self):
+        g_HeartbeatLog.print("[Heartbeat UDP] Sending heartbeat multicast")
+        # send my id as heartbeat
+        msg = str(g_ServerTCP.Id)
+        self.socketHB.sendto(msg.encode('ascii'), (MULTICAST_GRP_HB, MULTICAST_PORT_HB))
+
+    # Creates a Heartbeat if needed
+    def heartbeat_create(self, idx, remote):
+        pass
+
+    # setup to start listening
+    def setup_listening(self):
+        g_HealthMonitorLog.print("[HealthMonitorUDP] Bind UDP %s:%d"
+                                 % (MULTICAST_GRP_HB, MULTICAST_PORT_HB))
+        socket_listen_multicast(self.socketHB, MULTICAST_GRP_HB, MULTICAST_PORT_HB)
+        g_HealthMonitorLog.print("[HealthMonitorUDP] listening for heartbeats...")
+
+    # Blocks until a heartbeat is received
+    # returns id of the server that sent the heartbeat
+    def receive_heartbeat(self):
+        idx = g_ServerUDP.Id
+        while idx == g_ServerUDP.Id:
+            data, addr = self.socketHB.recvfrom(1024)
+            # heartbeat has the server id
+            idx = int(data.decode('ascii'))
+
+        return idx
 
 
 def main(argv):
@@ -509,9 +599,12 @@ def main(argv):
     g_ServerUDP.start()
 
     # Start HealthMonitor
-    global g_HealthMonitor
-    g_HealthMonitor = HealthMonitor(remote_list)
-    g_HealthMonitor.start()
+    global g_HealthMonitorTCP
+    g_HealthMonitorTCP = HealthMonitorTCP(remote_list)
+    g_HealthMonitorTCP.start()
+    global g_HealthMonitorUDP
+    g_HealthMonitorUDP = HealthMonitorUDP(remote_list)
+    g_HealthMonitorUDP.start()
 
 
 if __name__ == "__main__":
