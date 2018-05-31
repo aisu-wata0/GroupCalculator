@@ -29,6 +29,8 @@ g_HealthMonitorLog = None
 g_HeartbeatLog = None
 
 
+# Abstract class
+# Serves a connected client, the protocol must be implemented
 class Client(threading.Thread):
     def __init__(self, connection):
         threading.Thread.__init__(self)
@@ -40,9 +42,8 @@ class Client(threading.Thread):
 
     # Thread method invoked when started
     def run(self):
-        # receive expression
+        # receive expression from client
         expression = self.receive_exp()
-
         # calculate result
         g_ServerLog.print("[Client %s] Calculating expression: %s"
                           % (str(self.addr), expression))
@@ -50,7 +51,8 @@ class Client(threading.Thread):
         try:
             result = parse.create_result(expression)
             g_ServerLog.print("[Client %s] result = %s" % (str(self.addr), result))
-            print("received: " + str(expression) + " result: " + str(result))
+            print("received: " + str(expression) + " result = " + str(result))
+            # set response to result
             message = str(result)
         except ZeroDivisionError:
             print("received: Error! Division by Zero!")
@@ -63,20 +65,23 @@ class Client(threading.Thread):
             message = "exception"
         finally:
             sys.stdout.flush()
-            # respond with the result
+            # respond with the message
             self.respond(message)
             # end connection
             self.sock.close()
 
+    # retrieves the expression from user
     @abstractmethod
     def receive_exp(self):
         pass
 
+    # receives a message and sends it to user
     @abstractmethod
     def respond(self, msg):
         pass
 
 
+# TCP implementation of the client
 class ClientTCP(Client):
     def receive_exp(self):
         g_ServerLog.print("[ClientTCP %s] Waiting expression" % str(self.addr))
@@ -90,6 +95,7 @@ class ClientTCP(Client):
         self.sock.send(msg.encode("ascii"))
 
 
+# UDP implementation of the client
 class ClientUDP(Client):
     def __init__(self, connection):
         super().__init__(connection)
@@ -98,6 +104,7 @@ class ClientUDP(Client):
         # create another socket to respond
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except AttributeError:
             pass
@@ -112,6 +119,9 @@ class ClientUDP(Client):
         self.sock.sendto(msg.encode('ascii'), self.addr)
 
 
+# Abstract server
+# This is one server in a group, it only responds if it's the leader
+# the protocol must be implemented
 class Server(threading.Thread):
     def __init__(self, server_id, port):
         threading.Thread.__init__(self)
@@ -123,8 +133,8 @@ class Server(threading.Thread):
         # self.clients = []
         # Listening socket
         self.socket = self.create_socket()
-        self.queueSize = 5
 
+    # creates a socket for listening
     @abstractmethod
     def create_socket(self):
         pass
@@ -137,20 +147,29 @@ class Server(threading.Thread):
         self.start_listening()
 
         while True:
-            # establish connection
+            # blocks until client connects
             connection = self.wait_client()
-            if g_HealthMonitor.leader() == self.Id:
+            if self.leader_id() == self.Id:
                 client = self.create_client(connection)
                 client.start()
 
+    # setup to start listening
     @abstractmethod
     def start_listening(self):
         pass
 
+    # Blocks until a client connects
+    # returns a connection (which is dependant on the protocol implementation )
     @abstractmethod
     def wait_client(self):
         pass
 
+    # returns the group leader id
+    @abstractmethod
+    def leader_id(self):
+        pass
+
+    # returns a Client thread
     @abstractmethod
     def create_client(self, connection):
         pass
@@ -160,59 +179,82 @@ class Server(threading.Thread):
         return self.port + 1
 
 
+# TCP implementation of Server
 class ServerTCP(Server):
     def create_socket(self):
         g_ServerLog.print("[ServerTCP] Creating TCP socket")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
         return sock
 
+    # setup to start listening
     def start_listening(self):
         g_ServerLog.print("[ServerTCP] Bind TCP %s:%d" % (g_Host, self.port))
         self.socket.bind((g_Host, self.port))
-
+        queue_size = 5
         g_ServerLog.print("[ServerTCP] listening...")
-        self.socket.listen(self.queueSize)
+        self.socket.listen(queue_size)
 
+    # Blocks until a client connects
+    # returns (sock, addr) of the connected client
     def wait_client(self):
+        g_ServerLog.print("[ServerTCP] Waiting client...")
         connection = sock, addr = self.socket.accept()
         g_ServerLog.print("[ServerTCP] Connected %s:%d" % (str(addr[0]), addr[1]))
         return connection
+
+    # returns the group leader id
+    def leader_id(self):
+        return g_HealthMonitor.leader()
 
     def create_client(self, connection):
         return ClientTCP(connection)
 
 
+# UDP implementation of Server
 class ServerUDP(Server):
     def create_socket(self):
         g_ServerLog.print("[ServerUDP] Creating UDP socket")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except AttributeError:
             pass
+        # setup multicast
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
         return sock
 
+    # setup to start listening
     def start_listening(self):
         host = ''
         # host = MULTICAST_GRP
         g_ServerLog.print("[ServerUDP] Bind UDP %s:%d" % (MULTICAST_GRP, self.port))
         self.socket.bind((host, self.port))
 
+        # setup multicast
         mreq = socket.inet_aton(MULTICAST_GRP) + socket.inet_aton(g_Host)
         # mreq = struct.pack("4sl", socket.inet_aton(MULTICAST_GRP), socket.INADDR_ANY)
 
         self.socket.setsockopt(socket.SOL_IP, socket.IP_MULTICAST_IF, socket.inet_aton(g_Host))
         self.socket.setsockopt(socket.SOL_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        g_ServerLog.print("[ServerUDP] listening...")
-
+    # Blocks until a client connects
+    # returns (data, addr) of the connected client
     def wait_client(self):
+        g_ServerLog.print("[ServerUDP] Waiting client...")
         connection = data, addr = self.socket.recvfrom(BUFSIZ)
         g_ServerLog.print("[ServerUDP] Received from %s:%d" % (str(addr[0]), addr[1]))
         return connection
+
+    # returns the group leader id
+    def leader_id(self):
+        return g_HealthMonitor.leader()
 
     def create_client(self, connection):
         return ClientUDP(connection)
@@ -285,7 +327,11 @@ class Heartbeat:
         global g_heartbeatInterval
 
         sock_fd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
+            sock_fd.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
         # set timeout
         secs = int(Heartbeat.timeout())
         micro_secs = int(0)
@@ -331,8 +377,12 @@ class HealthMonitor(threading.Thread):
         # create socket
         self.socketListenHeartbeats \
             = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socketListenHeartbeats\
-            .setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
+            self.socketListenHeartbeats\
+                .setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        except AttributeError:
+            pass
         # heartbeat queue size
         self.queueSize = len(remote_list)*3
 
