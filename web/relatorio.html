@@ -18,17 +18,14 @@
                 em um grupo multicacast de N servidores.
             </p>
             <p>
-                Fizemos o trabalho em <strong>TCP e UDP</strong>. O server.py roda os dois ao mesmo tempo! No caso do TCP,
-                ele tenta conectar de um em um, fazendo uso de uma classe chamada HealthMonitor e enviando Heartbeats
-                (batidas de coração) repetidamente. No caso do UDP, ele faz uso do multicast para enviar de uma vez para o grupo.
+                Fizemos o trabalho em <strong>TCP e UDP</strong>. O usuário pode optar por rodar o servidor e cliente em TCP ou UDP. No caso do TCP,
+                o cliente tenta conectar de um em um, fazendo uso de uma classe chamada HealthMonitor e enviando Heartbeats
+                (batidas de coração) repetidamente. No caso do UDP, ele faz uso do multicast para enviar de uma vez para o grupo multicast.
                 Por causa disso, não é possível executar vários terminais na mesma máquina, são necessárias máquinas diferentes.
-                Para fazer o programa rodar na mesma máquina (portanto, apenas no protocolo TCP), o comando é o seguinte:
-                <br>
-                python3 server.py [numero da porta] <strong>TCP</strong>
-                <br>
             </p>
             <p>
-            <h5>Servidor TCP:</h5>
+            <h5>Servidor TCP</h5>
+            <p>
                 A partir do arquivo servers.txt, que contém uma lista (como se fosse o grupo) com o nome local e o número da porta de
                 cada servidor que queremos conectar, cada servidor tenta se conectar com todos os endereços da
                 lista em busca de outros servidores. Se encontrar, verifica qual possui o menor identificador. O servidor que,
@@ -36,7 +33,7 @@
                 marcado/promovido a líder, que será quem responde a todas as requisições do cliente. Após isso, cada servidor
             envia "heartbeats" para os demais, batidas de coração, marcando a hora da última vez que o servidor respondeu.
             </p>
-            <h5>Servidor UDP:</h5>
+            <h5>Servidor UDP</h5>
                 O UDP irá lidar com o endereço do grupo multicast e com a porta multicast. A partir desse endereço, cada
             servidor irá, periodicamente, enviar mensagens em busca dos demais. Cada um, ao receber a mensagem, verifica quem tem o menor identificador,
             o servidor que enviou, ou ele próprio que recebeu. O que sempre tiver o menor identificador será o líder.
@@ -44,7 +41,7 @@
             O identificador é escolhido com base no arquivo servers.txt, que contém a lista com nome local e o número da porta de cada servidor que queremos
             conectar.
             </p>
-            <h5>Cliente TCP:</h5>
+            <h5>Cliente TCP</h5>
             <p>
                 Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão matemática desejada,
                 como 1+1, e o cliente tenta criar uma conexão com cada cada servidor, usando <a href="https://docs.python.org/3/library/socket.html">socket</a>, e enviando a requisição caso consiga.
@@ -61,6 +58,12 @@
 
                 Feito isso, o cliente aguarda a resposta até que ela apareça ou o timeout aconteça.
             </p>
+             <h5>Cálculo do Timeout</h5>
+                <p>Para efetuar o cálculo do Timeout e descobrir se um servidor está acordado ou não, decidimos usar
+                    um valor de timeout que leva em consideração o desvio da conexão junto com o RTT como intervalo,
+                    já que a distância não interfere na frequência do sinal entre os heartbeats; um algoritmo semelhante
+                    ao visto em sala que o TCP usa.
+            </p>
             <h5>Cálculo da expressão matemática</h5>
                 <p>Para efetuar o cálculo da expressão matemática e poder devolver o resultado esperado (ou erro, em caso de divisão por zero,
                     ou expressão inválida), decidimos por usar a biblioteca <a href="https://pypi.org/project/pyparsing/">PyParsing</a>, disponível em
@@ -71,15 +74,16 @@
             </p>
             <h5>Exceções UDP</h5>
             <p>
-                Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout, implementado
-                no próprio <a href="https://docs.python.org/3/library/socket.html">socket</a>, que fará o cliente mostrar uma mensagem de erro,
-                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática.
+                Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout (de 4 segundos, no cliente. O servidor
+                que faz o cálculo dinâmico), implementado no próprio <a href="https://docs.python.org/3/library/socket.html">socket</a>,
+                que fará o cliente mostrar uma mensagem de erro, fechar todas as conexões abertas e pedir para o usuário proceder com
+                outra operação matemática.
             Caso tudo ocorra com sucesso, o select do cliente irá interpretar a mensagem recebida e irá imprimir o resultado.
             </p>
             <h5>Exceções TCP</h5>
             <p>
-            Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout, implementado
-                no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
+            Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout (de 4 segundos, no cliente. O servidor
+                que faz o cálculo dinâmico), implementado no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
                 fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática.
             Caso tudo ocorra com sucesso, o cliente irá interpretar a mensagem recebida pelo multicast e irá imprimir o resultado.
             </p>
@@ -148,7 +152,7 @@
                 e, se for o caso, responder a requisição do cliente. Ele é iniciado com os parâmetros porta e [opcional] "TCP" para desativar
                 o multicast udp (ou seja, para o nosso programa poder funcionar na mesma máquina em terminais diferentes).
             <p>
-                Para executar:<br><strong>UDP e TCP</strong>: <em>python3 server.py [porta]</em><br><strong>TCP</strong>: <em>python3 server.py [porta] TCP</em>
+                Para executar:<br><strong>TCP</strong>: <em>python3 server.py [porta]</em><br><strong>UDP</strong>: <em>python3 server.py UDP</em>
             <br>Onde porta é o número da porta (por exemplo, 69477). Esse número precisa estar dentro do arquivo servers.txt, que contém o nosso grupo de servidores.
             </p>
                 No caso do TCP, o servidor irá periodicamente verificar quem está acordado iterando sobre a lista obtida
@@ -157,6 +161,8 @@
                 <br>No caso do UDP, o servidor irá periodicamente verificar quem está acordado enviando mensagens com o próprio identificador para
                 o grupo multicast. Simultaneamente, ele está escutando pelos outros servidores que podem estar procurando ele, e pelo cliente.
                 A cada mensagem que chega, ele verifica se o identificador é maior ou menor que o dele e se, portanto, ele é o líder.
+
+            Como descrito acima no cálculo do timeout, o servidor está constantemente efetuando
             </p>
 
             <h4>Conclusão:</h4>
