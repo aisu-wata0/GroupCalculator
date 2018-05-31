@@ -622,23 +622,26 @@ def main(argv):
         sys.stdout.flush()
         sys.exit(1)
 
+    # TCP
     # Start Server
     global g_ServerTCP
     g_ServerTCP = ServerTCP(server_id, my_port)
     g_ServerTCP.start()
-
-    if len(argv) != 3 or argv[2].lower() != "tcp":
-        global g_ServerUDP
-        g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
-        g_ServerUDP.start()
-
     # Start HealthMonitor
     global g_HealthMonitorTCP
     g_HealthMonitorTCP = HealthMonitorTCP(remote_list)
     g_HealthMonitorTCP.start()
-    global g_HealthMonitorUDP
-    g_HealthMonitorUDP = HealthMonitorUDP(remote_list)
-    g_HealthMonitorUDP.start()
+
+    # UDP
+    if len(argv) != 3 or (len(argv) >= 3 and argv[2].lower() != "tcp"):
+        # Start Server
+        global g_ServerUDP
+        g_ServerUDP = ServerUDP(server_id, MULTICAST_PORT)
+        g_ServerUDP.start()
+        # Start HealthMonitor
+        global g_HealthMonitorUDP
+        g_HealthMonitorUDP = HealthMonitorUDP(remote_list)
+        g_HealthMonitorUDP.start()
 
 
 if __name__ == "__main__":
