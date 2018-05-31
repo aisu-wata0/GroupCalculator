@@ -15,39 +15,6 @@ MCAST_GRP = '224.1.1.1'
 MCAST_PORT = 5007
 
 
-# Creates a non-blocking TCP socket file descriptor
-def create_socket():
-    g_ClientLog.print("[ClientTCP] Created socket")
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setblocking(0)
-    return sock
-
-
-# This function receives a tuple (host, port) and creates a non-blocking socket attempting connection
-# To use the sockets use the blocking instruction:
-# ready_to_read, ready_to_write, in_error = select.select([], socks, [], TIMEOUT)
-# socks is a list of sockets returned by this function
-# ready_to_write will be the list of sockets in which connection was successful
-# ready_to_read will be the list of sockets in which a message is ready to be read
-def connect_server(remote):
-    sock = create_socket()
-    # Get remote info
-    host, port = remote
-    try:
-        # get remote address
-        host = socket.gethostbyname(host)
-        # Tries to establish connection
-        sock.connect((host, port))
-    except BlockingIOError:
-        g_ClientLog.print("[ClientTCP] Non-blocking connection in progress...")
-        pass
-    except Exception as e:  # Other exception
-        g_ClientLog.print("[ClientTCP] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
-
-    # return the non-blocking socket attempting connection
-    return sock
-
-
 class Client:
     # Attempts to send a expression to server group
     # Opens needed sockets
@@ -74,6 +41,40 @@ class ClientTCP(Client):
         self.sent_socks = []
         self.socks = []
 
+    # Creates a non-blocking TCP socket file descriptor
+    @staticmethod
+    def create_socket():
+        g_ClientLog.print("[ClientTCP] Creating socket")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setblocking(0)
+        g_ClientLog.print("[ClientTCP] created " + str(sock))
+        return sock
+
+    # This function receives a tuple (host, port) and creates a non-blocking socket attempting connection
+    # To use the sockets use the blocking instruction:
+    # ready_to_read, ready_to_write, in_error = select.select([], socks, [], TIMEOUT)
+    # socks is a list of sockets returned by this function
+    # ready_to_write will be the list of sockets in which connection was successful
+    # ready_to_read will be the list of sockets in which a message is ready to be read
+    @staticmethod
+    def connect_server(remote):
+        sock = ClientTCP.create_socket()
+        # Get remote info
+        host, port = remote
+        try:
+            # get remote address
+            host = socket.gethostbyname(host)
+            # Tries to establish connection
+            sock.connect((host, port))
+        except BlockingIOError:
+            g_ClientLog.print("[ClientTCP] Non-blocking connection in progress...")
+            pass
+        except Exception as e:  # Other exception
+            g_ClientLog.print("[ClientTCP] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
+
+        # return the non-blocking socket attempting connection
+        return sock
+
     # Blocks to connect to servers || Timeout
     # If any connected
     #   sends them the data without blocking
@@ -87,8 +88,13 @@ class ClientTCP(Client):
             g_ClientLog.print("[ClientTCP] Requesting server #%d" % idx)
             # tenta conectar no servidor da iteracao atual
             # non blocking
-            sock = connect_server(remote)
+            sock = ClientTCP.connect_server(remote)
             self.socks.append(sock)
+            try:
+                g_ClientLog.print("[ClientTCP] to address " + str(sock.getpeername()))
+            except Exception as e:
+                g_ClientLog.print("[ClientTCP] Exception in sock.getpeername(): " + str(e))
+                pass
 
         g_ClientLog.print("[ClientTCP] Waiting any server for %ds..." % TIMEOUT)
         # this will block until at least one socket is ready to write || Timeout
@@ -99,8 +105,12 @@ class ClientTCP(Client):
         if ready_to_write:
             # for all those that connected
             for sock in ready_to_write:
-                g_ClientLog.print("[ClientTCP] Connected to " + str(sock.getsockname()))
                 g_ClientLog.print("[ClientTCP] Sending expression: " + expression)
+                try:
+                    g_ClientLog.print("[ClientTCP] to server " + str(sock.getpeername()))
+                except Exception as e:
+                    g_ClientLog.print("[ClientTCP] Exception in sock.getpeername(): " + str(e))
+                    pass
                 # mensagem é codificada em ascii
                 data = expression.encode('ascii')
                 try:
@@ -123,14 +133,18 @@ class ClientTCP(Client):
             # only the leader should be ready
             for sock in ready_to_read:
                 result = sock.recv(BUFSIZ).decode('ascii')
-                g_ClientLog.print("[ClientTCP] Receiving from " + str(sock.getsockname()))
+                try:
+                    g_ClientLog.print("[ClientTCP] Receiving from " + str(sock.getpeername()))
+                except Exception as e:
+                    g_ClientLog.print("[ClientTCP] Exception in sock.getpeername(): " + str(e))
+                    pass
                 return result
         else:
             raise socket.timeout
 
     def close(self):
         for sock in self.socks:
-            g_ClientLog.print("[ClientTCP] Closing socket " + str(sock.getsockname()))
+            g_ClientLog.print("[ClientTCP] Closing socket " + str(sock))
             sock.close()
 
 
@@ -145,6 +159,7 @@ class ClientUDP(Client):
         self.sock.settimeout(TIMEOUT)
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
         # sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+        g_ClientLog.print("[ClientUDP] created " + str(self.sock))
         g_ClientLog.print("[ClientUDP] Multicasting " + str((MCAST_GRP, MCAST_PORT)) + " expression: " + expression)
         data = expression.encode('ascii')
         self.sock.sendto(data, (MCAST_GRP, MCAST_PORT))
@@ -158,6 +173,7 @@ class ClientUDP(Client):
         return result
 
     def close(self):
+        g_ClientLog.print("[ClientUDP] closing socket  " + str(self.sock))
         self.sock.close()
 
 
@@ -199,22 +215,22 @@ def main(argv):
             received_result = True
             # print expression result received from server
             if result == "exception":
-                print("[Client] An exception was detected. Try a valid mathematical expression")
+                print("[Client   ] An exception was detected. Try a valid mathematical expression")
             elif result == "zero division":
-                print("[Client] A division by zero was detected. Try a valid mathematical expression")
+                print("[Client   ] A division by zero was detected. Try a valid mathematical expression")
             else:
                 print("result = " + result)
             sys.stdout.flush()
         except socket.timeout:
-            g_ClientLog.print("[Client] Timeout")
+            g_ClientLog.print("[Client   ] Timeout")
             print("Server timeout, try again")
             sys.stdout.flush()
             pass
         except Exception as e:  # Other exception
-            g_ClientLog.print("[Client] Exception: " + str(e))
+            g_ClientLog.print("[Client   ] Exception: " + str(e))
 
         if not received_result:
-            g_ClientLog.print("[Client] No server could respond")
+            g_ClientLog.print("[Client   ] No server could respond")
             print("No response")
             sys.stdout.flush()
 

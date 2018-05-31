@@ -58,26 +58,33 @@ def create_socket_multicast():
 # Abstract class
 # Serves a connected client, the protocol must be implemented
 class Client(threading.Thread):
-    def __init__(self, connection):
+    # These attributes must be initialized
+    # in the concrete class constructor implementation
+
+    # Address of the client
+    addr = None
+    # Socket used to read/write with client
+    sock = None
+
+    def __init__(self):
         threading.Thread.__init__(self)
-        # Construction parameters
-        sock, addr = connection
-        self.sock = sock
-        self.addr = addr
-        g_ServerLog.print("[Client %s] Started" % str(self.addr))
+        g_ServerLog.print("[Client    %s] Started " % str(self.addr))
+        g_ServerLog.print("[Client    %s] With socket %s "
+                          % (str(self.addr), str(self.sock)))
 
     # Thread method invoked when started
     def run(self):
         # receive expression from client
         expression = self.receive_exp()
         # calculate result
-        g_ServerLog.print("[Client %s] Calculating expression: %s"
+        g_ServerLog.print("[Client    %s] Calculating expression: %s"
                           % (str(self.addr), expression))
         message = ""
         try:
             result = parse.create_result(expression)
-            g_ServerLog.print("[Client %s] result = %s" % (str(self.addr), result))
-            print("received: " + str(expression) + " result = " + str(result))
+            g_ServerLog.print("[Client    %s] result = %s" % (str(self.addr), result))
+            print("From " + str(self.addr) + " received: " + str(expression)
+                  + "; result = " + str(result))
             # set response to result
             message = str(result)
         except ZeroDivisionError:
@@ -86,7 +93,7 @@ class Client(threading.Thread):
             pass
         except Exception as e:  # Other exception
             g_ServerLog.print(
-                "[Client %s] Exception %s" % (str(self.addr), e))
+                "[Client    %s] Exception %s" % (str(self.addr), e))
             print("received: Error! Invalid expression!")
             message = "exception"
         finally:
@@ -94,6 +101,8 @@ class Client(threading.Thread):
             # respond with the message
             self.respond(message)
             # end connection
+            g_ServerLog.print("[Client    %s] Closing socket %s"
+                              % (str(self.addr), str(self.sock)))
             self.sock.close()
 
     # retrieves the expression from user
@@ -109,6 +118,13 @@ class Client(threading.Thread):
 
 # TCP implementation of the client
 class ClientTCP(Client):
+    def __init__(self, connection):
+        # Construction parameters
+        sock, addr = connection
+        self.sock = sock
+        self.addr = addr
+        super().__init__()
+
     def receive_exp(self):
         g_ServerLog.print("[ClientTCP %s] Waiting expression" % str(self.addr))
         expression = self.sock.recv(BUFSIZ).decode('ascii')
@@ -124,16 +140,20 @@ class ClientTCP(Client):
 # UDP implementation of the client
 class ClientUDP(Client):
     def __init__(self, connection):
-        super().__init__(connection)
         # Construction parameters
-        self.expression = self.sock.decode('ascii')
+        data, addr = connection
+        self.expression = data.decode('ascii')
+        self.addr = addr
         # create another socket to respond
+        g_ServerLog.print("[ClientUDP %s] Creating socket" % str(self.addr))
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
             # SO_REUSEADDR socket option allows a socket to forcibly bind to a port in use by another socket
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         except AttributeError:
             pass
+        g_ServerLog.print("[ClientUDP %s] created %s" % (str(self.addr), str(self.sock)))
+        super().__init__()
 
     def receive_exp(self):
         return self.expression
@@ -629,12 +649,13 @@ def main(argv):
 
     udp = False
     tcp = False
+    my_port = -1
     # get parameters
     if argv[1].upper() == "UDP":
         udp = True
     else:
         tcp = True
-    my_port = int(argv[1])
+        my_port = int(argv[1])
 
     if tcp:
         # get remotes registered
