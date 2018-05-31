@@ -37,7 +37,7 @@ def connect_server(remote):
         # get remote address
         host = socket.gethostbyname(host)
         # Tries to establish connection
-        sock.connect_ex((host, port))
+        sock.connect((host, port))
     except Exception as e:  # Other exception
         g_ClientLog.print("[ClientTCP] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
 
@@ -84,8 +84,11 @@ class ClientTCP(Client):
             g_ClientLog.print("[ClientTCP] Requesting server #%d" % idx)
             # tenta conectar no servidor da iteracao atual
             # non blocking
+            # try:
             sock = connect_server(remote)
             self.socks.append(sock)
+            # except Exception as e:  # Other exception
+            #     g_ClientLog.print("[ClientTCP] Exception: " + str(e) + " on connect server %s:%d" % (host, port))
 
         g_ClientLog.print("[ClientTCP] Waiting any server for %ds..." % TIMEOUT)
         # this will block until at least one socket is ready to write || Timeout
