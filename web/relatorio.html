@@ -183,9 +183,8 @@
 
             <h5>client.py</h5>
             <p>
-                Uso:
-                <br><strong>UDP</strong>: python3 cliente.py UDP
-                <br><strong>TCP</strong>: python3 cliente.py TCP
+                <strong>Uso</strong>:
+                <br>python3 cliente.py ["UDP"|"TCP"]
             </p>
             <p>
                 Cliente é o arquivo que será responsável por fazer a interação entre o usuário e os servidores. Ele é iniciado, como descrito acima, passando como parâmetros "TCP" ou "UDP". Após ser inicializado, o usuário digita a expressão matemática a ser calculada.
@@ -195,19 +194,9 @@
                 Servidor é o arquivo que será responsável por rodar Server e HealthMonitor, em conjunto checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
                 <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração portas em servers.txt servidores em uma mesma maquina são clones.
             <p>
-                Para executar:
-                <br><strong>TCP</strong>: <em>python3 server.py [porta]</em><br><strong>UDP</strong>: <em>python3 server.py UDP</em>
-                <br>Onde porta é o número da porta (por exemplo, 69477). Esse número precisa estar dentro do arquivo servers.txt, que contém o nosso grupo de servidores.
-            </p>
-                No caso do TCP, o servidor irá periodicamente verificar quem está acordado iterando sobre a lista obtida
-                no remotes.py, tentando criar conexão e enviando mensagem, para ver descobrir o identificador dos outros servidores
-                e poder saber se ele é ou não o líder. Ele também estará escutando pelo cliente e pelos outros servidores que poderão estar procurando por ele.
-                <br>
-                No caso do UDP, o servidor irá periodicamente verificar quem está acordado enviando mensagens com o próprio identificador para
-                o grupo multicast. Simultaneamente, ele está escutando pelos outros servidores que podem estar procurando ele, e pelo cliente.
-                A cada mensagem que chega, ele verifica se o identificador é maior ou menor que o dele e se, portanto, ele é o líder.
-                Como descrito acima no cálculo do timeout, o servidor está constantemente efetuando
-            </p>
+                <strong>Uso</strong>:
+                <br>python3 server.py [porta|"UDP"]
+                <br>Onde porta é o número da porta (por exemplo, 14699). A porta precisa estar descrita em servers.txt ao lado do nome da maquina atual.
 
             <h4>Conclusão:</h4>
             <p>
