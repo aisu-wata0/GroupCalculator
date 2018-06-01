@@ -400,8 +400,9 @@ class Remote:
         self.lastHeartbeat = datetime.datetime.now()
         timedelta = self.lastHeartbeat - prev
         # update deviation
-        self.devHB = 0.75 * self.devHB\
-            + 0.25 * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
+        Alpha = 0.25
+        self.devHB = (1-Alpha) * self.devHB\
+            + Alpha * abs(timedelta_ms(timedelta) - 1000*g_heartbeatInterval)
         g_HealthMonitorLog.print("[Remote %d] Heartbeat, delta = %dms; dev = %d"
                                  % (self.Id, timedelta_ms(timedelta), self.devHB))
 
