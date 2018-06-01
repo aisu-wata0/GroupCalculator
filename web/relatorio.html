@@ -92,11 +92,11 @@
                 Para receber heartbeats o monitor ouve na porta de multicast + 1 por IDs de outras remotas.
                 <br>O envio de heartbeats são multicasts do ID ao grupo de servidores, utilizam a porta de multicast +1
 
-
             <h5>Client</h5>
             <p>
-                Em um terminal separado, temos o cliente se conectando. O usuário digita a expressão matemática desejada, como "1+1", e então o cliente envia aos servidores usando <a href="https://docs.python.org/3/library/socket.html">sockets</a>.
+                O usuário digita a expressão matemática desejada, como "1+1", e então o cliente envia aos servidores usando <a href="https://docs.python.org/3/library/socket.html">sockets</a>.
                 <br>O servidor líder então efetua a operação matemática e retorna o resultado da conta ao cliente.
+                Após o resultado ser obtido o usuário pode entrar com outra expressão.
             </p>
 
             <h6>ClientTCP</h6>
