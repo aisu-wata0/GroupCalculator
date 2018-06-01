@@ -32,9 +32,9 @@
                 Atualizar servers.txt com a lista de servidores do grupo (name [port]) (veja a seção 'Arquivos')
             </p>
                 <h6>Server</h6>
-                    python3 server.py [port|"UDP"]
+            <p>python3 server.py [port|"UDP"]</p>
                 <h6>Client</h6>
-                    python3 client.py ["TCP"|"UDP"]
+                    <p>python3 client.py ["TCP"|"UDP"]</p>
             <p>
                 <br>* Deve-se usar python3 para execução;
                 <br>* Para terminar a execução interrompa com Ctrl+C
@@ -56,12 +56,13 @@
             </p>
 
             <h5>HealthMonitor</h5>
+            <p>
                 Aproxima o status da disponibilidade das outras remotas para o calculo do líder atual.
                 <br>É responsavel por mandar e escutar heartbeats.
                 <br>Heartbeats são mensagens enviadas periodicamente a outros servidores com o id do servidor origem, indicando que o servidor origem ainda está vivo. Heartbeats utilizam a porta do servidor destino +1.
                 <br>Ao pedido de um Server, HealthMonitor calcula o ID do líder atual utilizando as informações que tem das outras remotas, o servidor disponível de ID menor é o líder.
                 <h6>Constantes</h6>
-                    <strong>Periodo do heartbeat</strong>: tempo em segundos entre um heartbeat e o próximo
+                    <p><strong>Periodo do heartbeat</strong>: tempo em segundos entre um heartbeat e o próximo
                     <br>4 seg
                     <br>
                     <strong>Alpha</strong>: Multiplicador da nova sample de deviação = (PeriodoDoHeartbeat - (intervalo entre HB medido))
@@ -72,23 +73,25 @@
                 <br>As informações que mantém de cada remota são: data do último heartbeat, deviação no periodo do heartbeat.
                 <br>Uma remota é considerada <strong>indisponível</strong> quando não escutamos seu heartbeat a mais tempo que seu timeout value
                 <br>
-                <br><p style="font-size: smaller"><strong>DeviaçãoDaRemota</strong> = (1-Alpha)*DeviaçãoDaRemota + Alpha*|PeriodoDoHeartbeat - (intervalo entre HBs medido)|
-                <br><strong>timeout value</strong> = PeriodoDoHeartbeat + CD*DeviaçãoDaRemota</p>
+                <p style="font-size: smaller"><strong>DeviaçãoDaRemota</strong> = (1-Alpha)*DeviaçãoDaRemota + Alpha*|PeriodoDoHeartbeat - (intervalo entre HBs medido)|
+                <br><strong>timeout value</strong> = PeriodoDoHeartbeat + CD*DeviaçãoDaRemota<p>
                 O timeout de uma aplicação padrão utilizaria RTT em vez de uma constante com o período,
                 mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência
                 entre heartbeats não deve mudar além de deviações pela utilização da internet.
                 <br>Análogo a ondas físicas, heartbeats funcionam como sinais que remotas mandam ao ambiente,
                 nao importa a distância do receptor, a frequencia do sinal nao deve mudar a não ser que
                 estejam se movendo relativo um ao outro.
-
+            </p>
             <h6>HealthMonitorTCP</h6>
+            <p>
                 Para receber heartbeats o monitor ouve na porta do servidor + 1 por conexões de outras remotas e lê o ID de quem se conectou.
                 <br>O envio de heartbeats é feito tentando-se conectar com cada uma das remotas para informar seu ID a elas, para isso são criadas threads Heartbeaters que periodiacamente tentam se conectar com a remota designada a esse Heartbeater especifico e enviam o ID do servidor que residem se conseguirem. Heartbeats utilizam a porta da remota destino +1
-
+            </p>
             <h6>HealthMonitorUDP</h6>
+            <p>
                 Para receber heartbeats o monitor ouve na porta de multicast + 1 por IDs de outras remotas.
                 <br>O envio de heartbeats são multicasts do ID ao grupo de servidores, utilizam a porta de multicast +1
-
+            </p>
             <h5>Client</h5>
             <p>
                 O usuário digita a expressão matemática desejada, como "1+1", e então o cliente envia aos servidores usando <a href="https://docs.python.org/3/library/socket.html">sockets</a>.
