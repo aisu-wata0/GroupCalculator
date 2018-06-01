@@ -188,23 +188,12 @@
                 <br><strong>TCP</strong>: python3 cliente.py TCP
             </p>
             <p>
-                Cliente é o arquivo que será responsável por fazer a interação entre o usuário e os servidores. Ele é iniciado,
-                como descrito acima, passando como parâmetros "TCP" ou "UDP". Após ser inicializado, o usuário digita a expressão
-                matemática a ser calculada.
-                <br>No caso do TCP, o cliente irá tentar criar conexão com cada servidor da lista server.txt,
-                e, se conseguir, irá enviar a requisição do cliente. Após isso irá usar o "select" do Python para escutar todos os sockets
-                que ele criou e ver se a resposta chegou a algum. Se ela chegar, ele processa, verifica se não houve erro, e imprime para o
-                usuário o resultado. Se não chegar, irá ficar esperando 4 segundos até o timeout.
-                Após isso,
-                <br>No caso do UDP, o cliente irá criar uma conexão e enviar para todos os servidores do grupo a requisição do cliente. Após isso,
-                ele aguarda a resposta. Se ela chegar, ele processa, verifica se não houve erro, e imprime para o
-                usuário o resultado. Se não chegar, irá ficar esperando 4 segundos até o timeout.
+                Cliente é o arquivo que será responsável por fazer a interação entre o usuário e os servidores. Ele é iniciado, como descrito acima, passando como parâmetros "TCP" ou "UDP". Após ser inicializado, o usuário digita a expressão matemática a ser calculada.
             </p>
             <h5>server.py</h5>
             <p>
-                Servidor é o arquivo que será responsável por checar se os outros servidores estão funcionando, determinar quem é o líder,
-                e, se for o caso, responder a requisição do cliente. Ele é iniciado com os parâmetros porta e [opcional] "TCP" para desativar
-                o multicast udp (ou seja, para o nosso programa poder funcionar na mesma máquina em terminais diferentes).
+                Servidor é o arquivo que será responsável por rodar Server e HealthMonitor, em conjunto checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
+                <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração portas em servers.txt servidores em uma mesma maquina são clones.
             <p>
                 Para executar:
                 <br><strong>TCP</strong>: <em>python3 server.py [porta]</em><br><strong>UDP</strong>: <em>python3 server.py UDP</em>
