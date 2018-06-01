@@ -191,7 +191,7 @@
             </p>
             <h5>server.py</h5>
             <p>
-                Servidor é o arquivo que será responsável por rodar Server e HealthMonitor, em conjunto checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
+                server.py é o arquivo que será responsável por rodar Server, HealthMonitor e criar threads para servir clientes. Em conjunto essas classes checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
                 <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração portas em servers.txt servidores em uma mesma maquina são clones.
             <p>
                 <strong>Uso</strong>:
