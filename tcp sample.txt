@@ -1,0 +1,285 @@
+
+///// This sample will connect two servers into the client, we are going to run 0/0, a random string (different kind of error), and a valid mathematical operation.
+
+
+///// SERVER 0
+========================================
+[2018-06-05 15:23:29]:Starting Server
+========================================
+========================================
+[2018-06-05 15:23:29]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 15:23:29]:Starting Heartbeater
+========================================
+Registered remote ('10.254.224.44', 14699)
+I am server #0
+Registered remote ('10.254.224.44', 14701)
+[2018-06-05 15:23:29]:[Server] Creating server #0
+[2018-06-05 15:23:29]:[ServerTCP] Creating TCP socket
+[2018-06-05 15:23:29]:[ServerTCP] Bind TCP 10.254.224.44:14699
+[2018-06-05 15:23:29]:[ServerTCP] listening...
+[2018-06-05 15:23:29]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:29]:[HealthMonitor] created thread 140554240694016
+[2018-06-05 15:23:29]:[Remote 0] created
+[2018-06-05 15:23:29]:[Remote 1] created
+[2018-06-05 15:23:29]:[Remote 1] Starting heartbeat
+[2018-06-05 15:23:29]:[HealthMonitor] Bind TCP 10.254.224.44:14700
+[2018-06-05 15:23:29]:[HealthMonitor] listening for heartbeats...
+[2018-06-05 15:23:32]:[HealthMonitor] Connected 10.254.224.44:51818
+[2018-06-05 15:23:32]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 15:23:32]:[Remote 1] Heartbeat, delta = 7906ms; dev = 976
+[2018-06-05 15:23:33]:[Remote 1] Sending heartbeat 10.254.224.44:14702
+[2018-06-05 15:23:33]:[Remote 1] Creating socket
+[2018-06-05 15:23:33]:[Remote 1] Closing socket
+[2018-06-05 15:23:33]:[ServerTCP] Connected 10.254.224.44:32992
+[2018-06-05 15:23:33]:[HealthMonitor] leader calc
+[2018-06-05 15:23:33]:[HealthMonitor] Leader is 0, me
+
+///// SERVER 1
+========================================
+[2018-06-05 15:23:27]:Starting Server
+========================================
+========================================
+[2018-06-05 15:23:27]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 15:23:27]:Starting Heartbeater
+========================================
+Registered remote ('10.254.224.44', 14699)
+Registered remote ('10.254.224.44', 14701)
+I am server #1
+[2018-06-05 15:23:28]:[Server] Creating server #1
+[2018-06-05 15:23:28]:[ServerTCP] Creating TCP socket
+[2018-06-05 15:23:28]:[ServerTCP] Bind TCP 10.254.224.44:14701
+[2018-06-05 15:23:28]:[ServerTCP] listening...
+[2018-06-05 15:23:28]:[HealthMonitor] created thread 139945026897664
+[2018-06-05 15:23:28]:[Remote 0] created
+[2018-06-05 15:23:28]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:28]:[Remote 0] Starting heartbeat
+[2018-06-05 15:23:28]:[Remote 1] created
+[2018-06-05 15:23:28]:[HealthMonitor] Bind TCP 10.254.224.44:14702
+[2018-06-05 15:23:28]:[HealthMonitor] listening for heartbeats...
+[2018-06-05 15:23:32]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:32]:[Remote 0] Creating socket
+[2018-06-05 15:23:32]:[Remote 0] Closing socket
+[2018-06-05 15:23:33]:[HealthMonitor] Connected 10.254.224.44:47216
+[2018-06-05 15:23:33]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 15:23:33]:[Remote 0] Heartbeat, delta = 9102ms; dev = 1275
+[2018-06-05 15:23:33]:[ServerTCP] Connected 10.254.224.44:41346
+[2018-06-05 15:23:33]:[HealthMonitor] leader calc
+[2018-06-05 15:23:33]:[HealthMonitor] Remote 0 timeoutInterval = 9102ms
+[2018-06-05 15:23:33]:[HealthMonitor] 0 delta = 8465ms
+[2018-06-05 15:23:33]:[HealthMonitor] Leader is 0
+[2018-06-05 15:23:33]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:35]:[ServerTCP] Connected 10.254.224.44:41356
+[2018-06-05 15:23:35]:[HealthMonitor] leader calc
+[2018-06-05 15:23:35]:[HealthMonitor] Remote 0 timeoutInterval = 9102ms
+[2018-06-05 15:23:35]:[HealthMonitor] 0 delta = 7088ms
+[2018-06-05 15:23:35]:[HealthMonitor] Leader is 0
+
+
+///// CLIENT
+python3 client.py TCP
+Registered remote ('10.254.224.44', 14699)
+Registered remote ('10.254.224.44', 14701)
+========================================
+[2018-06-05 15:23:29]:Starting Client
+========================================
+[2018-06-05 15:23:35]:[ServerTCP] Connected 10.254.224.44:33002
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0/0
+[2018-06-05 15:23:33]:[ClientTCP] Requesting server #0
+[2018-06-05 15:23:33]:[ClientTCP] Creating socket
+[2018-06-05 15:23:33]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:33]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:33]:[ClientTCP] to address ('10.254.224.44', 14699)
+[2018-06-05 15:23:33]:[ClientTCP] Requesting server #1
+[2018-06-05 15:23:33]:[ClientTCP] Creating socket
+[2018-06-05 15:23:33]:[ClientTCP] created <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:33]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:33]:[ClientTCP] to address ('10.254.224.44', 14701)
+[2018-06-05 15:23:33]:[ClientTCP] Waiting any server for 4s...
+[2018-06-05 15:23:33]:[ClientTCP] Sending expression: 1+1
+[2018-06-05 15:23:33]:[ClientTCP] to server ('10.254.224.44', 14699)
+[2018-06-05 15:23:33]:[ClientTCP] Sending expression: 1+1
+[2018-06-05 15:23:33]:[ClientTCP] to server ('10.254.224.44', 14701)
+[2018-06-05 15:23:33]:[ClientTCP] Waiting any server result
+
+
+///// SERVER 0
+[2018-06-05 15:23:35]:[HealthMonitor] leader calc
+[2018-06-05 15:23:35]:[HealthMonitor] Leader is 0, me
+[2018-06-05 15:23:35]:[Client    ('10.254.224.44', 33002)] Started 
+[2018-06-05 15:23:35]:[Client    ('10.254.224.44', 33002)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14699), raddr=('10.254.224.44', 33002)> 
+[2018-06-05 15:23:35]:[ClientTCP ('10.254.224.44', 33002)] Waiting expression
+[2018-06-05 15:23:35]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:35]:[Client    ('10.254.224.44', 33002)] Calculating expression: 0/0
+received: Error! Division by Zero!
+[2018-06-05 15:23:35]:[ClientTCP ('10.254.224.44', 33002)] Sending result = zero division
+[2018-06-05 15:23:35]:[Client    ('10.254.224.44', 33002)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14699), raddr=('10.254.224.44', 33002)>
+
+
+///// SERVER 1
+[2018-06-05 15:23:33]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:35]:[ServerTCP] Connected 10.254.224.44:41356
+[2018-06-05 15:23:35]:[HealthMonitor] leader calc
+[2018-06-05 15:23:35]:[HealthMonitor] Remote 0 timeoutInterval = 9102ms
+[2018-06-05 15:23:35]:[HealthMonitor] 0 delta = 7088ms
+[2018-06-05 15:23:35]:[HealthMonitor] Leader is 0
+[2018-06-05 15:23:35]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:36]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:36]:[Remote 0] Creating socket
+[2018-06-05 15:23:36]:[Remote 0] Closing socket
+[2018-06-05 15:23:37]:[HealthMonitor] Connected 10.254.224.44:47234
+[2018-06-05 15:23:37]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 15:23:37]:[Remote 0] Heartbeat, delta = 4001ms; dev = 957
+[2018-06-05 15:23:38]:[ServerTCP] Connected 10.254.224.44:41364
+[2018-06-05 15:23:38]:[HealthMonitor] leader calc
+[2018-06-05 15:23:38]:[HealthMonitor] Remote 0 timeoutInterval = 7828ms
+[2018-06-05 15:23:38]:[HealthMonitor] 0 delta = 6126ms
+[2018-06-05 15:23:38]:[HealthMonitor] Leader is 0
+[2018-06-05 15:23:38]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:40]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:40]:[Remote 0] Creating socket
+[2018-06-05 15:23:40]:[Remote 0] Closing socket
+[2018-06-05 15:23:41]:[HealthMonitor] Connected 10.254.224.44:47242
+[2018-06-05 15:23:41]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 15:23:41]:[Remote 0] Heartbeat, delta = 4000ms; dev = 718
+[2018-06-05 15:23:44]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:44]:[Remote 0] Creating socket
+
+///// CLIENT
+[2018-06-05 15:23:35]:[ClientTCP] Requesting server #0
+[2018-06-05 15:23:35]:[ClientTCP] Creating socket
+[2018-06-05 15:23:35]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:35]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:35]:[ClientTCP] to address ('10.254.224.44', 14699)
+[2018-06-05 15:23:35]:[ClientTCP] Requesting server #1
+[2018-06-05 15:23:35]:[ClientTCP] Creating socket
+[2018-06-05 15:23:35]:[ClientTCP] created <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:35]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:35]:[ClientTCP] to address ('10.254.224.44', 14701)
+[2018-06-05 15:23:35]:[ClientTCP] Waiting any server for 4s...
+[2018-06-05 15:23:35]:[ClientTCP] Sending expression: 0/0
+[2018-06-05 15:23:35]:[ClientTCP] to server ('10.254.224.44', 14699)
+[2018-06-05 15:23:35]:[ClientTCP] Sending expression: 0/0
+[2018-06-05 15:23:35]:[ClientTCP] to server ('10.254.224.44', 14701)
+[2018-06-05 15:23:35]:[ClientTCP] Waiting any server result
+[2018-06-05 15:23:35]:[ClientTCP] Receiving from ('10.254.224.44', 14699)
+[Client   ] A division by zero was detected. Try a valid mathematical expression
+[2018-06-05 15:23:35]:[ClientTCP] Closing socket <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 33002), raddr=('10.254.224.44', 14699)>
+[2018-06-05 15:23:35]:[ClientTCP] Closing socket <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 41356), raddr=('10.254.224.44', 14701)>
+
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+aaaahhh
+[2018-06-05 15:23:38]:[ClientTCP] Requesting server #0
+[2018-06-05 15:23:38]:[ClientTCP] Creating socket
+[2018-06-05 15:23:38]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:38]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:38]:[ClientTCP] to address ('10.254.224.44', 14699)
+[2018-06-05 15:23:38]:[ClientTCP] Requesting server #1
+[2018-06-05 15:23:38]:[ClientTCP] Creating socket
+[2018-06-05 15:23:38]:[ClientTCP] created <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:38]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:38]:[ClientTCP] to address ('10.254.224.44', 14701)
+[2018-06-05 15:23:38]:[ClientTCP] Waiting any server for 4s...
+[2018-06-05 15:23:38]:[ClientTCP] Sending expression: aaaahhh
+[2018-06-05 15:23:38]:[ClientTCP] to server ('10.254.224.44', 14699)
+[2018-06-05 15:23:38]:[ClientTCP] Sending expression: aaaahhh
+[2018-06-05 15:23:38]:[ClientTCP] to server ('10.254.224.44', 14701)
+[2018-06-05 15:23:38]:[ClientTCP] Waiting any server result
+
+
+
+///// SERVER 0
+[2018-06-05 15:23:36]:[HealthMonitor] Connected 10.254.224.44:51836
+[2018-06-05 15:23:36]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 15:23:36]:[Remote 1] Heartbeat, delta = 4001ms; dev = 732
+[2018-06-05 15:23:37]:[Remote 1] Sending heartbeat 10.254.224.44:14702
+[2018-06-05 15:23:37]:[Remote 1] Creating socket
+[2018-06-05 15:23:37]:[Remote 1] Closing socket
+[2018-06-05 15:23:38]:[ServerTCP] Connected 10.254.224.44:33010
+[2018-06-05 15:23:38]:[HealthMonitor] leader calc
+[2018-06-05 15:23:38]:[HealthMonitor] Leader is 0, me
+[2018-06-05 15:23:38]:[Client    ('10.254.224.44', 33010)] Started 
+[2018-06-05 15:23:38]:[Client    ('10.254.224.44', 33010)] With socket <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14699), raddr=('10.254.224.44', 33010)> 
+[2018-06-05 15:23:38]:[ClientTCP ('10.254.224.44', 33010)] Waiting expression
+[2018-06-05 15:23:38]:[Client    ('10.254.224.44', 33010)] Calculating expression: aaaahhh
+[2018-06-05 15:23:38]:[Client    ('10.254.224.44', 33010)] Exception Expected {{["-"] {'PI' | 'E' | Combine:({W:(+-01...,0123...) [{"." [W:(0123...)]}] [{'E' W:(+-01...,0123...)}]}) | {W:(ABCD...,ABCD...) Suppress:("(") Forward: ... Suppress:(")")}}} | {Suppress:("(") Suppress:(Forward: ...) Suppress:(")")}} (at char 7), (line:1, col:8)
+received: Error! Invalid expression!
+[2018-06-05 15:23:38]:[ClientTCP ('10.254.224.44', 33010)] Sending result = exception
+[2018-06-05 15:23:38]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:38]:[Client    ('10.254.224.44', 33010)] Closing socket <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14699), raddr=('10.254.224.44', 33010)>
+[2018-06-05 15:23:40]:[HealthMonitor] Connected 10.254.224.44:51844
+[2018-06-05 15:23:40]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 15:23:40]:[Remote 1] Heartbeat, delta = 4001ms; dev = 549
+[2018-06-05 15:23:41]:[Remote 1] Sending heartbeat 10.254.224.44:14702
+[2018-06-05 15:23:41]:[Remote 1] Creating socket
+[2018-06-05 15:23:41]:[Remote 1] Closing socket
+[2018-06-05 15:23:57]:[ClientTCP] Closing socket <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 33046)>
+[2018-06-05 15:23:57]:[ClientTCP] Closing socket <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 41400), raddr=('10.254.224.44', 14701)>
+
+
+// NOW WE KILL THE FIRST SERVER
+///// CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2+2
+[2018-06-05 15:23:57]:[ClientTCP] Requesting server #0
+[2018-06-05 15:23:57]:[ClientTCP] Creating socket
+[2018-06-05 15:23:57]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:57]:[ClientTCP] Exception in sock.getpeername(): [Errno 107] Transport endpoint is not connected
+[2018-06-05 15:23:57]:[ClientTCP] Requesting server #1
+[2018-06-05 15:23:57]:[ClientTCP] Creating socket
+[2018-06-05 15:23:57]:[ClientTCP] created <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-05 15:23:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-05 15:23:57]:[ClientTCP] to address ('10.254.224.44', 14701)
+[2018-06-05 15:23:57]:[ClientTCP] Waiting any server for 4s...
+[2018-06-05 15:23:57]:[ClientTCP] Sending expression: 2+2
+[2018-06-05 15:23:57]:[ClientTCP] Exception in sock.getpeername(): [Errno 107] Transport endpoint is not connected
+[2018-06-05 15:23:57]:[ClientTCP] Exception in send: [Errno 111] Connection refused
+[2018-06-05 15:23:57]:[ClientTCP] Sending expression: 2+2
+[2018-06-05 15:23:57]:[ClientTCP] to server ('10.254.224.44', 14701)
+[2018-06-05 15:23:57]:[ClientTCP] Waiting any server result
+
+
+///// SERVER 1
+[2018-06-05 15:23:47]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:48]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:48]:[Remote 0] Creating socket
+[2018-06-05 15:23:48]:[Remote 0] Refused heartbeat [Errno 111] Connection refused
+[2018-06-05 15:23:48]:[Remote 0] Closing socket
+[2018-06-05 15:23:52]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:52]:[Remote 0] Creating socket
+[2018-06-05 15:23:52]:[Remote 0] Refused heartbeat [Errno 111] Connection refused
+[2018-06-05 15:23:52]:[Remote 0] Closing socket
+[2018-06-05 15:23:56]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:23:56]:[Remote 0] Creating socket
+[2018-06-05 15:23:56]:[Remote 0] Refused heartbeat [Errno 111] Connection refused
+[2018-06-05 15:23:56]:[Remote 0] Closing socket
+[2018-06-05 15:23:57]:[ServerTCP] Connected 10.254.224.44:41400
+[2018-06-05 15:23:57]:[HealthMonitor] leader calc
+[2018-06-05 15:23:57]:[HealthMonitor] Remote 0 timeoutInterval = 6154ms
+[2018-06-05 15:23:57]:[HealthMonitor] 0 delta = -6059ms
+[2018-06-05 15:23:57]:[HealthMonitor] Leader is 1, me
+[2018-06-05 15:23:57]:[Client    ('10.254.224.44', 41400)] Started 
+[2018-06-05 15:23:57]:[Client    ('10.254.224.44', 41400)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14701), raddr=('10.254.224.44', 41400)> 
+[2018-06-05 15:23:57]:[ClientTCP ('10.254.224.44', 41400)] Waiting expression
+[2018-06-05 15:23:57]:[ServerTCP] Waiting client...
+[2018-06-05 15:23:57]:[Client    ('10.254.224.44', 41400)] Calculating expression: 2+2
+[2018-06-05 15:23:57]:[Client    ('10.254.224.44', 41400)] result = 4.0
+From ('10.254.224.44', 41400) received: 2+2; result = 4.0
+[2018-06-05 15:23:57]:[ClientTCP ('10.254.224.44', 41400)] Sending result = 4.0
+[2018-06-05 15:23:57]:[Client    ('10.254.224.44', 41400)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.254.224.44', 14701), raddr=('10.254.224.44', 41400)>
+[2018-06-05 15:24:00]:[Remote 0] Sending heartbeat 10.254.224.44:14700
+[2018-06-05 15:24:00]:[Remote 0] Creating socket
+[2018-06-05 15:24:00]:[Remote 0] Refused heartbeat [Errno 111] Connection refused
+[2018-06-05 15:24:00]:[Remote 0] Closing socket
+
+
+///// CLIENT
+[2018-06-05 15:23:57]:[ClientTCP] Receiving from ('10.254.224.44', 14701)
+result = 4.0
+[2018-06-05 15:23:57]:[ClientTCP] Closing socket <socket.socket fd=3, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 33046)>
+[2018-06-05 15:23:57]:[ClientTCP] Closing socket <socket.socket fd=4, family=AddressFamily.AF_INET, type=2049, proto=0, laddr=('10.254.224.44', 41400), raddr=('10.254.224.44', 14701)>
