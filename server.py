@@ -491,10 +491,12 @@ class HealthMonitor(threading.Thread):
             # calculate tolerance
             tolerance = now - timeout
             last = re.lastHeartbeat
-            delta = timedelta_ms(last - tolerance)
-            g_HealthMonitorLog.print("[HealthMonitor] %d delta = %dms" % (re.Id, delta))
-            # If inside tolerance
-            if delta > 0:
+            # grace_period is how much time the server has to send the next heartbeat 
+            # before you assume it's dead (if it's negative, it's dead)
+            grace_period = timedelta_ms(last - tolerance)
+            g_HealthMonitorLog.print("[HealthMonitor] %d grace_period = %dms" % (re.Id, grace_period))
+            # If inside grace_period
+            if grace_period > 0:
                 g_HealthMonitorLog.print("[HealthMonitor] Leader is %d" % re.Id)
                 return re.Id
         return -1  # should be impossible, I will always find myself
