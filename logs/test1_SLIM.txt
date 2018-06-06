@@ -1,0 +1,514 @@
+
+///////
+This is the SLIM version of the logs
+
+RECOMMENDED for first viewing as they are more clear, but they also ommit some details that are present in the FULL version.
+* The sending/receiving of heartbeats are mostly cut from the slim (this) version of logs for the sake of readability, they appear a bit when the servers are restarting on the second part of this test where they become more relevant  *
+* opening and closing of sockets are also ommited in the client and server response *
+///////
+
+
+
+=== SERVER #0
+========================================
+[2018-06-05 14:15:17]:Starting Server
+========================================
+I am server #0
+[2018-06-05 14:15:17]:[Server] Creating server #0
+[2018-06-05 14:15:17]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:17]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:17]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #1
+========================================
+[2018-06-05 14:15:17]:Starting Server
+========================================
+I am server #1
+[2018-06-05 14:15:17]:[Server] Creating server #1
+[2018-06-05 14:15:17]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:17]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:17]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #2
+========================================
+[2018-06-05 14:15:16]:Starting Server
+========================================
+I am server #2
+[2018-06-05 14:15:16]:[Server] Creating server #2
+[2018-06-05 14:15:16]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:16]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:16]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:16]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #3
+========================================
+[2018-06-05 14:15:18]:Starting Server
+========================================
+I am server #3
+[2018-06-05 14:15:18]:[Server] Creating server #3
+[2018-06-05 14:15:18]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:18]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:18]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:18]:[HealthMonitor] created thread 140589436516096
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:18]:[HealthMonitorUDP] listening for heartbeats...
+
+*client sends an expression "0" as multicast*
+=== CLIENT (with response already from logs below)
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:15:22]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:15:22]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:22]:[ClientUDP] Received from ('10.254.224.36', 38148)
+result = 0.0
+
+* others will receive client's message but will promote 0 to leader *
+* grace_period is how much time the server has to send the next heartbeat *
+* before you assume it's dead (if it's negative, it's dead) *
+* timeoutInterval and the last heartbeat date are used to calculate it *
+* grace_period is high at first because the server just started *
+* and we take into account the deviation of each one to calculate it *
+
+=== SERVER #0
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0, me
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] Calculating expression: 0
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] result = 0.0
+From ('10.254.224.38', 37295) received: 0; result = 0.0
+[2018-06-05 14:15:22]:[ClientUDP ('10.254.224.38', 37295)] Sending result = 0.0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+* We kill server 0 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #1
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 8183ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 9060ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 7766ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+*client sends an expression "0" as multicast again*
+* happens right after 0 dies *
+* so others can't reasonably assume 0 is dead, they don't respond *
+
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:15:25]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:15:25]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:29]:[Client   ] Timeout
+Server timeout, try again
+[2018-06-05 14:15:29]:[Client   ] No server could respond
+No response
+
+=== SERVER #1
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4799ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 5676ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8966ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4989ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+
+*client sends an expression "1" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1
+[2018-06-05 14:15:32]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 1
+[2018-06-05 14:15:32]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:32]:[ClientUDP] Received from ('10.254.224.37', 46627)
+result = 1.0
+
+=== SERVER #1
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2137ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1, me
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] Calculating expression: 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] result = 1.0
+From ('10.254.224.38', 50132) received: 1; result = 1.0
+[2018-06-05 14:15:32]:[ClientUDP ('10.254.224.38', 50132)] Sending result = 1.0
+
+* We kill server 1 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #2
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -1259ms
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 7528ms
+[2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 4937ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2554ms
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 5851ms
+[2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 3582ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+
+*client sends an expression "2" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2
+[2018-06-05 14:15:43]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 2
+[2018-06-05 14:15:43]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:43]:[ClientUDP] Received from ('10.254.224.38', 46993)
+result = 2.0
+
+=== SERVER #2
+[2018-06-05 14:15:43]:[ServerUDP] Received from 10.254.224.38:57178
+[2018-06-05 14:15:43]:[HealthMonitor] leader calc
+[2018-06-05 14:15:43]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:43]:[HealthMonitor] 0 grace_period = -11411ms
+[2018-06-05 14:15:43]:[HealthMonitor] Remote 1 timeoutInterval = 6647ms
+[2018-06-05 14:15:43]:[HealthMonitor] 1 grace_period = -2976ms
+[2018-06-05 14:15:43]:[HealthMonitor] Leader is 2, me
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] Calculating expression: 2
+From ('10.254.224.38', 57178) received: 2; result = 2.0
+[2018-06-05 14:15:43]:[ClientUDP ('10.254.224.38', 57178)] Sending result = 2.0
+[2018-06-05 14:15:43]:[ServerUDP] Waiting client...
+
+* We kill server 2 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #3
+[2018-06-05 14:15:48]:[ServerUDP] Received from 10.254.224.38:37031
+[2018-06-05 14:15:48]:[HealthMonitor] leader calc
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:48]:[HealthMonitor] 0 grace_period = -18682ms
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
+[2018-06-05 14:15:48]:[HealthMonitor] 1 grace_period = -9468ms
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
+[2018-06-05 14:15:48]:[HealthMonitor] 2 grace_period = 1022ms
+[2018-06-05 14:15:48]:[HealthMonitor] Leader is 2
+[2018-06-05 14:15:48]:[ServerUDP] Waiting client...
+
+*client sends an expression "3" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+3
+[2018-06-05 14:15:54]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 3
+[2018-06-05 14:15:54]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:54]:[ClientUDP] Received from ('10.254.224.44', 41308)
+result = 3.0
+
+=== SERVER #3
+[2018-06-05 14:15:54]:[ServerUDP] Received from 10.254.224.38:42197
+[2018-06-05 14:15:54]:[HealthMonitor] leader calc
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:54]:[HealthMonitor] 0 grace_period = -25162ms
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
+[2018-06-05 14:15:54]:[HealthMonitor] 1 grace_period = -15949ms
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
+[2018-06-05 14:15:54]:[HealthMonitor] 2 grace_period = -4457ms
+[2018-06-05 14:15:54]:[HealthMonitor] Leader is 3, me
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] Calculating expression: 3
+[2018-06-05 14:15:54]:[ServerUDP] Waiting client...
+From ('10.254.224.38', 42197) received: 3; result = 3.0
+[2018-06-05 14:15:54]:[ClientUDP ('10.254.224.38', 42197)] Sending result = 3.0
+
+*We revive server 3*
+=== SERVER #3
+========================================
+[2018-06-05 14:16:04]:Starting Server
+========================================
+I am server #3
+[2018-06-05 14:16:04]:[Server] Creating server #3
+[2018-06-05 14:16:04]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:04]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:04]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:04]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:08]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+
+*client sends an expression "3" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+3
+[2018-06-05 14:16:08]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 3
+[2018-06-05 14:16:08]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:08]:[ClientUDP] Received from ('10.254.224.44', 59128)
+result = 3.0
+
+=== SERVER #3
+[2018-06-05 14:16:08]:[ServerUDP] Received from 10.254.224.38:33399
+[2018-06-05 14:16:08]:[HealthMonitor] leader calc
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 0 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 1 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 2 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 2 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Leader is 3, me
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] Calculating expression: 3
+[2018-06-05 14:16:08]:[ServerUDP] Waiting client...
+From ('10.254.224.38', 33399) received: 3; result = 3.0
+[2018-06-05 14:16:08]:[ClientUDP ('10.254.224.38', 33399)] Sending result = 3.0
+
+
+*We revive server 2*
+=== SERVER #2
+========================================
+[2018-06-05 14:16:14]:Starting Server
+========================================
+I am server #2
+[2018-06-05 14:16:14]:[Server] Creating server #2
+[2018-06-05 14:16:14]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:14]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:14]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:14]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:16]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:16]:[Remote 3] Heartbeat, delta = 5783ms; dev = 445
+[2018-06-05 14:16:18]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+
+* This message [Remote 3] Heartbeat, delta = 5783ms; dev = 445 *
+* means this server received a heartbeat from Server 3, 5783ms since last heartbeat (or server startup if this is the first one), with deviation of 445ms *
+* The sending/receiving of heartbeats are cut from the slim (this) version of logs for the sake of readability, but here in this part of the test they are very important *
+
+*client sends an expression "2" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2
+[2018-06-05 14:16:22]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 2
+[2018-06-05 14:16:22]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:22]:[ClientUDP] Received from ('10.254.224.38', 60008)
+result = 2.0
+
+=== SERVER #2
+[2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
+[2018-06-05 14:16:22]:[HealthMonitor] leader calc
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -7340ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -7339ms
+[2018-06-05 14:16:22]:[HealthMonitor] Leader is 2, me
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] Calculating expression: 2
+[2018-06-05 14:16:22]:[ServerUDP] Waiting client...
+From ('10.254.224.38', 37464) received: 2; result = 2.0
+[2018-06-05 14:16:22]:[ClientUDP ('10.254.224.38', 37464)] Sending result = 2.0
+
+=== SERVER #3
+[2018-06-05 14:16:18]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:18]:[Remote 2] Heartbeat, delta = 19223ms; dev = 3805
+[2018-06-05 14:16:20]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
+[2018-06-05 14:16:22]:[HealthMonitor] leader calc
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -17561ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -17561ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 2 timeoutInterval = 19223ms
+[2018-06-05 14:16:22]:[HealthMonitor] 2 grace_period = 16108ms
+[2018-06-05 14:16:22]:[HealthMonitor] Leader is 2
+[2018-06-05 14:16:22]:[ServerUDP] Waiting client...
+
+*We revive server 1*
+=== SERVER #1
+
+========================================
+[2018-06-05 14:16:25]:Starting Server
+========================================
+I am server #1
+[2018-06-05 14:16:25]:[Server] Creating server #1
+[2018-06-05 14:16:25]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:25]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:25]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:25]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:26]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:26]:[Remote 2] Heartbeat, delta = 5793ms; dev = 448
+[2018-06-05 14:16:28]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:28]:[Remote 3] Heartbeat, delta = 6577ms; dev = 644
+[2018-06-05 14:16:29]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+
+*client sends an expression "1" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1
+[2018-06-05 14:16:32]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 1
+[2018-06-05 14:16:32]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:32]:[ClientUDP] Received from ('10.254.224.37', 38168)
+result = 1.0
+
+=== SERVER #1
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -5568ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1, me
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] Calculating expression: 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+From ('10.254.224.38', 58764) received: 1; result = 1.0
+[2018-06-05 14:16:32]:[ClientUDP ('10.254.224.38', 58764)] Sending result = 1.0
+
+=== SERVER #2
+[2018-06-05 14:16:28]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:28]:[Remote 3] Heartbeat, delta = 4001ms; dev = 188
+[2018-06-05 14:16:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:29]:[Remote 1] Heartbeat, delta = 19213ms; dev = 3803
+[2018-06-05 14:16:30]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -16779ms
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 19213ms
+[2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 17860ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:16:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:29]:[Remote 1] Heartbeat, delta = 30434ms; dev = 6608
+[2018-06-05 14:16:30]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:30]:[Remote 2] Heartbeat, delta = 4001ms; dev = 1606
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -27000ms
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 30434ms
+[2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 28301ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+
+*We revive server 0*
+=== SERVER #0
+========================================
+[2018-06-05 14:16:36]:Starting Server
+========================================
+I am server #0
+[2018-06-05 14:16:36]:[Server] Creating server #0
+[2018-06-05 14:16:36]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:36]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:36]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:36]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:37]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:37]:[Remote 1] Heartbeat, delta = 5881ms; dev = 470
+[2018-06-05 14:16:38]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:38]:[Remote 2] Heartbeat, delta = 6676ms; dev = 669
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:40]:[Remote 3] Heartbeat, delta = 7459ms; dev = 864
+[2018-06-05 14:16:40]:[HealthMonitorUDP] Sending heartbeat multicast: 0
+
+*client sends an expression "0" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:16:43]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:16:43]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:43]:[ClientUDP] Received from ('10.254.224.36', 41182)
+result = 0.0
+
+=== SERVER #0
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0, me
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] result = 0.0
+From ('10.254.224.38', 35519) received: 0; result = 0.0
+[2018-06-05 14:16:43]:[ClientUDP ('10.254.224.38', 35519)] Sending result = 0.0
+
+=== SERVER #1
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 19123ms; dev = 3780
+[2018-06-05 14:16:41]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+[2018-06-05 14:16:42]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 142
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 19123ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 16281ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 30335ms; dev = 6583
+[2018-06-05 14:16:41]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:41]:[Remote 1] Heartbeat, delta = 4000ms; dev = 1745
+[2018-06-05 14:16:42]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 30335ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 27705ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 41555ms; dev = 9388
+[2018-06-05 14:16:41]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:41]:[Remote 1] Heartbeat, delta = 4000ms; dev = 2928
+[2018-06-05 14:16:42]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 678
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 41555ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 39144ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...

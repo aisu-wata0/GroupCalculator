@@ -75,11 +75,8 @@
                 <br>
                 <p style="font-size: smaller"><strong>DeviaçãoDaRemota</strong> = (1-Alpha)*DeviaçãoDaRemota + Alpha*|PeriodoDoHeartbeat - (intervalo entre HBs medido)|
                 <br><strong>timeout value</strong> = PeriodoDoHeartbeat + CD*DeviaçãoDaRemota<p>
-                O timeout de uma aplicação padrão utilizaria RTT em vez de uma constante com o período,
-                mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência
-                entre heartbeats não deve mudar além de deviações pela utilização da internet.
-                <br>Análogo a ondas físicas, heartbeats funcionam como sinais que remotas mandam ao ambiente,
-                nao importa a distância do receptor, a frequencia do sinal nao deve mudar a não ser que
+                O timeout de uma aplicação padrão utilizaria RTT em vez de uma constante com o período, mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência entre heartbeats não deve mudar além de deviações pela utilização da internet.
+                <br>Análogo a ondas físicas, heartbeats funcionam como sinais que remotas mandam ao ambiente, nao importa a distância do receptor, a frequencia do sinal nao deve mudar a não ser que
                 estejam se movendo relativo um ao outro.
             </p>
             <h6>HealthMonitorTCP</h6>
@@ -208,16 +205,21 @@
                 <br>O envio de expressões do Client e heartbeats por parte do HealthMonitor foram muito mais simples em multicast, tanto que uma classe inteira Heartbeater ficou obsoleta.
             </p>
 
-            <h4>Logs:</h4>
+            <h4>Logs exemplo:</h4>
+            	Os logs vem em 2 versões, SLIM e FULL. Nas duas versões os logs dos servidores e cliente estão em um mesmo arquivo mesclado para facilitar análise.
+            	<br>Devido ao tamanho do log as ações dos servidores em resposta a um cliente estão juntas.
+            	<br><strong>SLIM é recomendada</strong> para primeira análise já que é mais clara, mas a versão <strong>omite</strong> alguns detalhes presentes na versão FULL, como criação de sockets em resposta, alguns Heartbeats, etc.
                 Segue os logs de algumas execuções em situações diferenciadas
-                <br>Teste UDP multicast com 4 servidores:
-                <br>1. Todos os sevidores vivos
-                <br>2. Cliente manda uma expressão
-				<br>3. O servidor lider atual é desligado propositalmente
-				<br>4. Volta a '2' até todos os servidores desligarem
-				<br>5. Revive o servidor de maior ID
-                <br>6. Cliente manda uma expressão
-                <br>7. Volta a '5' até todos os servidores estiverem vivos
+                <br>
+                <br><strong>Teste 1</strong>: UDP multicast com 4 servidores:
+                <br>1) Todos os sevidores vivos
+                <br>2) Cliente manda uma expressão e recebe resposta
+				<br>3) O servidor lider atual é desligado propositalmente
+				<br>4) Volta ao passo 2) até todos os servidores estiverem desligados
+				<br>(juntamente em 2, logo apos o primeiro lider ser desligado, propositalmente o cliente manda uma mensagem <strong>antes</strong> de outro servidor ter a chance de tomar liderança (logo não recebe resposta). Outros servidores não podem assumir que 0 está morto tão rapidamente, limitação do sistema de heartbeats implementado)
+				<br>5) Revive o servidor de maior ID
+                <br>6) Cliente manda uma expressão
+                <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
             <pre>
 > Logs:
             </pre>
