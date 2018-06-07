@@ -1,0 +1,630 @@
+
+///////
+This is the SLIM version of the logs
+
+RECOMMENDED for first viewing as they are more clear, but they also ommit some details that are present in the FULL version.
+* The sending/receiving of heartbeats are mostly cut from the slim (this) version of logs for the sake of readability *
+* some of the opening and closing of sockets are also ommited in the client and server response *
+
+We simplified the hearbeat process as this: { heartbeat process }. It looks the same as the lines below:
+
+"""
+{ heartbeat process }
+
+[2018-06-07 04:00:52]:[HealthMonitor] Bind TCP 192.168.31.202:14697
+[2018-06-07 04:00:52]:[HealthMonitor] listening for heartbeats...
+[2018-06-07 04:00:52]:[Remote 3] Starting heartbeat
+[2018-06-07 04:00:52]:[HealthMonitor] Bind TCP 192.168.31.202:14697
+[2018-06-07 04:00:52]:[HealthMonitor] listening for heartbeats...
+[2018-06-07 04:00:55]:[HealthMonitor] Connected 192.168.31.202:55448
+[2018-06-07 04:00:55]:[HealthMonitor] Heartbeat from 3
+[2018-06-07 04:00:55]:[Remote 3] Heartbeat, delta = 7815ms; dev = 953
+[2018-06-07 04:00:55]:[HealthMonitor] Connected 192.168.31.202:55452
+[2018-06-07 04:00:55]:[HealthMonitor] Heartbeat from 2
+[2018-06-07 04:00:55]:[Remote 2] Heartbeat, delta = 7201ms; dev = 800
+[2018-06-07 04:00:56]:[HealthMonitor] Connected 192.168.31.202:55455
+[2018-06-07 04:00:56]:[HealthMonitor] Heartbeat from 0
+[2018-06-07 04:00:56]:[Remote 0] Heartbeat, delta = 8167ms; dev = 1041
+[2018-06-07 04:00:56]:[Remote 0] Sending heartbeat 192.168.31.202:14701
+[2018-06-07 04:00:56]:[Remote 0] Creating socket
+[2018-06-07 04:00:56]:[Remote 2] Sending heartbeat 192.168.31.202:14703
+[2018-06-07 04:00:56]:[Remote 2] Creating socket
+[2018-06-07 04:00:56]:[Remote 3] Sending heartbeat 192.168.31.202:14705
+[2018-06-07 04:00:56]:[Remote 3] Creating socket
+[2018-06-07 04:00:56]:[Remote 2] Closing socket
+[2018-06-07 04:00:56]:[Remote 0] Closing socket
+[2018-06-07 04:00:56]:[Remote 3] Closing socket
+"""
+If you have any questions, please check the full log for all the details that were hidden here.
+
+
+
+We simplified the client sending: { client sending process }. It looks the same as the lines below:
+
+"""
+{ client sending process }
+
+[2018-06-07 04:00:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-07 04:00:57]:[ClientTCP] to address ('192.168.31.202', 14696)
+[2018-06-07 04:00:57]:[ClientTCP] Requesting server #2
+[2018-06-07 04:00:57]:[ClientTCP] Creating socket
+[2018-06-07 04:00:57]:[ClientTCP] created <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-07 04:00:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-07 04:00:57]:[ClientTCP] to address ('192.168.31.202', 14702)
+[2018-06-07 04:00:57]:[ClientTCP] Requesting server #3
+[2018-06-07 04:00:57]:[ClientTCP] Creating socket
+[2018-06-07 04:00:57]:[ClientTCP] created <socket.socket fd=8, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-07 04:00:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-07 04:00:57]:[ClientTCP] to address ('192.168.31.202', 14704)
+[2018-06-07 04:00:57]:[ClientTCP] Waiting any server for 4s...
+[2018-06-07 04:00:57]:[ClientTCP] Sending expression: 1+1
+[2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14700)
+[2018-06-07 04:00:57]:[ClientTCP] Sending expression: 1+1
+[2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14696)
+[2018-06-07 04:00:57]:[ClientTCP] Sending expression: 1+1
+[2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14702)
+[2018-06-07 04:00:57]:[ClientTCP] Sending expression: 1+1
+[2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14704)
+"""
+
+
+
+We simplified client closing process as: {client closing}:
+"""
+{client closing}
+
+[2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55509)>
+[2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55510), raddr=('192.168.31.202', 14696)>
+[2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55511), raddr=('192.168.31.202', 14702)>
+[2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=8, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55512), raddr=('192.168.31.202', 14704)>
+"""
+
+
+///////
+
+
+=== SERVER #0
+========================================
+[2018-06-07 04:00:52]:Starting Server
+========================================
+I am server #0
+[2018-06-07 04:00:52]:[Server] Creating server #0
+[2018-06-07 04:00:52]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:00:52]:[Remote 0] created
+[2018-06-07 04:00:52]:[Remote 1] created
+[2018-06-07 04:00:52]:[Remote 1] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 2] created
+[2018-06-07 04:00:52]:[Remote 2] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 3] created
+[2018-06-07 04:00:52]:[Remote 3] Starting heartbeat
+[2018-06-07 04:00:52]:[ServerTCP] Bind TCP 192.168.31.202:14700
+[2018-06-07 04:00:52]:[ServerTCP] Waiting client...
+{ heartbeat process }
+
+
+=== SERVER #1
+========================================
+[2018-06-07 04:00:52]:Starting Server
+========================================
+I am server #1
+[2018-06-07 04:00:52]:[Server] Creating server #1
+[2018-06-07 04:00:52]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:00:52]:[Remote 0] created
+[2018-06-07 04:00:52]:[Remote 0] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 1] created
+[2018-06-07 04:00:52]:[Remote 2] created
+[2018-06-07 04:00:52]:[Remote 2] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 3] created
+[2018-06-07 04:00:52]:[Remote 3] Starting heartbeat
+[2018-06-07 04:00:52]:[ServerTCP] Bind TCP 192.168.31.202:14696
+[2018-06-07 04:00:52]:[ServerTCP] Waiting client...
+{ heartbeat process }
+
+
+
+=== SERVER #2
+========================================
+[2018-06-07 04:00:51]:Starting Server
+========================================
+I am server #2
+[2018-06-07 04:00:51]:[Server] Creating server #2
+[2018-06-07 04:00:51]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:00:52]:[Remote 0] created
+[2018-06-07 04:00:52]:[Remote 0] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 1] created
+[2018-06-07 04:00:52]:[Remote 1] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 2] created
+[2018-06-07 04:00:52]:[Remote 3] created
+[2018-06-07 04:00:52]:[Remote 3] Starting heartbeat
+[2018-06-07 04:00:51]:[ServerTCP] Bind TCP 192.168.31.202:14702
+[2018-06-07 04:00:51]:[ServerTCP] Waiting client...
+{ heartbeat process }
+
+
+=== SERVER #3
+========================================
+[2018-06-07 04:00:51]:Starting Server
+========================================
+I am server #3
+[2018-06-07 04:00:51]:[Server] Creating server #3
+[2018-06-07 04:00:51]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:00:52]:[Remote 0] created
+[2018-06-07 04:00:52]:[Remote 0] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 1] created
+[2018-06-07 04:00:52]:[Remote 1] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 2] created
+[2018-06-07 04:00:52]:[Remote 2] Starting heartbeat
+[2018-06-07 04:00:52]:[Remote 3] created
+[2018-06-07 04:00:51]:[ServerTCP] Bind TCP 192.168.31.202:14704
+[2018-06-07 04:00:51]:[ServerTCP] Waiting client...
+{ heartbeat process }
+
+
+
+=== CLIENT
+========================================
+[2018-06-07 04:00:53]:Starting Client
+========================================
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1+1
+2018-06-07 04:00:57]:[ClientTCP] Requesting server #0
+[2018-06-07 04:00:57]:[ClientTCP] Creating socket
+[2018-06-07 04:00:57]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-07 04:00:57]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-07 04:00:57]:[ClientTCP] Exception in sock.getpeername(): [Errno 57] Socket is not connected
+[2018-06-07 04:00:57]:[ClientTCP] Requesting server #1
+[2018-06-07 04:00:57]:[ClientTCP] Creating socket
+[2018-06-07 04:00:57]:[ClientTCP] created <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+
+
+
+
+=== SERVER 0
+[2018-06-07 04:00:56]:[Remote 1] Heartbeat, delta = 8851ms; dev = 1212
+[2018-06-07 04:00:57]:[ServerTCP] Connected 192.168.31.202:55461
+[2018-06-07 04:00:57]:[HealthMonitor] leader calc
+[2018-06-07 04:00:57]:[HealthMonitor] Leader is 0, me
+[2018-06-07 04:00:57]:[Client    ('192.168.31.202', 55461)] Started 
+[2018-06-07 04:00:57]:[Client    ('192.168.31.202', 55461)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14700), raddr=('192.168.31.202', 55461)> 
+[2018-06-07 04:00:57]:[ClientTCP ('192.168.31.202', 55461)] Waiting expression
+[2018-06-07 04:00:57]:[ServerTCP] Waiting client...
+[2018-06-07 04:00:57]:[Client    ('192.168.31.202', 55461)] Calculating expression: 1+1
+[2018-06-07 04:00:57]:[Client    ('192.168.31.202', 55461)] result = 2.0
+From ('192.168.31.202', 55461) received: 1+1; result = 2.0
+[2018-06-07 04:00:57]:[ClientTCP ('192.168.31.202', 55461)] Sending result = 2.0
+[2018-06-07 04:00:57]:[Client    ('192.168.31.202', 55461)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14700), raddr=('192.168.31.202', 55461)>
+
+
+=== SERVER 1
+[2018-06-07 04:00:57]:[ServerTCP] Connected 192.168.31.202:55462
+[2018-06-07 04:00:57]:[HealthMonitor] leader calc
+[2018-06-07 04:00:57]:[HealthMonitor] Remote 0 timeoutInterval = 8167ms
+[2018-06-07 04:00:57]:[HealthMonitor] 0 grace_period = 7526ms
+[2018-06-07 04:00:57]:[HealthMonitor] Leader is 0
+[2018-06-07 04:00:57]:[ServerTCP] Waiting client...
+
+
+=== SERVER 2
+[2018-06-07 04:00:57]:[ServerTCP] Connected 192.168.31.202:55463
+[2018-06-07 04:00:57]:[HealthMonitor] leader calc
+[2018-06-07 04:00:57]:[HealthMonitor] Remote 0 timeoutInterval = 8975ms
+[2018-06-07 04:00:57]:[HealthMonitor] 0 grace_period = 8141ms
+[2018-06-07 04:00:57]:[HealthMonitor] Leader is 0
+[2018-06-07 04:00:57]:[ServerTCP] Waiting client...
+
+
+=== SERVER 3
+[2018-06-07 04:00:57]:[ServerTCP] Connected 192.168.31.202:55464
+[2018-06-07 04:00:57]:[HealthMonitor] leader calc
+[2018-06-07 04:00:57]:[HealthMonitor] Remote 0 timeoutInterval = 9358ms
+[2018-06-07 04:00:57]:[HealthMonitor] 0 grace_period = 8906ms
+[2018-06-07 04:00:57]:[HealthMonitor] Leader is 0
+[2018-06-07 04:00:57]:[ServerTCP] Waiting client...
+
+
+
+=== CLIENT
+[2018-06-07 04:00:57]:[ClientTCP] Receiving from ('192.168.31.202', 14700)
+result = 2.0
+{client closing}
+
+==== SERVER 0 IS KILLED
+
+==== SERVER 1
+[2018-06-07 04:01:11]:[HealthMonitor] Connected 192.168.31.202:55502
+{ heartbeat process }
+
+==== SERVER 2
+[2018-06-07 04:01:11]:[HealthMonitor] Connected 192.168.31.202:55501
+{ heartbeat process }
+[2018-06-07 04:01:14]:[ServerTCP] Connected 192.168.31.202:55511
+[2018-06-07 04:01:14]:[HealthMonitor] leader calc
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 0 timeoutInterval = 7736ms
+[2018-06-07 04:01:14]:[HealthMonitor] 0 grace_period = -5732ms
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 1 timeoutInterval = 5854ms
+[2018-06-07 04:01:14]:[HealthMonitor] 1 grace_period = 4363ms
+[2018-06-07 04:01:14]:[HealthMonitor] Leader is 1
+[2018-06-07 04:01:14]:[ServerTCP] Waiting client...
+
+
+==== SERVER 3
+{ heartbeat process }
+[2018-06-07 04:01:14]:[ServerTCP] Connected 192.168.31.202:55512
+[2018-06-07 04:01:14]:[HealthMonitor] leader calc
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 0 timeoutInterval = 8023ms
+[2018-06-07 04:01:14]:[HealthMonitor] 0 grace_period = -5159ms
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 1 timeoutInterval = 5659ms
+[2018-06-07 04:01:14]:[HealthMonitor] 1 grace_period = 4971ms
+[2018-06-07 04:01:14]:[HealthMonitor] Leader is 1
+[2018-06-07 04:01:14]:[ServerTCP] Waiting client...
+
+
+
+==== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2+2
+[2018-06-07 04:01:14]:[ClientTCP] Requesting server #0
+[2018-06-07 04:01:14]:[ClientTCP] Creating socket
+[2018-06-07 04:01:14]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:01:14]:[ClientTCP] Waiting any server result
+
+
+==== SERVER 1
+
+[2018-06-07 04:01:14]:[ServerTCP] Connected 192.168.31.202:55510
+[2018-06-07 04:01:14]:[HealthMonitor] leader calc
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 0 timeoutInterval = 7129ms
+[2018-06-07 04:01:14]:[HealthMonitor] 0 grace_period = -6944ms
+[2018-06-07 04:01:14]:[HealthMonitor] Leader is 1, me
+[2018-06-07 04:01:14]:[Client    ('192.168.31.202', 55510)] Started 
+[2018-06-07 04:01:14]:[Client    ('192.168.31.202', 55510)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14696), raddr=('192.168.31.202', 55510)> 
+[2018-06-07 04:01:14]:[ClientTCP ('192.168.31.202', 55510)] Waiting expression
+[2018-06-07 04:01:14]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:14]:[Client    ('192.168.31.202', 55510)] Calculating expression: 2+2
+[2018-06-07 04:01:14]:[Client    ('192.168.31.202', 55510)] result = 4.0
+From ('192.168.31.202', 55510) received: 2+2; result = 4.0
+[2018-06-07 04:01:14]:[ClientTCP ('192.168.31.202', 55510)] Sending result = 4.0
+[2018-06-07 04:01:14]:[Client    ('192.168.31.202', 55510)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14696), raddr=('192.168.31.202', 55510)>
+
+==== SERVER 2
+[2018-06-07 04:01:14]:[ServerTCP] Connected 192.168.31.202:55511
+[2018-06-07 04:01:14]:[HealthMonitor] leader calc
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 0 timeoutInterval = 7736ms
+[2018-06-07 04:01:14]:[HealthMonitor] 0 grace_period = -5732ms
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 1 timeoutInterval = 5854ms
+[2018-06-07 04:01:14]:[HealthMonitor] 1 grace_period = 4363ms
+[2018-06-07 04:01:14]:[HealthMonitor] Leader is 1
+[2018-06-07 04:01:14]:[ServerTCP] Waiting client...
+
+
+==== SERVER 3
+[2018-06-07 04:01:14]:[ServerTCP] Connected 192.168.31.202:55512
+[2018-06-07 04:01:14]:[HealthMonitor] leader calc
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 0 timeoutInterval = 8023ms
+[2018-06-07 04:01:14]:[HealthMonitor] 0 grace_period = -5159ms
+[2018-06-07 04:01:14]:[HealthMonitor] Remote 1 timeoutInterval = 5659ms
+[2018-06-07 04:01:14]:[HealthMonitor] 1 grace_period = 4971ms
+[2018-06-07 04:01:14]:[HealthMonitor] Leader is 1
+[2018-06-07 04:01:14]:[ServerTCP] Waiting client...
+
+
+
+==== CLIENT
+[2018-06-07 04:01:14]:[ClientTCP] Receiving from ('192.168.31.202', 14696)
+result = 4.0
+{closing ports}
+
+
+==== SERVER 1 IS KILLED
+
+==== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0/0
+[2018-06-07 04:01:30]:[ClientTCP] Requesting server #0
+[2018-06-07 04:01:30]:[ClientTCP] Creating socket
+[2018-06-07 04:01:30]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:01:30]:[ClientTCP] Waiting any server result
+
+
+==== SERVER 2
+[2018-06-07 04:01:58]:[HealthMonitor] Connected 192.168.31.202:55585
+[2018-06-07 04:01:58]:[HealthMonitor] Heartbeat from 3
+[2018-06-07 04:01:58]:[Remote 3] Heartbeat, delta = 5105ms; dev = 276
+[2018-06-07 04:01:59]:[ServerTCP] Connected 192.168.31.202:55589
+[2018-06-07 04:01:59]:[HealthMonitor] leader calc
+[2018-06-07 04:01:59]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:01:59]:[HealthMonitor] 0 grace_period = -1355ms
+[2018-06-07 04:01:59]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-07 04:01:59]:[HealthMonitor] 1 grace_period = -1355ms
+[2018-06-07 04:01:59]:[HealthMonitor] Leader is 2, me
+[2018-06-07 04:01:59]:[Client    ('192.168.31.202', 55589)] Started 
+[2018-06-07 04:01:59]:[Client    ('192.168.31.202', 55589)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14702), raddr=('192.168.31.202', 55589)> 
+[2018-06-07 04:01:59]:[ClientTCP ('192.168.31.202', 55589)] Waiting expression
+[2018-06-07 04:01:59]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:59]:[Client    ('192.168.31.202', 55589)] Calculating expression: 0/0
+received: Error! Division by Zero!
+[2018-06-07 04:01:59]:[ClientTCP ('192.168.31.202', 55589)] Sending result = zero division
+[2018-06-07 04:01:59]:[Client    ('192.168.31.202', 55589)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14702)>
+
+
+==== SERVER 3
+[2018-06-07 04:01:58]:[HealthMonitor] Connected 192.168.31.202:55585
+[2018-06-07 04:01:58]:[HealthMonitor] Heartbeat from 3
+[2018-06-07 04:01:58]:[Remote 3] Heartbeat, delta = 5105ms; dev = 276
+[2018-06-07 04:01:59]:[ServerTCP] Connected 192.168.31.202:55589
+[2018-06-07 04:01:59]:[HealthMonitor] leader calc
+[2018-06-07 04:01:59]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:01:59]:[HealthMonitor] 0 grace_period = -1355ms
+[2018-06-07 04:01:59]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-07 04:01:59]:[HealthMonitor] 1 grace_period = -1355ms
+[2018-06-07 04:01:59]:[HealthMonitor] Leader is 2, me
+
+
+==== CLIENT
+[2018-06-07 04:01:30]:[ClientTCP] Receiving from ('192.168.31.202', 14702)
+[Client   ] A division by zero was detected. Try a valid mathematical expression
+{client closing}
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1+1
+
+
+=== SERVER 2 IS KILLED
+
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1+1
+[2018-06-07 04:01:33]:[ClientTCP] Requesting server #0
+[2018-06-07 04:01:33]:[ClientTCP] Creating socket
+[2018-06-07 04:01:33]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+
+
+=== SERVER 3
+[2018-06-07 04:01:33]:[ServerTCP] Connected 192.168.31.202:55556
+[2018-06-07 04:01:33]:[HealthMonitor] leader calc
+[2018-06-07 04:01:33]:[HealthMonitor] Remote 0 timeoutInterval = 7736ms
+[2018-06-07 04:01:33]:[HealthMonitor] 0 grace_period = -25193ms
+[2018-06-07 04:01:33]:[HealthMonitor] Remote 1 timeoutInterval = 5394ms
+[2018-06-07 04:01:33]:[HealthMonitor] 1 grace_period = -11014ms
+[2018-06-07 04:01:33]:[HealthMonitor] Leader is 3, me
+[2018-06-07 04:01:33]:[Client    ('192.168.31.202', 55556)] Started 
+[2018-06-07 04:01:33]:[Client    ('192.168.31.202', 55556)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14704), raddr=('192.168.31.202', 55556)> 
+[2018-06-07 04:01:33]:[ClientTCP ('192.168.31.202', 55556)] Waiting expression
+[2018-06-07 04:01:33]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:33]:[Client    ('192.168.31.202', 55556)] Calculating expression: 1+1
+[2018-06-07 04:01:33]:[Client    ('192.168.31.202', 55556)] result = 2.0
+From ('192.168.31.202', 55556) received: 1+1; result = 2.0
+[2018-06-07 04:01:33]:[ClientTCP ('192.168.31.202', 55556)] Sending result = 2.0
+[2018-06-07 04:01:33]:[Client    ('192.168.31.202', 55556)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14704), raddr=('192.168.31.202', 55556)>
+
+==== CLIENT
+[2018-06-07 04:01:33]:[ClientTCP] Waiting any server result
+[2018-06-07 04:01:33]:[ClientTCP] Receiving from ('192.168.31.202', 14704)
+result = 2.0
+{client closing}
+
+
+==== SERVER 3 IS KILLED
+
+==== CLIENT 
+
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1+1
+[2018-06-07 04:01:39]:[ClientTCP] Requesting server #0
+[2018-06-07 04:01:39]:[ClientTCP] Creating socket
+[2018-06-07 04:01:39]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:01:39]:[Client   ] Timeout
+Server timeout, try again
+[2018-06-07 04:01:39]:[Client   ] No server could respond
+No response
+{client closing}
+
+
+==== SERVER 3 IS STARTED AGAIN
+========================================
+[2018-06-07 04:01:50]:Starting Server
+========================================
+I am server #3
+[2018-06-07 04:01:50]:[Server] Creating server #3
+[2018-06-07 04:01:50]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:01:50]:[ServerTCP] Bind TCP 192.168.31.202:14704
+[2018-06-07 04:01:50]:[HealthMonitor] created thread 140736093909888
+[2018-06-07 04:01:50]:[ServerTCP] listening...
+[2018-06-07 04:01:50]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:50]:[Remote 0] created
+[2018-06-07 04:01:50]:[Remote 0] Starting heartbeat
+[2018-06-07 04:01:50]:[Remote 1] created
+[2018-06-07 04:01:50]:[Remote 1] Starting heartbeat
+[2018-06-07 04:01:50]:[Remote 2] created
+[2018-06-07 04:01:50]:[Remote 2] Starting heartbeat
+[2018-06-07 04:01:50]:[Remote 3] created
+[2018-06-07 04:01:50]:[HealthMonitor] Bind TCP 192.168.31.202:14705
+[2018-06-07 04:01:50]:[HealthMonitor] listening for heartbeats...
+
+
+==== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+arrrr
+[2018-06-07 04:01:53]:[ClientTCP] Requesting server #0
+[2018-06-07 04:01:53]:[ClientTCP] Creating socket
+[2018-06-07 04:01:53]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:01:53]:[ClientTCP] Waiting any server result
+
+
+
+==== SERVER 3
+[2018-06-07 04:01:53]:[ServerTCP] Connected 192.168.31.202:55580
+[2018-06-07 04:01:53]:[HealthMonitor] leader calc
+[2018-06-07 04:01:53]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:01:53]:[HealthMonitor] 0 grace_period = -2040ms
+[2018-06-07 04:01:53]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-07 04:01:53]:[HealthMonitor] 1 grace_period = -2040ms
+[2018-06-07 04:01:53]:[HealthMonitor] Remote 2 timeoutInterval = 4000ms
+[2018-06-07 04:01:53]:[HealthMonitor] 2 grace_period = -2040ms
+[2018-06-07 04:01:53]:[HealthMonitor] Leader is 3, me
+[2018-06-07 04:01:53]:[Client    ('192.168.31.202', 55580)] Started 
+[2018-06-07 04:01:53]:[Client    ('192.168.31.202', 55580)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14704), raddr=('192.168.31.202', 55580)> 
+[2018-06-07 04:01:53]:[ClientTCP ('192.168.31.202', 55580)] Waiting expression
+[2018-06-07 04:01:53]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:53]:[Client    ('192.168.31.202', 55580)] Calculating expression: arrrr
+[2018-06-07 04:01:53]:[Client    ('192.168.31.202', 55580)] Exception Expected {{["-"] {'PI' | 'E' | Combine:({W:(+-01...,0123...) [{"." [W:(0123...)]}] [{'E' W:(+-01...,0123...)}]}) | {W:(ABCD...,ABCD...) Suppress:("(") Forward: ... Suppress:(")")}}} | {Suppress:("(") Suppress:(Forward: ...) Suppress:(")")}} (at char 5), (line:1, col:6)
+received: Error! Invalid expression!
+[2018-06-07 04:01:53]:[ClientTCP ('192.168.31.202', 55580)] Sending result = exception
+[2018-06-07 04:01:53]:[Client    ('192.168.31.202', 55580)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14704), raddr=('192.168.31.202', 55580)>
+
+
+==== CLIENT
+[2018-06-07 04:01:53]:[ClientTCP] Receiving from ('192.168.31.202', 14704)
+[Client   ] An exception was detected. Try a valid mathematical expression
+{client closing}
+
+
+==== SERVER 2 IS STARTED AGAIN
+========================================
+[2018-06-07 04:01:57]:Starting Server
+========================================
+========================================
+[2018-06-07 04:01:57]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-07 04:01:57]:Starting Heartbeater
+========================================
+Registered remote ('Bernardos-iMac.local', 14700)
+Registered remote ('Bernardos-iMac.local', 14696)
+Registered remote ('Bernardos-iMac.local', 14702)
+I am server #2
+Registered remote ('Bernardos-iMac.local', 14704)
+[2018-06-07 04:01:54]:[Server] Creating server #2
+[2018-06-07 04:01:54]:[ServerTCP] Creating TCP socket
+[2018-06-07 04:01:54]:[ServerTCP] Bind TCP 192.168.31.202:14702
+[2018-06-07 04:01:54]:[HealthMonitor] created thread 140736093909888
+[2018-06-07 04:01:54]:[ServerTCP] listening...
+[2018-06-07 04:01:54]:[Remote 0] created
+[2018-06-07 04:01:54]:[ServerTCP] Waiting client...
+[2018-06-07 04:01:54]:[Remote 0] Starting heartbeat
+[2018-06-07 04:01:54]:[Remote 1] created
+[2018-06-07 04:01:54]:[Remote 1] Starting heartbeat
+[2018-06-07 04:01:54]:[Remote 2] created
+[2018-06-07 04:01:54]:[Remote 3] created
+[2018-06-07 04:01:54]:[Remote 3] Starting heartbeat
+[2018-06-07 04:01:54]:[HealthMonitor] Bind TCP 192.168.31.202:14703
+[2018-06-07 04:01:54]:[HealthMonitor] listening for heartbeats...
+
+
+==== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+3+2
+[2018-06-07 04:02:03]:[ClientTCP] Requesting server #0
+[2018-06-07 04:02:03]:[ClientTCP] Creating socket
+[2018-06-07 04:02:03]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:02:03]:[ClientTCP] Waiting any server result
+
+
+==== SERVER 3
+[2018-06-07 04:02:03]:[ServerTCP] Connected 192.168.31.202:55600
+[2018-06-07 04:02:03]:[HealthMonitor] leader calc
+[2018-06-07 04:02:03]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:02:03]:[HealthMonitor] 0 grace_period = -12590ms
+[2018-06-07 04:02:03]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-07 04:02:03]:[HealthMonitor] 1 grace_period = -12590ms
+[2018-06-07 04:02:03]:[HealthMonitor] Remote 2 timeoutInterval = 15914ms
+[2018-06-07 04:02:03]:[HealthMonitor] 2 grace_period = 14151ms
+[2018-06-07 04:02:03]:[HealthMonitor] Leader is 2
+[2018-06-07 04:02:03]:[ServerTCP] Waiting client...
+[2018-06-07 04:02:05]:[HealthMonitor] Connected 192.168.31.202:55603
+{ heartbeat process }
+
+
+
+
+==== SERVER 2
+[2018-06-07 04:02:03]:[ServerTCP] Connected 192.168.31.202:55598
+[2018-06-07 04:02:03]:[HealthMonitor] leader calc
+[2018-06-07 04:02:03]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:02:03]:[HealthMonitor] 0 grace_period = -1856ms
+[2018-06-07 04:02:03]:[HealthMonitor] Leader is 2, me
+[2018-06-07 04:02:03]:[Client    ('192.168.31.202', 55598)] Started 
+[2018-06-07 04:02:03]:[Client    ('192.168.31.202', 55598)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14702), raddr=('192.168.31.202', 55598)> 
+[2018-06-07 04:02:03]:[ClientTCP ('192.168.31.202', 55598)] Waiting expression
+[2018-06-07 04:02:03]:[ServerTCP] Waiting client...
+[2018-06-07 04:02:03]:[Client    ('192.168.31.202', 55598)] Calculating expression: 3+2
+[2018-06-07 04:02:03]:[Client    ('192.168.31.202', 55598)] result = 5.0
+From ('192.168.31.202', 55598) received: 3+2; result = 5.0
+[2018-06-07 04:02:03]:[ClientTCP ('192.168.31.202', 55598)] Sending result = 5.0
+[2018-06-07 04:02:03]:[Client    ('192.168.31.202', 55598)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14702)>
+{ heartbeat process }
+
+
+==== SERVER 0 IS ALIVE AGAIN
+
+==== CLIENT
+[2018-06-07 04:02:03]:[ClientTCP] Receiving from ('192.168.31.202', 14702)
+result = 5.0
+{client closing}
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2+2
+[2018-06-07 04:02:09]:[ClientTCP] Requesting server #0
+[2018-06-07 04:02:09]:[ClientTCP] Creating socket
+[2018-06-07 04:02:09]:[ClientTCP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+[2018-06-07 04:02:09]:[ClientTCP] Non-blocking connection in progress...
+[2018-06-07 04:02:09]:[ClientTCP] Exception in sock.getpeername(): [Errno 57] Socket is not connected
+[2018-06-07 04:02:09]:[ClientTCP] Requesting server #1
+[2018-06-07 04:02:09]:[ClientTCP] Creating socket
+[2018-06-07 04:02:09]:[ClientTCP] created <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
+{ client sending process }
+[2018-06-07 04:02:09]:[ClientTCP] Waiting any server result
+
+
+==== SERVER 1
+[2018-06-07 04:02:09]:[ServerTCP] Connected 192.168.31.202:55611
+[2018-06-07 04:02:09]:[HealthMonitor] leader calc
+[2018-06-07 04:02:09]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:02:09]:[HealthMonitor] 0 grace_period = -7089ms
+[2018-06-07 04:02:09]:[HealthMonitor] Leader is 1, me
+[2018-06-07 04:02:09]:[Client    ('192.168.31.202', 55611)] Started 
+[2018-06-07 04:02:09]:[Client    ('192.168.31.202', 55611)] With socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14696), raddr=('192.168.31.202', 55611)> 
+[2018-06-07 04:02:09]:[ClientTCP ('192.168.31.202', 55611)] Waiting expression
+[2018-06-07 04:02:09]:[ServerTCP] Waiting client...
+[2018-06-07 04:02:09]:[Client    ('192.168.31.202', 55611)] Calculating expression: 2+2
+[2018-06-07 04:02:09]:[Client    ('192.168.31.202', 55611)] result = 4.0
+From ('192.168.31.202', 55611) received: 2+2; result = 4.0
+[2018-06-07 04:02:09]:[ClientTCP ('192.168.31.202', 55611)] Sending result = 4.0
+[2018-06-07 04:02:09]:[Client    ('192.168.31.202', 55611)] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 14696), raddr=('192.168.31.202', 55611)>
+{ heartbeat process }
+[2018-06-07 04:02:11]:[HealthMonitor] Connected 192.168.31.202:55623
+[2018-06-07 04:02:11]:[HealthMonitor] Heartbeat from 0
+
+
+==== SERVER 2
+[2018-06-07 04:02:09]:[HealthMonitor] leader calc
+[2018-06-07 04:02:09]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:02:09]:[HealthMonitor] 0 grace_period = -10918ms
+[2018-06-07 04:02:09]:[HealthMonitor] Remote 1 timeoutInterval = 12835ms
+[2018-06-07 04:02:09]:[HealthMonitor] 1 grace_period = 9586ms
+[2018-06-07 04:02:09]:[HealthMonitor] Leader is 1
+[2018-06-07 04:02:09]:[ServerTCP] Waiting client...
+{ heartbeat process }
+[2018-06-07 04:02:10]:[HealthMonitor] Connected 192.168.31.202:55622
+
+
+==== SERVER 3
+[2018-06-07 04:02:09]:[ServerTCP] Connected 192.168.31.202:55613
+[2018-06-07 04:02:09]:[HealthMonitor] leader calc
+[2018-06-07 04:02:09]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-07 04:02:09]:[HealthMonitor] 0 grace_period = -18823ms
+[2018-06-07 04:02:09]:[HealthMonitor] Remote 1 timeoutInterval = 19739ms
+[2018-06-07 04:02:09]:[HealthMonitor] 1 grace_period = 16394ms
+[2018-06-07 04:02:09]:[HealthMonitor] Leader is 1
+[2018-06-07 04:02:09]:[ServerTCP] Waiting client...
+{ heartbeat process }
+[2018-06-07 04:02:11]:[HealthMonitor] Connected 192.168.31.202:55624
+
+
+==== CLIENT
+result = 4.0
+{client closing}

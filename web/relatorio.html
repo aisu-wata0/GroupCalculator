@@ -222,8 +222,8 @@
                 <br>6) Cliente manda uma expressão
                 <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
                 </p>
-<button type="button" class="btn btn-primary" onclick="window.location='test1_FULL.txt';">Log Resumido (slim)</button>
-<button type="button" class="btn btn-secondary" onclick="window.location='test1_SLIM.txt';">Log Completo (full)</button>
+<button type="button" class="btn btn-primary" onclick="window.location='test1_FULL.txt';">UDP Log Resumido (slim)</button>
+<button type="button" class="btn btn-secondary" onclick="window.location='test1_SLIM.txt';">UDP Log Completo (full)</button>
 
 
             <br>
@@ -232,21 +232,33 @@
                 <br>1) Todos os sevidores vivos
                 <br>2) Cliente manda uma expressão e recebe resposta
 				<br>3) O servidor líder atual é desligado propositalmente
-				<br>4) Volta ao passo 2) até todos os servidores estiverem desligados
+				<br>4) Volta ao passo 2) até todos os servidores (do 0 ao 3) estiverem desligados
 				<br>(juntamente em 2, logo apos o primeiro lider ser desligado, propositalmente o cliente manda uma mensagem <strong>antes</strong> de outro servidor ter a chance de tomar liderança (logo não recebe resposta). Outros servidores não podem assumir que 0 está morto tão rapidamente, limitação do sistema de heartbeats com timeout implementado)
 				<br>5) Revive o servidor de maior ID
                 <br>6) Cliente manda uma expressão
-                <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
-
-                <br> As expressões enviadas são 1+1, 0/0, rawrrr, 12*12*12, 53*12/0, 1-1.
-                <br> Os resultados recebidos são 2, erro (divisão por 0), erro (expressão errada), 1728, erro (divisão por 0), 0.
-                </p>
+                <br>7) Volta ao passo 5) até todos os servidores (do 1 ao 3) estiverem vivos.
+                <br> Retiramos a última iteração, com o 0, 1, 2 e 3 para economizar espaço do log, já que já é possível ver que tudo está funcionando corretamente.
+             </p>
             <p>
-                <button type="button" class="btn btn-primary" onclick="window.location='test2_FULL.txt';">Log Resumido (slim)</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location='test2_SLIM.txt';">Log Completo (full)</button>
+                <button type="button" class="btn btn-primary" onclick="window.location='test2_SLIM.txt';">TCP Log Resumido (slim)</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location='test2_FULL.txt';">TCP Log Completo (full)</button>
             </p>
 
             <h4>Arquivos do Trabalho:</h4>
+            <p>
+                Arquivos principais:
+                <p>
+                <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">client.py.txt</button>
+                <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">server.py.txt</button>
+                <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">remotes.py.txt</button>
+
+            <p>
+                Abaixo os dois arquivos de bibliotecas que usamos. Eles não foram modificados.
+                <p>
+                <button type="button" class="btn btn-secondary" onclick="window.location='pyparsing.py.txt';">pyparsing.py.txt (biblioteca que usamos)</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location='parse.py.txt';">remotes.py.txt (biblioteca que usamos)</button>
+        </p>
+        </p>
 
 
         </main>
