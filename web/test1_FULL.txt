@@ -1,0 +1,782 @@
+
+///////
+This is the FULL version of the logs
+
+NOT RECOMMENDED for first viewing as they are more extensive, but they also include some details that are not present in the SLIM version.
+* more details are kept in this version and is thus harder to read, but useful for closer analysis *
+///////
+
+
+=== SERVER #0
+========================================
+[2018-06-05 14:15:17]:Starting Server
+========================================
+========================================
+[2018-06-05 14:15:17]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:15:17]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+I am server #0
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:15:17]:[Server] Creating server #0
+[2018-06-05 14:15:17]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:17]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:17]:[HealthMonitor] created thread 140101414688512
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:17]:[Remote 0] created
+[2018-06-05 14:15:17]:[Remote 1] created
+[2018-06-05 14:15:17]:[Remote 2] created
+[2018-06-05 14:15:17]:[Remote 3] created
+[2018-06-05 14:15:17]:[Remote 4] created
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:17]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #1
+========================================
+[2018-06-05 14:15:17]:Starting Server
+========================================
+========================================
+[2018-06-05 14:15:17]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:15:17]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+I am server #1
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:15:17]:[Server] Creating server #1
+[2018-06-05 14:15:17]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:17]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:17]:[HealthMonitor] created thread 139900482377472
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:17]:[Remote 0] created
+[2018-06-05 14:15:17]:[Remote 1] created
+[2018-06-05 14:15:17]:[Remote 2] created
+[2018-06-05 14:15:17]:[Remote 3] created
+[2018-06-05 14:15:17]:[Remote 4] created
+[2018-06-05 14:15:17]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:17]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #2
+========================================
+[2018-06-05 14:15:16]:Starting Server
+========================================
+========================================
+[2018-06-05 14:15:16]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:15:16]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+I am server #2
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:15:16]:[Server] Creating server #2
+[2018-06-05 14:15:16]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:16]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:16]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:16]:[HealthMonitor] created thread 139941570955008
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:16]:[Remote 0] created
+[2018-06-05 14:15:16]:[Remote 1] created
+[2018-06-05 14:15:16]:[Remote 2] created
+[2018-06-05 14:15:16]:[Remote 3] created
+[2018-06-05 14:15:16]:[Remote 4] created
+[2018-06-05 14:15:16]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:16]:[HealthMonitorUDP] listening for heartbeats...
+
+=== SERVER #3
+========================================
+[2018-06-05 14:15:18]:Starting Server
+========================================
+========================================
+[2018-06-05 14:15:18]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:15:18]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+I am server #3
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:15:18]:[Server] Creating server #3
+[2018-06-05 14:15:18]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:15:18]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:15:18]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:18]:[HealthMonitor] created thread 140589436516096
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:15:18]:[Remote 0] created
+[2018-06-05 14:15:18]:[Remote 1] created
+[2018-06-05 14:15:18]:[Remote 2] created
+[2018-06-05 14:15:18]:[Remote 3] created
+[2018-06-05 14:15:18]:[Remote 4] created
+[2018-06-05 14:15:18]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:15:18]:[HealthMonitorUDP] listening for heartbeats...
+
+*client sends an expression "0" as multicast*
+=== CLIENT (with response already from logs below)
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:15:22]:[ClientUDP] Creating socket
+[2018-06-05 14:15:22]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:22]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:15:22]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:22]:[ClientUDP] Received from ('10.254.224.36', 38148)
+result = 0.0
+[2018-06-05 14:15:22]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 37295)>
+
+
+=== SERVER #0
+[2018-06-05 14:15:20]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:20]:[Remote 2] Heartbeat, delta = 7739ms; dev = 934
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:15:21]:[Remote 1] Heartbeat, delta = 8675ms; dev = 1168
+[2018-06-05 14:15:21]:[HealthMonitorUDP] Sending heartbeat multicast: 0
+[2018-06-05 14:15:22]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:22]:[Remote 3] Heartbeat, delta = 9387ms; dev = 1346
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0, me
+[2018-06-05 14:15:22]:[ClientUDP ('10.254.224.38', 37295)] Creating socket
+[2018-06-05 14:15:22]:[ClientUDP ('10.254.224.38', 37295)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] Started 
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] Calculating expression: 0
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] result = 0.0
+From ('10.254.224.38', 37295) received: 0; result = 0.0
+[2018-06-05 14:15:22]:[ClientUDP ('10.254.224.38', 37295)] Sending result = 0.0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:22]:[Client    ('10.254.224.38', 37295)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 38148)>
+
+* We kill server 0 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #1
+[2018-06-05 14:15:20]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:20]:[Remote 2] Heartbeat, delta = 8065ms; dev = 1016
+[2018-06-05 14:15:21]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:15:21]:[Remote 0] Heartbeat, delta = 8328ms; dev = 1082
+[2018-06-05 14:15:22]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:22]:[Remote 3] Heartbeat, delta = 9712ms; dev = 1428
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 8183ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:15:20]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:15:21]:[Remote 1] Heartbeat, delta = 8939ms; dev = 1234
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:15:21]:[Remote 0] Heartbeat, delta = 9266ms; dev = 1316
+[2018-06-05 14:15:22]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:22]:[Remote 3] Heartbeat, delta = 9650ms; dev = 1412
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 9060ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:20]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:20]:[Remote 2] Heartbeat, delta = 7355ms; dev = 838
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:15:21]:[Remote 1] Heartbeat, delta = 7291ms; dev = 822
+[2018-06-05 14:15:21]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:15:21]:[Remote 0] Heartbeat, delta = 7619ms; dev = 904
+[2018-06-05 14:15:22]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
+[2018-06-05 14:15:22]:[HealthMonitor] leader calc
+[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 7766ms
+[2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:22]:[ServerUDP] Waiting client...
+
+*client sends an expression "0" as multicast again*
+* happens right after 0 dies *
+* so others can't reasonably assume 0 is dead, they don't respond *
+
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:15:25]:[ClientUDP] Creating socket
+[2018-06-05 14:15:25]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:25]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:15:25]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:29]:[Client   ] Timeout
+Server timeout, try again
+[2018-06-05 14:15:29]:[Client   ] No server could respond
+No response
+[2018-06-05 14:15:29]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 34709)>
+
+=== SERVER #1
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4799ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 5676ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
+[2018-06-05 14:15:25]:[HealthMonitor] leader calc
+[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8966ms
+[2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4989ms
+[2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+
+
+*client sends an expression "1" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1
+[2018-06-05 14:15:32]:[ClientUDP] Creating socket
+[2018-06-05 14:15:32]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:32]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 1
+[2018-06-05 14:15:32]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:32]:[ClientUDP] Received from ('10.254.224.37', 46627)
+result = 1.0
+[2018-06-05 14:15:32]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 50132)>
+
+=== SERVER #1
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:26]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:26]:[Remote 3] Heartbeat, delta = 4001ms; dev = 1071
+[2018-06-05 14:15:28]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:28]:[Remote 2] Heartbeat, delta = 4002ms; dev = 572
+[2018-06-05 14:15:29]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+[2018-06-05 14:15:30]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:30]:[Remote 3] Heartbeat, delta = 4001ms; dev = 803
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2137ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1, me
+[2018-06-05 14:15:32]:[ClientUDP ('10.254.224.38', 50132)] Creating socket
+[2018-06-05 14:15:32]:[ClientUDP ('10.254.224.38', 50132)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] Started 
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] Calculating expression: 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] result = 1.0
+From ('10.254.224.38', 50132) received: 1; result = 1.0
+[2018-06-05 14:15:32]:[ClientUDP ('10.254.224.38', 50132)] Sending result = 1.0
+[2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 46627)>
+
+* We kill server 1 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #2
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:26]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:26]:[Remote 3] Heartbeat, delta = 4001ms; dev = 1059
+[2018-06-05 14:15:28]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:15:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:15:29]:[Remote 1] Heartbeat, delta = 4000ms; dev = 882
+[2018-06-05 14:15:30]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:30]:[Remote 3] Heartbeat, delta = 4001ms; dev = 795
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -1259ms
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 7528ms
+[2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 4937ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:15:25]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:26]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:15:28]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:28]:[Remote 2] Heartbeat, delta = 4001ms; dev = 472
+[2018-06-05 14:15:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:15:29]:[Remote 1] Heartbeat, delta = 4000ms; dev = 462
+[2018-06-05 14:15:30]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
+[2018-06-05 14:15:32]:[HealthMonitor] leader calc
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2554ms
+[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 5851ms
+[2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 3582ms
+[2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:15:32]:[ServerUDP] Waiting client...
+
+*client sends an expression "2" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2
+[2018-06-05 14:15:43]:[ClientUDP] Creating socket
+[2018-06-05 14:15:43]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:43]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 2
+[2018-06-05 14:15:43]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:43]:[ClientUDP] Received from ('10.254.224.38', 46993)
+result = 2.0
+[2018-06-05 14:15:43]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 57178)>
+
+=== SERVER #2
+[2018-06-05 14:15:37]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:38]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:38]:[Remote 3] Heartbeat, delta = 4000ms; dev = 447
+[2018-06-05 14:15:40]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:15:42]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:15:42]:[Remote 3] Heartbeat, delta = 4001ms; dev = 336
+[2018-06-05 14:15:43]:[ServerUDP] Received from 10.254.224.38:57178
+[2018-06-05 14:15:43]:[HealthMonitor] leader calc
+[2018-06-05 14:15:43]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
+[2018-06-05 14:15:43]:[HealthMonitor] 0 grace_period = -11411ms
+[2018-06-05 14:15:43]:[HealthMonitor] Remote 1 timeoutInterval = 6647ms
+[2018-06-05 14:15:43]:[HealthMonitor] 1 grace_period = -2976ms
+[2018-06-05 14:15:43]:[HealthMonitor] Leader is 2, me
+[2018-06-05 14:15:43]:[ClientUDP ('10.254.224.38', 57178)] Creating socket
+[2018-06-05 14:15:43]:[ClientUDP ('10.254.224.38', 57178)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] Started 
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] Calculating expression: 2
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] result = 2.0
+From ('10.254.224.38', 57178) received: 2; result = 2.0
+[2018-06-05 14:15:43]:[ClientUDP ('10.254.224.38', 57178)] Sending result = 2.0
+[2018-06-05 14:15:43]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 46993)>
+[2018-06-05 14:15:44]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+
+* We kill server 2 so others can become leaders on the next expression*
+KeyboardInterrupt
+
+=== SERVER #3
+[2018-06-05 14:15:43]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:44]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:15:44]:[Remote 2] Heartbeat, delta = 4000ms; dev = 150
+[2018-06-05 14:15:46]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:15:48]:[ServerUDP] Received from 10.254.224.38:37031
+[2018-06-05 14:15:48]:[HealthMonitor] leader calc
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:48]:[HealthMonitor] 0 grace_period = -18682ms
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
+[2018-06-05 14:15:48]:[HealthMonitor] 1 grace_period = -9468ms
+[2018-06-05 14:15:48]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
+[2018-06-05 14:15:48]:[HealthMonitor] 2 grace_period = 1022ms
+[2018-06-05 14:15:48]:[HealthMonitor] Leader is 2
+[2018-06-05 14:15:48]:[ServerUDP] Waiting client...
+
+*client sends an expression "3" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+3
+[2018-06-05 14:15:54]:[ClientUDP] Creating socket
+[2018-06-05 14:15:54]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:54]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 3
+[2018-06-05 14:15:54]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:15:54]:[ClientUDP] Received from ('10.254.224.44', 41308)
+result = 3.0
+[2018-06-05 14:15:54]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 42197)>
+
+=== SERVER #3
+[2018-06-05 14:15:54]:[ServerUDP] Received from 10.254.224.38:42197
+[2018-06-05 14:15:54]:[HealthMonitor] leader calc
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
+[2018-06-05 14:15:54]:[HealthMonitor] 0 grace_period = -25162ms
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
+[2018-06-05 14:15:54]:[HealthMonitor] 1 grace_period = -15949ms
+[2018-06-05 14:15:54]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
+[2018-06-05 14:15:54]:[HealthMonitor] 2 grace_period = -4457ms
+[2018-06-05 14:15:54]:[HealthMonitor] Leader is 3, me
+[2018-06-05 14:15:54]:[ClientUDP ('10.254.224.38', 42197)] Creating socket
+[2018-06-05 14:15:54]:[ClientUDP ('10.254.224.38', 42197)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] Started 
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] Calculating expression: 3
+[2018-06-05 14:15:54]:[ServerUDP] Waiting client...
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] result = 3.0
+From ('10.254.224.38', 42197) received: 3; result = 3.0
+[2018-06-05 14:15:54]:[ClientUDP ('10.254.224.38', 42197)] Sending result = 3.0
+[2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 41308)>
+
+*We revive server 3*
+=== SERVER #3
+========================================
+[2018-06-05 14:16:04]:Starting Server
+========================================
+========================================
+[2018-06-05 14:16:04]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:16:04]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+I am server #3
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:16:04]:[Server] Creating server #3
+[2018-06-05 14:16:04]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:04]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:04]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:04]:[HealthMonitor] created thread 139681240868608
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:04]:[Remote 0] created
+[2018-06-05 14:16:04]:[Remote 1] created
+[2018-06-05 14:16:04]:[Remote 2] created
+[2018-06-05 14:16:04]:[Remote 3] created
+[2018-06-05 14:16:04]:[Remote 4] created
+[2018-06-05 14:16:04]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:04]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:08]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+
+*client sends an expression "3" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+3
+[2018-06-05 14:16:08]:[ClientUDP] Creating socket
+[2018-06-05 14:16:08]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:08]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 3
+[2018-06-05 14:16:08]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:08]:[ClientUDP] Received from ('10.254.224.44', 59128)
+result = 3.0
+[2018-06-05 14:16:08]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 33399)>
+
+=== SERVER #3
+[2018-06-05 14:16:08]:[ServerUDP] Received from 10.254.224.38:33399
+[2018-06-05 14:16:08]:[HealthMonitor] leader calc
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 0 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 1 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Remote 2 timeoutInterval = 4000ms
+[2018-06-05 14:16:08]:[HealthMonitor] 2 grace_period = -4168ms
+[2018-06-05 14:16:08]:[HealthMonitor] Leader is 3, me
+[2018-06-05 14:16:08]:[ClientUDP ('10.254.224.38', 33399)] Creating socket
+[2018-06-05 14:16:08]:[ClientUDP ('10.254.224.38', 33399)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] Started 
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] Calculating expression: 3
+[2018-06-05 14:16:08]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] result = 3.0
+From ('10.254.224.38', 33399) received: 3; result = 3.0
+[2018-06-05 14:16:08]:[ClientUDP ('10.254.224.38', 33399)] Sending result = 3.0
+[2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 59128)>
+
+
+*We revive server 2*
+=== SERVER #2
+========================================
+[2018-06-05 14:16:14]:Starting Server
+========================================
+========================================
+[2018-06-05 14:16:14]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:16:14]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+I am server #2
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:16:14]:[Server] Creating server #2
+[2018-06-05 14:16:14]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:14]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:14]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:14]:[HealthMonitor] created thread 140366328981248
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:14]:[Remote 0] created
+[2018-06-05 14:16:14]:[Remote 1] created
+[2018-06-05 14:16:14]:[Remote 2] created
+[2018-06-05 14:16:14]:[Remote 3] created
+[2018-06-05 14:16:14]:[Remote 4] created
+[2018-06-05 14:16:14]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:14]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:16]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:16]:[Remote 3] Heartbeat, delta = 5783ms; dev = 445
+[2018-06-05 14:16:18]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:16:20]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:20]:[Remote 3] Heartbeat, delta = 4001ms; dev = 334
+
+*client sends an expression "2" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+2
+[2018-06-05 14:16:22]:[ClientUDP] Creating socket
+[2018-06-05 14:16:22]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:22]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 2
+[2018-06-05 14:16:22]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:22]:[ClientUDP] Received from ('10.254.224.38', 60008)
+result = 2.0
+[2018-06-05 14:16:22]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 37464)>
+
+=== SERVER #2
+[2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
+[2018-06-05 14:16:22]:[HealthMonitor] leader calc
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -7340ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -7339ms
+[2018-06-05 14:16:22]:[HealthMonitor] Leader is 2, me
+[2018-06-05 14:16:22]:[ClientUDP ('10.254.224.38', 37464)] Creating socket
+[2018-06-05 14:16:22]:[ClientUDP ('10.254.224.38', 37464)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] Started 
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] Calculating expression: 2
+[2018-06-05 14:16:22]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] result = 2.0
+From ('10.254.224.38', 37464) received: 2; result = 2.0
+[2018-06-05 14:16:22]:[ClientUDP ('10.254.224.38', 37464)] Sending result = 2.0
+[2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 60008)>
+
+=== SERVER #3
+[2018-06-05 14:16:18]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:18]:[Remote 2] Heartbeat, delta = 19223ms; dev = 3805
+[2018-06-05 14:16:20]:[HealthMonitorUDP] Sending heartbeat multicast: 3
+[2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
+[2018-06-05 14:16:22]:[HealthMonitor] leader calc
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -17561ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
+[2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -17561ms
+[2018-06-05 14:16:22]:[HealthMonitor] Remote 2 timeoutInterval = 19223ms
+[2018-06-05 14:16:22]:[HealthMonitor] 2 grace_period = 16108ms
+[2018-06-05 14:16:22]:[HealthMonitor] Leader is 2
+[2018-06-05 14:16:22]:[ServerUDP] Waiting client...
+
+*We revive server 1*
+=== SERVER #1
+
+========================================
+[2018-06-05 14:16:25]:Starting Server
+========================================
+========================================
+[2018-06-05 14:16:25]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:16:25]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+Registered remote ['10.254.224.37', '14699\n']
+I am server #1
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:16:25]:[Server] Creating server #1
+[2018-06-05 14:16:25]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:25]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:25]:[HealthMonitor] created thread 140414026471168
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:25]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:25]:[Remote 0] created
+[2018-06-05 14:16:25]:[Remote 1] created
+[2018-06-05 14:16:25]:[Remote 2] created
+[2018-06-05 14:16:25]:[Remote 3] created
+[2018-06-05 14:16:25]:[Remote 4] created
+[2018-06-05 14:16:25]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:25]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:26]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:26]:[Remote 2] Heartbeat, delta = 5793ms; dev = 448
+[2018-06-05 14:16:28]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:28]:[Remote 3] Heartbeat, delta = 6577ms; dev = 644
+[2018-06-05 14:16:29]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+[2018-06-05 14:16:30]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:30]:[Remote 2] Heartbeat, delta = 4001ms; dev = 336
+
+*client sends an expression "1" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+1
+[2018-06-05 14:16:32]:[ClientUDP] Creating socket
+[2018-06-05 14:16:32]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:32]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 1
+[2018-06-05 14:16:32]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:32]:[ClientUDP] Received from ('10.254.224.37', 38168)
+result = 1.0
+[2018-06-05 14:16:32]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 58764)>
+
+=== SERVER #1
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -5568ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1, me
+[2018-06-05 14:16:32]:[ClientUDP ('10.254.224.38', 58764)] Creating socket
+[2018-06-05 14:16:32]:[ClientUDP ('10.254.224.38', 58764)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] Started 
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] Calculating expression: 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] result = 1.0
+From ('10.254.224.38', 58764) received: 1; result = 1.0
+[2018-06-05 14:16:32]:[ClientUDP ('10.254.224.38', 58764)] Sending result = 1.0
+[2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 38168)>
+
+=== SERVER #2
+[2018-06-05 14:16:28]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:28]:[Remote 3] Heartbeat, delta = 4001ms; dev = 188
+[2018-06-05 14:16:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:29]:[Remote 1] Heartbeat, delta = 19213ms; dev = 3803
+[2018-06-05 14:16:30]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -16779ms
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 19213ms
+[2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 17860ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:16:29]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:29]:[Remote 1] Heartbeat, delta = 30434ms; dev = 6608
+[2018-06-05 14:16:30]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:30]:[Remote 2] Heartbeat, delta = 4001ms; dev = 1606
+[2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
+[2018-06-05 14:16:32]:[HealthMonitor] leader calc
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
+[2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -27000ms
+[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 30434ms
+[2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 28301ms
+[2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
+[2018-06-05 14:16:32]:[ServerUDP] Waiting client...
+
+*We revive server 0*
+=== SERVER #0
+========================================
+[2018-06-05 14:16:36]:Starting Server
+========================================
+========================================
+[2018-06-05 14:16:36]:Starting HealthMonitor
+========================================
+========================================
+[2018-06-05 14:16:36]:Starting Heartbeater
+========================================
+Registered remote ['10.254.224.36', '14699\n']
+I am server #0
+Registered remote ['10.254.224.37', '14699\n']
+Registered remote ['10.254.224.38', '14699\n']
+Registered remote ['10.254.224.44', '14699\n']
+Registered remote ['200.17.202.6', '14699\n']
+[2018-06-05 14:16:36]:[Server] Creating server #0
+[2018-06-05 14:16:36]:[ServerUDP] Creating UDP socket multicast
+[2018-06-05 14:16:36]:[ServerUDP] Bind UDP 224.1.1.1:5007
+[2018-06-05 14:16:36]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:36]:[HealthMonitor] created thread 140570819475200
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Creating UDP socket multicast
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Starting heartbeat sender
+[2018-06-05 14:16:36]:[Remote 0] created
+[2018-06-05 14:16:36]:[Remote 1] created
+[2018-06-05 14:16:36]:[Remote 2] created
+[2018-06-05 14:16:36]:[Remote 3] created
+[2018-06-05 14:16:36]:[Remote 4] created
+[2018-06-05 14:16:36]:[HealthMonitorUDP] Bind UDP 224.1.1.2:5008
+[2018-06-05 14:16:36]:[HealthMonitorUDP] listening for heartbeats...
+[2018-06-05 14:16:37]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:37]:[Remote 1] Heartbeat, delta = 5881ms; dev = 470
+[2018-06-05 14:16:38]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:38]:[Remote 2] Heartbeat, delta = 6676ms; dev = 669
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:40]:[Remote 3] Heartbeat, delta = 7459ms; dev = 864
+[2018-06-05 14:16:40]:[HealthMonitorUDP] Sending heartbeat multicast: 0
+[2018-06-05 14:16:41]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:41]:[Remote 1] Heartbeat, delta = 4000ms; dev = 352
+[2018-06-05 14:16:42]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4000ms; dev = 502
+
+*client sends an expression "0" as multicast*
+=== CLIENT
+Type an arithmetic expression. Example: 1+1, (13+1)*2, 5^3
+0
+[2018-06-05 14:16:43]:[ClientUDP] Creating socket
+[2018-06-05 14:16:43]:[ClientUDP] created <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:43]:[ClientUDP] Multicasting ('224.1.1.1', 5007) expression: 0
+[2018-06-05 14:16:43]:[ClientUDP] Waiting any server for 4s...
+[2018-06-05 14:16:43]:[ClientUDP] Received from ('10.254.224.36', 41182)
+result = 0.0
+[2018-06-05 14:16:43]:[ClientUDP] closing socket  <socket.socket fd=3, family=AddressFamily.AF_INET, type=2050, proto=17, laddr=('0.0.0.0', 35519)>
+
+=== SERVER #0
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0, me
+[2018-06-05 14:16:43]:[ClientUDP ('10.254.224.38', 35519)] Creating socket
+[2018-06-05 14:16:43]:[ClientUDP ('10.254.224.38', 35519)] created <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)>
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] Started 
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] With socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 0)> 
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] Calculating expression: 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] result = 0.0
+From ('10.254.224.38', 35519) received: 0; result = 0.0
+[2018-06-05 14:16:43]:[ClientUDP ('10.254.224.38', 35519)] Sending result = 0.0
+[2018-06-05 14:16:43]:[Client    ('10.254.224.38', 35519)] Closing socket <socket.socket fd=5, family=AddressFamily.AF_INET, type=SocketKind.SOCK_DGRAM, proto=17, laddr=('0.0.0.0', 41182)>
+
+=== SERVER #1
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 3
+[2018-06-05 14:16:40]:[Remote 3] Heartbeat, delta = 4001ms; dev = 272
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 19123ms; dev = 3780
+[2018-06-05 14:16:41]:[HealthMonitorUDP] Sending heartbeat multicast: 1
+[2018-06-05 14:16:42]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 142
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 19123ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 16281ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+
+=== SERVER #2
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 30335ms; dev = 6583
+[2018-06-05 14:16:41]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:41]:[Remote 1] Heartbeat, delta = 4000ms; dev = 1745
+[2018-06-05 14:16:42]:[HealthMonitorUDP] Sending heartbeat multicast: 2
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 30335ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 27705ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...
+
+=== SERVER #3
+[2018-06-05 14:16:40]:[HealthMonitor] Heartbeat from 0
+[2018-06-05 14:16:40]:[Remote 0] Heartbeat, delta = 41555ms; dev = 9388
+[2018-06-05 14:16:41]:[HealthMonitor] Heartbeat from 1
+[2018-06-05 14:16:41]:[Remote 1] Heartbeat, delta = 4000ms; dev = 2928
+[2018-06-05 14:16:42]:[HealthMonitor] Heartbeat from 2
+[2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 678
+[2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
+[2018-06-05 14:16:43]:[HealthMonitor] leader calc
+[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 41555ms
+[2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 39144ms
+[2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
+[2018-06-05 14:16:43]:[ServerUDP] Waiting client...

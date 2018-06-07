@@ -151,7 +151,7 @@
             <p>
                 Na raiz do projeto, deve conter a lista dos hosts que fazem parte do grupo de servidores.
                 <br>Cada linha da lista tem o nome do host e o número da porta de cada servidor (porta é opcional no caso de UDP).
-                <br>O nome localhost é proibido, deve-se utilizar o nome da maquina na rede local.
+                <br>O nome localhost é proibido, deve-se utilizar o nome da máquina na rede local.
             </p>
 
             <h5>pyparsing.py e pyparsingtest.py</h5>
@@ -189,11 +189,11 @@
             <h5>server.py</h5>
             <p>
                 server.py é o arquivo que será responsável por rodar Server, HealthMonitor e criar threads para servir clientes. Em conjunto essas classes checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
-                <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração portas em servers.txt servidores em uma mesma maquina são clones.
+                <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração as portas em servers.txt, servidores em uma mesma máquina são clones.
             <p>
                 <strong>Uso</strong>:
                 <br>python3 server.py [porta|"UDP"]
-                <br>Onde porta é o número da porta (por exemplo, 14699). A porta precisa estar descrita em servers.txt ao lado do nome da maquina atual.
+                <br>Onde porta é o número da porta (por exemplo, 14699). A porta precisa estar descrita em servers.txt ao lado do nome da máquina atual.
 
             <h4>Conclusão:</h4>
             <p>
@@ -206,6 +206,7 @@
             </p>
 
             <h4>Logs exemplo:</h4>
+            <p>
             	Os logs vem em 2 versões, SLIM e FULL. Nas duas versões os logs dos servidores e cliente estão em um mesmo arquivo mesclado para facilitar análise.
             	<br>Devido ao tamanho do log as ações dos servidores em resposta a um cliente estão juntas.
             	<br><strong>SLIM é recomendada</strong> para primeira análise já que é mais clara, mas a versão <strong>omite</strong> alguns detalhes presentes na versão FULL, como criação de sockets em resposta, alguns Heartbeats, etc.
@@ -214,16 +215,40 @@
                 <br><strong>Teste 1</strong>: UDP multicast com 4 servidores:
                 <br>1) Todos os sevidores vivos
                 <br>2) Cliente manda uma expressão e recebe resposta
-				<br>3) O servidor lider atual é desligado propositalmente
+				<br>3) O servidor líder atual é desligado propositalmente
 				<br>4) Volta ao passo 2) até todos os servidores estiverem desligados
 				<br>(juntamente em 2, logo apos o primeiro lider ser desligado, propositalmente o cliente manda uma mensagem <strong>antes</strong> de outro servidor ter a chance de tomar liderança (logo não recebe resposta). Outros servidores não podem assumir que 0 está morto tão rapidamente, limitação do sistema de heartbeats implementado)
 				<br>5) Revive o servidor de maior ID
                 <br>6) Cliente manda uma expressão
                 <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
-            <pre>
-> Logs:
-            </pre>
+                </p>
+<button type="button" class="btn btn-primary" onclick="window.location='test1_FULL.txt';">Log Resumido (slim)</button>
+<button type="button" class="btn btn-secondary" onclick="window.location='test1_SLIM.txt';">Log Completo (full)</button>
+
+
             <br>
+            <p>
+                <br><strong>Teste 2</strong>: TCP com 4 servidores:
+                <br>1) Todos os sevidores vivos
+                <br>2) Cliente manda uma expressão e recebe resposta
+				<br>3) O servidor líder atual é desligado propositalmente
+				<br>4) Volta ao passo 2) até todos os servidores estiverem desligados
+				<br>(juntamente em 2, logo apos o primeiro lider ser desligado, propositalmente o cliente manda uma mensagem <strong>antes</strong> de outro servidor ter a chance de tomar liderança (logo não recebe resposta). Outros servidores não podem assumir que 0 está morto tão rapidamente, limitação do sistema de heartbeats com timeout implementado)
+				<br>5) Revive o servidor de maior ID
+                <br>6) Cliente manda uma expressão
+                <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
+
+                <br> As expressões enviadas são 1+1, 0/0, rawrrr, 12*12*12, 53*12/0, 1-1.
+                <br> Os resultados recebidos são 2, erro (divisão por 0), erro (expressão errada), 1728, erro (divisão por 0), 0.
+                </p>
+            <p>
+                <button type="button" class="btn btn-primary" onclick="window.location='test2_FULL.txt';">Log Resumido (slim)</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location='test2_SLIM.txt';">Log Completo (full)</button>
+            </p>
+
+            <h4>Arquivos do Trabalho:</h4>
+
+
         </main>
     </section>
 </body>
