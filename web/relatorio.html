@@ -18,9 +18,12 @@
             <p>
                 O cliente pede ao grupo se servidores para avaliar uma expressão, se algum estiver disponível ele irá retornar
                 o resultado para o cliente.
-                <br>É feito um multicast ao grupo de servidores e apenas o lider responde ao cliente com o resultado.
+                <br>
+				É feito um multicast ao grupo de servidores e apenas o lider responde ao cliente com o resultado.
                 No caso do TCP esse multicast é simulado apartir de pedidos de conexões nao bloqueantes da parte do cliente.
-                O cada servidor roda as threads HealthMonitor e Server. HealthMonitor é quem cuida do calculo do líder atual.
+                O cada servidor roda as threads HealthMonitor e Server. HealthMonitor de cada server é responsável pelo cálculo do líder atual.
+                <br>
+				As portas utilizadas por um servidor são: a porta descrita em servers.txt para clientes (ou a porta de multicast UDP) e a mesma porta + 1 para heartbeats.
                 <br>
                 O trabalho foi implementado em <strong>TCP</strong> e <strong>UDP com multicast</strong>. O servidor e cliente podem ser rodados em TCP ou UDP
                 utilizando os parametros de execução.
@@ -29,10 +32,10 @@
 
             <h4>Modo de uso:</h4>
             <p>
-                Atualizar servers.txt com a lista de servidores do grupo (name [port]) (veja a seção 'Arquivos')
+                Atualizar servers.txt com a lista de servidores do grupo (name [port]) (veja a seção 'Arquivos > servers.txt')
             </p>
                 <h6>Server</h6>
-            <p>python3 server.py [port|"UDP"]</p>
+					<p>python3 server.py [port|"UDP"]</p>
                 <h6>Client</h6>
                     <p>python3 client.py ["TCP"|"UDP"]</p>
             <p>
@@ -42,24 +45,24 @@
 
             <h5>Server</h5>
             <p>
-                O servidor fica a escuta de clientes e cria threads para servirem eles se o HealthMonitor informar que é lider.
-                <br>A partir do arquivo servers.txt o servidor descobre seu ID: o número da linha de sua própria entrada (um erro ocorre quando o servidor não se acha na lista).
+                O servidor fica a escuta de clientes e cria threads (Client) para servirem eles apenas se o HealthMonitor informar que é lider do grupo.
+                <br>A partir do arquivo servers.txt o servidor descobre seu ID: o número da linha de sua própria entrada (um erro ocorre quando o servidor não se acha na lista, veja a seção 'Arquivos > servers.txt').
+				<br>Clientes conversam utilizando a porta especificada em servers.txt.
             </p>
 
             <h6>ServerTCP</h6>
             <p>
-                A implementação TCP escuta e aceita conexões de clientes
+                A implementação TCP escuta e aceita conexões de clientes. Threads Client criadas tem implementação TCP.
             </p>
             <h6>ServerUDP</h6>
-                A implementação UDP escuta pacotes eviados por multicast contendo a expressão a ser avaliada.
-
+                A implementação UDP escuta pacotes eviados por multicast contendo a expressão a ser avaliada. Threads Client criadas tem implementação UDP.
             </p>
 
             <h5>HealthMonitor</h5>
             <p>
                 Aproxima o status da disponibilidade das outras remotas para o calculo do líder atual.
                 <br>É responsavel por mandar e escutar heartbeats.
-                <br>Heartbeats são mensagens enviadas periodicamente a outros servidores com o id do servidor origem, indicando que o servidor origem ainda está vivo. Heartbeats utilizam a porta do servidor destino +1.
+                <br>Heartbeats são mensagens enviadas periodicamente a outros servidores com o id do servidor origem, indicando que o servidor origem ainda está vivo. Heartbeats são enviados a porta do servidor destino +1, chamada porta de heartbeat.
                 <br>Ao pedido de um Server, HealthMonitor calcula o ID do líder atual utilizando as informações que tem das outras remotas, o servidor disponível de ID menor é o líder.
                 <h6>Constantes</h6>
                     <p><strong>Periodo do heartbeat</strong>: tempo em segundos entre um heartbeat e o próximo
@@ -150,8 +153,14 @@
             <h5>servers.txt</h5>
             <p>
                 Na raiz do projeto, deve conter a lista dos hosts que fazem parte do grupo de servidores.
-                <br>Cada linha da lista tem o nome do host e o número da porta de cada servidor (porta é opcional no caso de UDP).
-                <br>O nome localhost é proibido, deve-se utilizar o nome da máquina na rede local.
+                <br>Cada linha da lista tem o nome/endereço do host e o número da porta de cada servidor (porta é opcional no caso de UDP).
+                <br>O nome localhost é proibido, deve-se utilizar o nome da máquina na rede local, pois é através desse nome que o servidor acha seu próprio ID.
+				<br>O endereço de um host pode ser descoberto rodando python3 server.py sem argumentos. (ex output: Hostname: 10.254.224.37)
+				<br>Exemplo:
+					<br>10.254.224.36 14699
+					<br>10.254.224.37 14699
+					<br>10.254.224.38 14699
+
             </p>
 
             <h5>pyparsing.py e pyparsingtest.py</h5>
@@ -189,11 +198,11 @@
             <h5>server.py</h5>
             <p>
                 server.py é o arquivo que será responsável por rodar Server, HealthMonitor e criar threads para servir clientes. Em conjunto essas classes checam se os outros servidores estão funcionando, determinam quem é o líder, e, se for o caso, respondem requisições de clientes.
-                <br>Ele é iniciado com um parâmetro, porta, ou "UDP". No caso de UDP, como não se leva em consideração as portas em servers.txt, servidores em uma mesma máquina são clones.
+                <br>Ele é iniciado com um parâmetro, porta ou "UDP". No caso de UDP, como não se leva em consideração as portas em servers.txt, servidores em uma mesma máquina são clones.
             <p>
                 <strong>Uso</strong>:
                 <br>python3 server.py [porta|"UDP"]
-                <br>Onde porta é o número da porta (por exemplo, 14699). A porta precisa estar descrita em servers.txt ao lado do nome da máquina atual.
+                <br>Onde porta é o número da porta do servidor que o cliente utilizará (por exemplo, 14699). No caso de TCP a porta precisa estar descrita em servers.txt ao lado do nome da máquina atual.
 
             <h4>Conclusão:</h4>
             <p>
@@ -249,14 +258,14 @@
                 Arquivos principais:
                 <p>
                 <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">client.py.txt</button>
-                <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">server.py.txt</button>
-                <button type="button" class="btn btn-primary" onclick="window.location='client.py.txt';">remotes.py.txt</button>
+                <button type="button" class="btn btn-primary" onclick="window.location='server.py.txt';">server.py.txt</button>
+                <button type="button" class="btn btn-primary" onclick="window.location='remotes.py.txt';">remotes.py.txt</button>
 
             <p>
                 Abaixo os dois arquivos de bibliotecas que usamos. Eles não foram modificados.
                 <p>
                 <button type="button" class="btn btn-secondary" onclick="window.location='pyparsing.py.txt';">pyparsing.py.txt (biblioteca que usamos)</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location='parse.py.txt';">remotes.py.txt (biblioteca que usamos)</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location='parse.py.txt';">parse.py.txt (biblioteca que usamos)</button>
         </p>
         </p>
 
