@@ -66,19 +66,22 @@
                 <br>Ao pedido de um Server, HealthMonitor calcula o ID do líder atual utilizando as informações que tem das outras remotas, o servidor disponível de ID menor é o líder.
                 <h6>Constantes</h6>
                     <p><strong>Periodo do heartbeat</strong>: tempo em segundos entre um heartbeat e o próximo
-                    <br>4 seg
+                    <br>(4 seg)
                     <br>
                     <strong>Alpha</strong>: Multiplicador da nova sample de deviação = (PeriodoDoHeartbeat - (intervalo entre HB medido))
-                    <br>0.25, para pouco peso em spikes anômalos na conexão
+                    <br>(0.25, para pouco peso em spikes anômalos na conexão)
                     <br>
                     <strong>Multiplicador da deviação</strong>: utilizado no cálculo do timeout value de uma remota
-                    <br>4
-                <br>As informações que mantém de cada remota são: data do último heartbeat, deviação no periodo do heartbeat.
-                <br>Uma remota é considerada <strong>indisponível</strong> quando não escutamos seu heartbeat a mais tempo que seu timeout value
+                    <br>(4)
+                <br>As informações que HealthMonitor mantém de cada remota são:
+				<br>data do último heartbeat
+				<br>deviação no periodo do heartbeat
+				<br>
+                <br>Uma remota é considerada <strong>indisponível</strong> quando não escutamos seu heartbeat a mais tempo que seu timeout value, calculado de forma análoga ao TCP:
                 <br>
                 <p style="font-size: smaller"><strong>DeviaçãoDaRemota</strong> = (1-Alpha)*DeviaçãoDaRemota + Alpha*|PeriodoDoHeartbeat - (intervalo entre HBs medido)|
                 <br><strong>timeout value</strong> = PeriodoDoHeartbeat + CD*DeviaçãoDaRemota<p>
-                O timeout de uma aplicação padrão utilizaria RTT em vez de uma constante com o período, mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência entre heartbeats não deve mudar além de deviações pela utilização da internet.
+                O timeout do TCP utilizaria RTT em vez de uma constante com o período, mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência entre heartbeats não deve mudar além de deviações pela utilização da internet (Espera-se receber um heartbeat de um servidor cada 'PeriodoDoHeartbeat' segundos, não importa a sua distância).
                 <br>Análogo a ondas físicas, heartbeats funcionam como sinais que remotas mandam ao ambiente, nao importa a distância do receptor, a frequencia do sinal nao deve mudar a não ser que
                 estejam se movendo relativo um ao outro.
             </p>
