@@ -7,7 +7,7 @@ RECOMMENDED for first viewing as they are more clear, but they also ommit some d
 
 We simplified the hearbeat process as this: { heartbeat process }. It looks the same as the lines below:
 
-"""
+\\\
 { heartbeat process }
 
 [2018-06-07 04:00:52]:[HealthMonitor] Bind TCP 192.168.31.202:14697
@@ -33,14 +33,14 @@ We simplified the hearbeat process as this: { heartbeat process }. It looks the 
 [2018-06-07 04:00:56]:[Remote 2] Closing socket
 [2018-06-07 04:00:56]:[Remote 0] Closing socket
 [2018-06-07 04:00:56]:[Remote 3] Closing socket
-"""
+\\\
 If you have any questions, please check the full log for all the details that were hidden here.
 
 
 
 We simplified the client sending: { client sending process }. It looks the same as the lines below:
 
-"""
+\\\
 { client sending process }
 
 [2018-06-07 04:00:57]:[ClientTCP] Non-blocking connection in progress...
@@ -64,19 +64,19 @@ We simplified the client sending: { client sending process }. It looks the same 
 [2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14702)
 [2018-06-07 04:00:57]:[ClientTCP] Sending expression: 1+1
 [2018-06-07 04:00:57]:[ClientTCP] to server ('192.168.31.202', 14704)
-"""
+\\\
 
 
 
 We simplified client closing process as: {client closing}:
-"""
+\\\
 {client closing}
 
 [2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55509)>
 [2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55510), raddr=('192.168.31.202', 14696)>
 [2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=7, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55511), raddr=('192.168.31.202', 14702)>
 [2018-06-07 04:01:14]:[ClientTCP] Closing socket <socket.socket fd=8, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('192.168.31.202', 55512), raddr=('192.168.31.202', 14704)>
-"""
+\\\
 
 
 ///////
