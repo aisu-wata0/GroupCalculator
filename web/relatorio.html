@@ -10,7 +10,7 @@
     <section class="row flex-nowrap">
         <main class="col-8 col-md-9 col-xl-10 py-md-3 pl-md-5 pl-5 bd-content" role="main">
             <h1 class="bd-title" id="content">Calculadora remota altamente-disponível</h1>
-            <h3 id="content">Redes 2 - Trabalho</h3>
+            <h3>Redes 2 - Trabalho</h3>
             <p class="bd-lead">Bernardo Ferrari<br>Bruno Freitas Serbena</p>
             <p>
                 O trabalho de Redes 2 desse semestre consistiu na implementação de uma calculadora remota altamente-disponível, baseada em um grupo multicacast de N servidores.
@@ -45,7 +45,7 @@
 
             <h5>Server</h5>
             <p>
-                O servidor fica a escuta de clientes. Cria threads (Client) para servirem eles apenas se o HealthMonitor informar que é lider do grupo.
+                O servidor fica a escuta de clientes e cria threads (Client) para servirem eles apenas se o HealthMonitor informar que é lider do grupo.
                 <br>A partir do arquivo servers.txt o servidor descobre seu ID: o número da linha de sua própria entrada (um erro ocorre quando o servidor não se acha na lista, veja a seção 'Arquivos > servers.txt').
 				<br>Clientes conversam utilizando a porta especificada em servers.txt.
             </p>
@@ -81,7 +81,7 @@
                 <br>
                 <p style="font-size: smaller"><strong>DeviaçãoDaRemota</strong> = (1-Alpha)*DeviaçãoDaRemota + Alpha*|PeriodoDoHeartbeat - (intervalo entre HBs medido)|
                 <br><strong>timeout value</strong> = PeriodoDoHeartbeat + CD*DeviaçãoDaRemota<p>
-                O timeout do TCP utilizaria RTT em vez de uma constante como período, mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência entre heartbeats não deve mudar além de deviações pela utilização da internet (Espera-se receber um heartbeat de um servidor cada 'PeriodoDoHeartbeat' segundos, não importa a sua distância).
+                O timeout do TCP utilizaria RTT em vez de uma constante com o período, mas no caso de nossos servidores não importa a distância de uma remota a outra, a frequência entre heartbeats não deve mudar além de deviações pela utilização da internet (Espera-se receber um heartbeat de um servidor cada 'PeriodoDoHeartbeat' segundos, não importa a sua distância).
                 <br>Análogo a ondas físicas, heartbeats funcionam como sinais que remotas mandam ao ambiente, nao importa a distância do receptor, a frequencia do sinal nao deve mudar a não ser que
                 estejam se movendo relativo um ao outro.
             </p>
@@ -115,11 +115,7 @@
                 O cliente envia essa expressão para o grupo multicast.
                 <br>Enviado o cliente escuta pela resposta do servidor líder que retornará o resultado da conta.
             </p>
-            <h6>Exceções</h6>
-            <p>
-                Caso o grupo de servidores, por qualquer motivo, não retorne o resultado da operação (indisponível).
-                O cliente tem um timeout de 4 segundos e então mostrará uma mensagem de erro e pedir para o usuário proceder com outra operação matemática.
-            </p>
+
             <h5>Cálculo da expressão matemática</h5>
             <p>
                 Para efetuar o cálculo da expressão matemática e poder devolver o resultado esperado (ou erro, em caso de divisão por zero,
@@ -128,6 +124,21 @@
                 em uma operação matemática e a resolve. É uma forma muito mais segura e, em muitos casos, mais rápida, e mais customizável que o uso do tradicional Eval.
                 É possível, portanto, efetuar as operações de soma (+), subtração (-), divisião (/), multiplicação (*), exponenciação (^),
                 seno (sin), cosseno (cos), tangente (tan), módulo (abs), concatenação (trunc) e aproximação (round).
+            </p>
+            <h5>Exceções UDP</h5>
+            <p>
+                Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout (de 4 segundos, no cliente. O servidor
+                que faz o cálculo dinâmico), implementado no próprio <a href="https://docs.python.org/3/library/socket.html">socket</a>,
+                que fará o cliente mostrar uma mensagem de erro, fechar todas as conexões abertas e pedir para o usuário proceder com
+                outra operação matemática.
+                Caso tudo ocorra com sucesso, o select do cliente irá interpretar a mensagem recebida e irá imprimir o resultado.
+            </p>
+            <h5>Exceções TCP</h5>
+            <p>
+                Caso o servidor líder, por qualquer motivo, não retorne o resultado da operação, irá ocorrer o Timeout (de 4 segundos, no cliente. O servidor
+                que faz o cálculo dinâmico), implementado no próprio <a href="https://docs.python.org/3/library/select.html">select</a>, que fará o cliente mostrar uma mensagem de erro,
+                fechar todas as conexões abertas e pedir para o usuário proceder com outra operação matemática.
+                Caso tudo ocorra com sucesso, o cliente irá interpretar a mensagem recebida pelo multicast e irá imprimir o resultado.
             </p>
             <h5>Mensagens de erro:</h5>
                 Colocamos duas mensagens de erro:
@@ -205,6 +216,24 @@
                 <br>Para iniciar essa adição sepamos as classes que utilizavam TCP em uma versão abstrata sem o uso de sockets e uma concreta que conteria a implementação do TCP/UDP.
                 <br>O envio de expressões do Client e heartbeats por parte do HealthMonitor foram muito mais simples em multicast, tanto que uma classe inteira Heartbeater ficou obsoleta.
             </p>
+
+            <h4>Logs exemplo:</h4>
+            <p>
+            	Os logs vem em 2 versões, SLIM e FULL. Nas duas versões os logs dos servidores e cliente estão em um mesmo arquivo mesclado para facilitar análise.
+            	<br>Devido ao tamanho do log as ações dos servidores em resposta a um cliente estão juntas.
+            	<br><strong>SLIM é recomendada</strong> para primeira análise já que é mais clara, mas a versão <strong>omite</strong> alguns detalhes presentes na versão FULL, como criação de sockets em resposta, alguns Heartbeats, etc.
+                Segue os logs de algumas execuções em situações diferenciadas
+                <br>
+                <br><strong>Teste 1</strong>: UDP multicast com 4 servidores:
+                <br>1) Todos os sevidores vivos
+                <br>2) Cliente manda uma expressão e recebe resposta
+				<br>3) O servidor líder atual é desligado propositalmente
+				<br>4) Volta ao passo 2) até todos os servidores estiverem desligados
+				<br>(juntamente em 2, logo apos o primeiro lider ser desligado, propositalmente o cliente manda uma mensagem <strong>antes</strong> de outro servidor ter a chance de tomar liderança (logo não recebe resposta). Outros servidores não podem assumir que 0 está morto tão rapidamente, limitação do sistema de heartbeats implementado)
+				<br>5) Revive o servidor de maior ID
+                <br>6) Cliente manda uma expressão
+                <br>7) Volta ao passo 5) até todos os servidores estiverem vivos
+                </p>
 
             <h4>Logs exemplo:</h4>
             <p>
