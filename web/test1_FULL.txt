@@ -1,10 +1,9 @@
 
-///////
+
 This is the FULL version of the logs
 
 NOT RECOMMENDED for first viewing as they are more extensive, but they also include some details that are not present in the SLIM version.
 * more details are kept in this version and is thus harder to read, but useful for closer analysis *
-///////
 
 
 === SERVER #0
