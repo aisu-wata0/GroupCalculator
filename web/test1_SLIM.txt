@@ -78,9 +78,8 @@ result = 0.0
 * others will receive client's message but will promote 0 to leader *
 * grace_period is how much time the server has to send the next heartbeat *
 * before you assume it's dead (if it's negative, it's dead) *
-* timeoutInterval and the last heartbeat date are used to calculate it *
 * grace_period is high at first because the server just started *
-* and we take into account the deviation of each one to calculate it *
+* and we take into account the deviation from each one to calculate it *
 
 === SERVER #0
 [2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
@@ -98,7 +97,6 @@ KeyboardInterrupt
 === SERVER #1
 [2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
 [2018-06-05 14:15:22]:[HealthMonitor] leader calc
-[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
 [2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 8183ms
 [2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:22]:[ServerUDP] Waiting client...
@@ -106,7 +104,6 @@ KeyboardInterrupt
 === SERVER #2
 [2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
 [2018-06-05 14:15:22]:[HealthMonitor] leader calc
-[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
 [2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 9060ms
 [2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:22]:[ServerUDP] Waiting client...
@@ -114,7 +111,6 @@ KeyboardInterrupt
 === SERVER #3
 [2018-06-05 14:15:22]:[ServerUDP] Received from 10.254.224.38:37295
 [2018-06-05 14:15:22]:[HealthMonitor] leader calc
-[2018-06-05 14:15:22]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
 [2018-06-05 14:15:22]:[HealthMonitor] 0 grace_period = 7766ms
 [2018-06-05 14:15:22]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:22]:[ServerUDP] Waiting client...
@@ -136,7 +132,6 @@ No response
 === SERVER #1
 [2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
 [2018-06-05 14:15:25]:[HealthMonitor] leader calc
-[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
 [2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4799ms
 [2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:25]:[ServerUDP] Waiting client...
@@ -144,7 +139,6 @@ No response
 === SERVER #2
 [2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
 [2018-06-05 14:15:25]:[HealthMonitor] leader calc
-[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
 [2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 5676ms
 [2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:25]:[ServerUDP] Waiting client...
@@ -152,7 +146,6 @@ No response
 === SERVER #3
 [2018-06-05 14:15:25]:[ServerUDP] Received from 10.254.224.38:34709
 [2018-06-05 14:15:25]:[HealthMonitor] leader calc
-[2018-06-05 14:15:25]:[HealthMonitor] Remote 0 timeoutInterval = 8966ms
 [2018-06-05 14:15:25]:[HealthMonitor] 0 grace_period = 4989ms
 [2018-06-05 14:15:25]:[HealthMonitor] Leader is 0
 [2018-06-05 14:15:25]:[ServerUDP] Waiting client...
@@ -170,7 +163,6 @@ result = 1.0
 === SERVER #1
 [2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
 [2018-06-05 14:15:32]:[HealthMonitor] leader calc
-[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 8328ms
 [2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2137ms
 [2018-06-05 14:15:32]:[HealthMonitor] Leader is 1, me
 [2018-06-05 14:15:32]:[Client    ('10.254.224.38', 50132)] Calculating expression: 1
@@ -185,9 +177,7 @@ KeyboardInterrupt
 === SERVER #2
 [2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
 [2018-06-05 14:15:32]:[HealthMonitor] leader calc
-[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
 [2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -1259ms
-[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 7528ms
 [2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 4937ms
 [2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
 [2018-06-05 14:15:32]:[ServerUDP] Waiting client...
@@ -195,9 +185,7 @@ KeyboardInterrupt
 === SERVER #3
 [2018-06-05 14:15:32]:[ServerUDP] Received from 10.254.224.38:50132
 [2018-06-05 14:15:32]:[HealthMonitor] leader calc
-[2018-06-05 14:15:32]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
 [2018-06-05 14:15:32]:[HealthMonitor] 0 grace_period = -2554ms
-[2018-06-05 14:15:32]:[HealthMonitor] Remote 1 timeoutInterval = 5851ms
 [2018-06-05 14:15:32]:[HealthMonitor] 1 grace_period = 3582ms
 [2018-06-05 14:15:32]:[HealthMonitor] Leader is 1
 [2018-06-05 14:15:32]:[ServerUDP] Waiting client...
@@ -214,9 +202,7 @@ result = 2.0
 === SERVER #2
 [2018-06-05 14:15:43]:[ServerUDP] Received from 10.254.224.38:57178
 [2018-06-05 14:15:43]:[HealthMonitor] leader calc
-[2018-06-05 14:15:43]:[HealthMonitor] Remote 0 timeoutInterval = 9266ms
 [2018-06-05 14:15:43]:[HealthMonitor] 0 grace_period = -11411ms
-[2018-06-05 14:15:43]:[HealthMonitor] Remote 1 timeoutInterval = 6647ms
 [2018-06-05 14:15:43]:[HealthMonitor] 1 grace_period = -2976ms
 [2018-06-05 14:15:43]:[HealthMonitor] Leader is 2, me
 [2018-06-05 14:15:43]:[Client    ('10.254.224.38', 57178)] Calculating expression: 2
@@ -230,11 +216,8 @@ KeyboardInterrupt
 === SERVER #3
 [2018-06-05 14:15:48]:[ServerUDP] Received from 10.254.224.38:37031
 [2018-06-05 14:15:48]:[HealthMonitor] leader calc
-[2018-06-05 14:15:48]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
 [2018-06-05 14:15:48]:[HealthMonitor] 0 grace_period = -18682ms
-[2018-06-05 14:15:48]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
 [2018-06-05 14:15:48]:[HealthMonitor] 1 grace_period = -9468ms
-[2018-06-05 14:15:48]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
 [2018-06-05 14:15:48]:[HealthMonitor] 2 grace_period = 1022ms
 [2018-06-05 14:15:48]:[HealthMonitor] Leader is 2
 [2018-06-05 14:15:48]:[ServerUDP] Waiting client...
@@ -251,11 +234,8 @@ result = 3.0
 === SERVER #3
 [2018-06-05 14:15:54]:[ServerUDP] Received from 10.254.224.38:42197
 [2018-06-05 14:15:54]:[HealthMonitor] leader calc
-[2018-06-05 14:15:54]:[HealthMonitor] Remote 0 timeoutInterval = 7619ms
 [2018-06-05 14:15:54]:[HealthMonitor] 0 grace_period = -25162ms
-[2018-06-05 14:15:54]:[HealthMonitor] Remote 1 timeoutInterval = 5389ms
 [2018-06-05 14:15:54]:[HealthMonitor] 1 grace_period = -15949ms
-[2018-06-05 14:15:54]:[HealthMonitor] Remote 2 timeoutInterval = 4600ms
 [2018-06-05 14:15:54]:[HealthMonitor] 2 grace_period = -4457ms
 [2018-06-05 14:15:54]:[HealthMonitor] Leader is 3, me
 [2018-06-05 14:15:54]:[Client    ('10.254.224.38', 42197)] Calculating expression: 3
@@ -291,11 +271,8 @@ result = 3.0
 === SERVER #3
 [2018-06-05 14:16:08]:[ServerUDP] Received from 10.254.224.38:33399
 [2018-06-05 14:16:08]:[HealthMonitor] leader calc
-[2018-06-05 14:16:08]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:08]:[HealthMonitor] 0 grace_period = -4168ms
-[2018-06-05 14:16:08]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
 [2018-06-05 14:16:08]:[HealthMonitor] 1 grace_period = -4168ms
-[2018-06-05 14:16:08]:[HealthMonitor] Remote 2 timeoutInterval = 4000ms
 [2018-06-05 14:16:08]:[HealthMonitor] 2 grace_period = -4168ms
 [2018-06-05 14:16:08]:[HealthMonitor] Leader is 3, me
 [2018-06-05 14:16:08]:[Client    ('10.254.224.38', 33399)] Calculating expression: 3
@@ -338,9 +315,7 @@ result = 2.0
 === SERVER #2
 [2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
 [2018-06-05 14:16:22]:[HealthMonitor] leader calc
-[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -7340ms
-[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
 [2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -7339ms
 [2018-06-05 14:16:22]:[HealthMonitor] Leader is 2, me
 [2018-06-05 14:16:22]:[Client    ('10.254.224.38', 37464)] Calculating expression: 2
@@ -354,11 +329,8 @@ From ('10.254.224.38', 37464) received: 2; result = 2.0
 [2018-06-05 14:16:20]:[HealthMonitorUDP] Sending heartbeat multicast: 3
 [2018-06-05 14:16:22]:[ServerUDP] Received from 10.254.224.38:37464
 [2018-06-05 14:16:22]:[HealthMonitor] leader calc
-[2018-06-05 14:16:22]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:22]:[HealthMonitor] 0 grace_period = -17561ms
-[2018-06-05 14:16:22]:[HealthMonitor] Remote 1 timeoutInterval = 4000ms
 [2018-06-05 14:16:22]:[HealthMonitor] 1 grace_period = -17561ms
-[2018-06-05 14:16:22]:[HealthMonitor] Remote 2 timeoutInterval = 19223ms
 [2018-06-05 14:16:22]:[HealthMonitor] 2 grace_period = 16108ms
 [2018-06-05 14:16:22]:[HealthMonitor] Leader is 2
 [2018-06-05 14:16:22]:[ServerUDP] Waiting client...
@@ -396,7 +368,6 @@ result = 1.0
 === SERVER #1
 [2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
 [2018-06-05 14:16:32]:[HealthMonitor] leader calc
-[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -5568ms
 [2018-06-05 14:16:32]:[HealthMonitor] Leader is 1, me
 [2018-06-05 14:16:32]:[Client    ('10.254.224.38', 58764)] Calculating expression: 1
@@ -412,9 +383,7 @@ From ('10.254.224.38', 58764) received: 1; result = 1.0
 [2018-06-05 14:16:30]:[HealthMonitorUDP] Sending heartbeat multicast: 2
 [2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
 [2018-06-05 14:16:32]:[HealthMonitor] leader calc
-[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -16779ms
-[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 19213ms
 [2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 17860ms
 [2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
 [2018-06-05 14:16:32]:[ServerUDP] Waiting client...
@@ -426,9 +395,7 @@ From ('10.254.224.38', 58764) received: 1; result = 1.0
 [2018-06-05 14:16:30]:[Remote 2] Heartbeat, delta = 4001ms; dev = 1606
 [2018-06-05 14:16:32]:[ServerUDP] Received from 10.254.224.38:58764
 [2018-06-05 14:16:32]:[HealthMonitor] leader calc
-[2018-06-05 14:16:32]:[HealthMonitor] Remote 0 timeoutInterval = 4000ms
 [2018-06-05 14:16:32]:[HealthMonitor] 0 grace_period = -27000ms
-[2018-06-05 14:16:32]:[HealthMonitor] Remote 1 timeoutInterval = 30434ms
 [2018-06-05 14:16:32]:[HealthMonitor] 1 grace_period = 28301ms
 [2018-06-05 14:16:32]:[HealthMonitor] Leader is 1
 [2018-06-05 14:16:32]:[ServerUDP] Waiting client...
@@ -481,7 +448,6 @@ From ('10.254.224.38', 35519) received: 0; result = 0.0
 [2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 142
 [2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
 [2018-06-05 14:16:43]:[HealthMonitor] leader calc
-[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 19123ms
 [2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 16281ms
 [2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
 [2018-06-05 14:16:43]:[ServerUDP] Waiting client...
@@ -494,7 +460,6 @@ From ('10.254.224.38', 35519) received: 0; result = 0.0
 [2018-06-05 14:16:42]:[HealthMonitorUDP] Sending heartbeat multicast: 2
 [2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
 [2018-06-05 14:16:43]:[HealthMonitor] leader calc
-[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 30335ms
 [2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 27705ms
 [2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
 [2018-06-05 14:16:43]:[ServerUDP] Waiting client...
@@ -508,7 +473,6 @@ From ('10.254.224.38', 35519) received: 0; result = 0.0
 [2018-06-05 14:16:42]:[Remote 2] Heartbeat, delta = 4001ms; dev = 678
 [2018-06-05 14:16:43]:[ServerUDP] Received from 10.254.224.38:35519
 [2018-06-05 14:16:43]:[HealthMonitor] leader calc
-[2018-06-05 14:16:43]:[HealthMonitor] Remote 0 timeoutInterval = 41555ms
 [2018-06-05 14:16:43]:[HealthMonitor] 0 grace_period = 39144ms
 [2018-06-05 14:16:43]:[HealthMonitor] Leader is 0
 [2018-06-05 14:16:43]:[ServerUDP] Waiting client...
